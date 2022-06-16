@@ -2,7 +2,6 @@ import json
 import sys
 import os
 
-
 VERBOSE = False
 
 all_spans = dict()
@@ -178,8 +177,8 @@ def ProcessTraceData(data):
     return 0
 
 
-outdir = sys.argv[1]
-traces = GetAllTracesInDir(outdir)
+traces_dir = sys.argv[1]
+traces = GetAllTracesInDir(traces_dir)
 traces.sort()
 cnt = 0
 for trace in traces:
@@ -218,16 +217,14 @@ for process in outgoing_spans_by_process.keys():
 
     def PrintDict(d):
         for k, v in d.items():
-            print(" ", k)
-            #print("  ", k, v)
+            print("  ", k, v)
 
+    # partition spans by subservice at the other end
     incoming_span_partitions = PartitionSpansByEndPoint(incoming_spans, lambda x: x.GetParentProcess())
-    print("Incoming span partitions", process)
-    PrintDict(incoming_span_partitions)
+    print("Incoming span partitions", process, incoming_span_partitions.keys())
     print("\n")
     outgoing_span_partitions = PartitionSpansByEndPoint(outgoing_spans, lambda x: x.GetChildProcess())
-    print("Outgoing span partitions", process)
-    PrintDict(outgoing_span_partitions)
+    print("Outgoing span partitions", process, outgoing_span_partitions.keys())
     print("\n\n")
 
     def ComputeAccuracy(trace_id_seq1, trace_id_seq2):
@@ -237,23 +234,20 @@ for process in outgoing_spans_by_process.keys():
             cnt += int((trace_id_seq1[i] == trace_id_seq2[i]))
         return cnt/float(len(trace_id_seq1))
 
-    def FCFS():
-        # for this trace
+    # decide a trace id sequence for an outgoing list of spans (to a particular subservice)
+    def FCFS(subservice):
+        # fcfs doesn't use any info about the subservice
         assert len(incoming_span_partitions) == 1
         ep = list(incoming_span_partitions.keys())[0]
         trace_id_seq = [s.trace_id for s in incoming_span_partitions[ep]]
         return trace_id_seq
 
-   def FCFS_Timing():
-
+    def FCFC_timing(subservice):
+        pass
+    
+    # iterate over each subservice
     for ep, part in outgoing_span_partitions.items():
         trace_id_seq = [s.trace_id for s in part]
-        trace_id_seq_pred = FCFS()
+        trace_id_seq_pred = FCFS(ep)
         accuracy = ComputeAccuracy(trace_id_seq, trace_id_seq_pred)
         print("Accuracy", accuracy)
-
-
-
-
-
-
