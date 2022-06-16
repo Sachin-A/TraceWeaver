@@ -1,0 +1,270 @@
+{
+    "data": [
+        {
+            "traceID": "1f244416d5d5e69a",
+            "spans": [
+                {
+                    "traceID": "1f244416d5d5e69a",
+                    "spanID": "18e7291d9d80bf38",
+                    "flags": 1,
+                    "operationName": "/recommendation.Recommendation/GetRecommendations",
+                    "references": [
+                        {
+                            "refType": "CHILD_OF",
+                            "traceID": "1f244416d5d5e69a",
+                            "spanID": "583e1b5a4502a19b"
+                        }
+                    ],
+                    "startTime": 1655312390018373,
+                    "duration": 156,
+                    "tags": [
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "server"
+                        },
+                        {
+                            "key": "component",
+                            "type": "string",
+                            "value": "gRPC"
+                        },
+                        {
+                            "key": "internal.span.format",
+                            "type": "string",
+                            "value": "proto"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p1",
+                    "warnings": null
+                },
+                {
+                    "traceID": "1f244416d5d5e69a",
+                    "spanID": "583e1b5a4502a19b",
+                    "flags": 1,
+                    "operationName": "/recommendation.Recommendation/GetRecommendations",
+                    "references": [
+                        {
+                            "refType": "CHILD_OF",
+                            "traceID": "1f244416d5d5e69a",
+                            "spanID": "1f244416d5d5e69a"
+                        }
+                    ],
+                    "startTime": 1655312390017448,
+                    "duration": 3392,
+                    "tags": [
+                        {
+                            "key": "component",
+                            "type": "string",
+                            "value": "gRPC"
+                        },
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "client"
+                        },
+                        {
+                            "key": "internal.span.format",
+                            "type": "string",
+                            "value": "proto"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p2",
+                    "warnings": null
+                },
+                {
+                    "traceID": "1f244416d5d5e69a",
+                    "spanID": "6dfb2dd34b6e34e6",
+                    "flags": 1,
+                    "operationName": "/profile.Profile/GetProfiles",
+                    "references": [
+                        {
+                            "refType": "CHILD_OF",
+                            "traceID": "1f244416d5d5e69a",
+                            "spanID": "1f244416d5d5e69a"
+                        }
+                    ],
+                    "startTime": 1655312390020851,
+                    "duration": 12667,
+                    "tags": [
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "client"
+                        },
+                        {
+                            "key": "component",
+                            "type": "string",
+                            "value": "gRPC"
+                        },
+                        {
+                            "key": "internal.span.format",
+                            "type": "string",
+                            "value": "proto"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p2",
+                    "warnings": null
+                },
+                {
+                    "traceID": "1f244416d5d5e69a",
+                    "spanID": "1f244416d5d5e69a",
+                    "flags": 1,
+                    "operationName": "HTTP GET /recommendations",
+                    "references": [],
+                    "startTime": 1655312390017429,
+                    "duration": 16196,
+                    "tags": [
+                        {
+                            "key": "sampler.type",
+                            "type": "string",
+                            "value": "probabilistic"
+                        },
+                        {
+                            "key": "sampler.param",
+                            "type": "float64",
+                            "value": 0.3
+                        },
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "server"
+                        },
+                        {
+                            "key": "http.method",
+                            "type": "string",
+                            "value": "GET"
+                        },
+                        {
+                            "key": "http.url",
+                            "type": "string",
+                            "value": "/recommendations?require=rate\u0026lat=38.133\u0026lon=-122.055"
+                        },
+                        {
+                            "key": "component",
+                            "type": "string",
+                            "value": "net/http"
+                        },
+                        {
+                            "key": "http.status_code",
+                            "type": "int64",
+                            "value": 200
+                        },
+                        {
+                            "key": "internal.span.format",
+                            "type": "string",
+                            "value": "proto"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p2",
+                    "warnings": null
+                },
+                {
+                    "traceID": "1f244416d5d5e69a",
+                    "spanID": "4c3255e5752dbbe9",
+                    "flags": 1,
+                    "operationName": "/profile.Profile/GetProfiles",
+                    "references": [
+                        {
+                            "refType": "CHILD_OF",
+                            "traceID": "1f244416d5d5e69a",
+                            "spanID": "6dfb2dd34b6e34e6"
+                        }
+                    ],
+                    "startTime": 1655312390021861,
+                    "duration": 10353,
+                    "tags": [
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "server"
+                        },
+                        {
+                            "key": "component",
+                            "type": "string",
+                            "value": "gRPC"
+                        },
+                        {
+                            "key": "internal.span.format",
+                            "type": "string",
+                            "value": "proto"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p3",
+                    "warnings": null
+                }
+            ],
+            "processes": {
+                "p1": {
+                    "serviceName": "recommendation",
+                    "tags": [
+                        {
+                            "key": "hostname",
+                            "type": "string",
+                            "value": "recommendation-65f6cbc7b9-xmfdn"
+                        },
+                        {
+                            "key": "ip",
+                            "type": "string",
+                            "value": "10.0.1.40"
+                        },
+                        {
+                            "key": "jaeger.version",
+                            "type": "string",
+                            "value": "Go-2.11.2"
+                        }
+                    ]
+                },
+                "p2": {
+                    "serviceName": "frontend",
+                    "tags": [
+                        {
+                            "key": "hostname",
+                            "type": "string",
+                            "value": "frontend-55fcd587c6-l6ffw"
+                        },
+                        {
+                            "key": "ip",
+                            "type": "string",
+                            "value": "10.0.1.169"
+                        },
+                        {
+                            "key": "jaeger.version",
+                            "type": "string",
+                            "value": "Go-2.11.2"
+                        }
+                    ]
+                },
+                "p3": {
+                    "serviceName": "profile",
+                    "tags": [
+                        {
+                            "key": "hostname",
+                            "type": "string",
+                            "value": "profile-74f596f9f7-qpsng"
+                        },
+                        {
+                            "key": "ip",
+                            "type": "string",
+                            "value": "10.0.2.101"
+                        },
+                        {
+                            "key": "jaeger.version",
+                            "type": "string",
+                            "value": "Go-2.11.2"
+                        }
+                    ]
+                }
+            },
+            "warnings": null
+        }
+    ],
+    "total": 0,
+    "limit": 0,
+    "offset": 0,
+    "errors": null
+}

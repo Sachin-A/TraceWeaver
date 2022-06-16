@@ -1,0 +1,540 @@
+{
+    "data": [
+        {
+            "traceID": "13baeb02949579bb",
+            "spans": [
+                {
+                    "traceID": "13baeb02949579bb",
+                    "spanID": "6857ae08817002d0",
+                    "flags": 1,
+                    "operationName": "/geo.Geo/Nearby",
+                    "references": [
+                        {
+                            "refType": "CHILD_OF",
+                            "traceID": "13baeb02949579bb",
+                            "spanID": "171925f382194eb9"
+                        }
+                    ],
+                    "startTime": 1655312378973052,
+                    "duration": 352,
+                    "tags": [
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "server"
+                        },
+                        {
+                            "key": "component",
+                            "type": "string",
+                            "value": "gRPC"
+                        },
+                        {
+                            "key": "internal.span.format",
+                            "type": "string",
+                            "value": "proto"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p1",
+                    "warnings": null
+                },
+                {
+                    "traceID": "13baeb02949579bb",
+                    "spanID": "00748596f3dd64b6",
+                    "flags": 1,
+                    "operationName": "/search.Search/Nearby",
+                    "references": [
+                        {
+                            "refType": "CHILD_OF",
+                            "traceID": "13baeb02949579bb",
+                            "spanID": "13baeb02949579bb"
+                        }
+                    ],
+                    "startTime": 1655312378968461,
+                    "duration": 10434,
+                    "tags": [
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "client"
+                        },
+                        {
+                            "key": "component",
+                            "type": "string",
+                            "value": "gRPC"
+                        },
+                        {
+                            "key": "internal.span.format",
+                            "type": "string",
+                            "value": "proto"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p2",
+                    "warnings": null
+                },
+                {
+                    "traceID": "13baeb02949579bb",
+                    "spanID": "6d6a440fb45003e5",
+                    "flags": 1,
+                    "operationName": "/reservation.Reservation/CheckAvailability",
+                    "references": [
+                        {
+                            "refType": "CHILD_OF",
+                            "traceID": "13baeb02949579bb",
+                            "spanID": "13baeb02949579bb"
+                        }
+                    ],
+                    "startTime": 1655312378979022,
+                    "duration": 5397,
+                    "tags": [
+                        {
+                            "key": "component",
+                            "type": "string",
+                            "value": "gRPC"
+                        },
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "client"
+                        },
+                        {
+                            "key": "internal.span.format",
+                            "type": "string",
+                            "value": "proto"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p2",
+                    "warnings": null
+                },
+                {
+                    "traceID": "13baeb02949579bb",
+                    "spanID": "553dba500623da83",
+                    "flags": 1,
+                    "operationName": "/profile.Profile/GetProfiles",
+                    "references": [
+                        {
+                            "refType": "CHILD_OF",
+                            "traceID": "13baeb02949579bb",
+                            "spanID": "13baeb02949579bb"
+                        }
+                    ],
+                    "startTime": 1655312378986235,
+                    "duration": 2632,
+                    "tags": [
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "client"
+                        },
+                        {
+                            "key": "component",
+                            "type": "string",
+                            "value": "gRPC"
+                        },
+                        {
+                            "key": "internal.span.format",
+                            "type": "string",
+                            "value": "proto"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p2",
+                    "warnings": null
+                },
+                {
+                    "traceID": "13baeb02949579bb",
+                    "spanID": "13baeb02949579bb",
+                    "flags": 1,
+                    "operationName": "HTTP GET /hotels",
+                    "references": [],
+                    "startTime": 1655312378968134,
+                    "duration": 20853,
+                    "tags": [
+                        {
+                            "key": "sampler.type",
+                            "type": "string",
+                            "value": "probabilistic"
+                        },
+                        {
+                            "key": "sampler.param",
+                            "type": "float64",
+                            "value": 0.3
+                        },
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "server"
+                        },
+                        {
+                            "key": "http.method",
+                            "type": "string",
+                            "value": "GET"
+                        },
+                        {
+                            "key": "http.url",
+                            "type": "string",
+                            "value": "/hotels?inDate=2015-04-14\u0026outDate=2015-04-22\u0026lat=38.242\u0026lon=-122.004"
+                        },
+                        {
+                            "key": "component",
+                            "type": "string",
+                            "value": "net/http"
+                        },
+                        {
+                            "key": "http.status_code",
+                            "type": "int64",
+                            "value": 200
+                        },
+                        {
+                            "key": "internal.span.format",
+                            "type": "string",
+                            "value": "proto"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p2",
+                    "warnings": null
+                },
+                {
+                    "traceID": "13baeb02949579bb",
+                    "spanID": "15f9e2c52d24dc70",
+                    "flags": 1,
+                    "operationName": "/profile.Profile/GetProfiles",
+                    "references": [
+                        {
+                            "refType": "CHILD_OF",
+                            "traceID": "13baeb02949579bb",
+                            "spanID": "553dba500623da83"
+                        }
+                    ],
+                    "startTime": 1655312378987356,
+                    "duration": 193,
+                    "tags": [
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "server"
+                        },
+                        {
+                            "key": "component",
+                            "type": "string",
+                            "value": "gRPC"
+                        },
+                        {
+                            "key": "internal.span.format",
+                            "type": "string",
+                            "value": "proto"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p3",
+                    "warnings": null
+                },
+                {
+                    "traceID": "13baeb02949579bb",
+                    "spanID": "74bc64fec4ec6fb9",
+                    "flags": 1,
+                    "operationName": "/reservation.Reservation/CheckAvailability",
+                    "references": [
+                        {
+                            "refType": "CHILD_OF",
+                            "traceID": "13baeb02949579bb",
+                            "spanID": "6d6a440fb45003e5"
+                        }
+                    ],
+                    "startTime": 1655312378980368,
+                    "duration": 14,
+                    "tags": [
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "server"
+                        },
+                        {
+                            "key": "component",
+                            "type": "string",
+                            "value": "gRPC"
+                        },
+                        {
+                            "key": "internal.span.format",
+                            "type": "string",
+                            "value": "proto"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p4",
+                    "warnings": null
+                },
+                {
+                    "traceID": "13baeb02949579bb",
+                    "spanID": "7ba015ad5e08d14e",
+                    "flags": 1,
+                    "operationName": "/rate.Rate/GetRates",
+                    "references": [
+                        {
+                            "refType": "CHILD_OF",
+                            "traceID": "13baeb02949579bb",
+                            "spanID": "469dbe7713e2131f"
+                        }
+                    ],
+                    "startTime": 1655312378975132,
+                    "duration": 8,
+                    "tags": [
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "server"
+                        },
+                        {
+                            "key": "component",
+                            "type": "string",
+                            "value": "gRPC"
+                        },
+                        {
+                            "key": "internal.span.format",
+                            "type": "string",
+                            "value": "proto"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p5",
+                    "warnings": null
+                },
+                {
+                    "traceID": "13baeb02949579bb",
+                    "spanID": "171925f382194eb9",
+                    "flags": 1,
+                    "operationName": "/geo.Geo/Nearby",
+                    "references": [
+                        {
+                            "refType": "CHILD_OF",
+                            "traceID": "13baeb02949579bb",
+                            "spanID": "72820133e7b1b64f"
+                        }
+                    ],
+                    "startTime": 1655312378970187,
+                    "duration": 4263,
+                    "tags": [
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "client"
+                        },
+                        {
+                            "key": "component",
+                            "type": "string",
+                            "value": "gRPC"
+                        },
+                        {
+                            "key": "internal.span.format",
+                            "type": "string",
+                            "value": "proto"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p6",
+                    "warnings": null
+                },
+                {
+                    "traceID": "13baeb02949579bb",
+                    "spanID": "469dbe7713e2131f",
+                    "flags": 1,
+                    "operationName": "/rate.Rate/GetRates",
+                    "references": [
+                        {
+                            "refType": "CHILD_OF",
+                            "traceID": "13baeb02949579bb",
+                            "spanID": "72820133e7b1b64f"
+                        }
+                    ],
+                    "startTime": 1655312378974459,
+                    "duration": 3257,
+                    "tags": [
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "client"
+                        },
+                        {
+                            "key": "component",
+                            "type": "string",
+                            "value": "gRPC"
+                        },
+                        {
+                            "key": "internal.span.format",
+                            "type": "string",
+                            "value": "proto"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p6",
+                    "warnings": null
+                },
+                {
+                    "traceID": "13baeb02949579bb",
+                    "spanID": "72820133e7b1b64f",
+                    "flags": 1,
+                    "operationName": "/search.Search/Nearby",
+                    "references": [
+                        {
+                            "refType": "CHILD_OF",
+                            "traceID": "13baeb02949579bb",
+                            "spanID": "00748596f3dd64b6"
+                        }
+                    ],
+                    "startTime": 1655312378970007,
+                    "duration": 7713,
+                    "tags": [
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "server"
+                        },
+                        {
+                            "key": "component",
+                            "type": "string",
+                            "value": "gRPC"
+                        },
+                        {
+                            "key": "internal.span.format",
+                            "type": "string",
+                            "value": "proto"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p6",
+                    "warnings": null
+                }
+            ],
+            "processes": {
+                "p1": {
+                    "serviceName": "geo",
+                    "tags": [
+                        {
+                            "key": "hostname",
+                            "type": "string",
+                            "value": "geo-6947b7cc99-xvthb"
+                        },
+                        {
+                            "key": "ip",
+                            "type": "string",
+                            "value": "10.0.1.167"
+                        },
+                        {
+                            "key": "jaeger.version",
+                            "type": "string",
+                            "value": "Go-2.11.2"
+                        }
+                    ]
+                },
+                "p2": {
+                    "serviceName": "frontend",
+                    "tags": [
+                        {
+                            "key": "hostname",
+                            "type": "string",
+                            "value": "frontend-55fcd587c6-l6ffw"
+                        },
+                        {
+                            "key": "ip",
+                            "type": "string",
+                            "value": "10.0.1.169"
+                        },
+                        {
+                            "key": "jaeger.version",
+                            "type": "string",
+                            "value": "Go-2.11.2"
+                        }
+                    ]
+                },
+                "p3": {
+                    "serviceName": "profile",
+                    "tags": [
+                        {
+                            "key": "hostname",
+                            "type": "string",
+                            "value": "profile-74f596f9f7-qpsng"
+                        },
+                        {
+                            "key": "ip",
+                            "type": "string",
+                            "value": "10.0.2.101"
+                        },
+                        {
+                            "key": "jaeger.version",
+                            "type": "string",
+                            "value": "Go-2.11.2"
+                        }
+                    ]
+                },
+                "p4": {
+                    "serviceName": "reservation",
+                    "tags": [
+                        {
+                            "key": "hostname",
+                            "type": "string",
+                            "value": "reservation-65878f6654-7w6nb"
+                        },
+                        {
+                            "key": "ip",
+                            "type": "string",
+                            "value": "10.0.1.76"
+                        },
+                        {
+                            "key": "jaeger.version",
+                            "type": "string",
+                            "value": "Go-2.11.2"
+                        }
+                    ]
+                },
+                "p5": {
+                    "serviceName": "rate",
+                    "tags": [
+                        {
+                            "key": "hostname",
+                            "type": "string",
+                            "value": "rate-75f4b764bf-hqzcl"
+                        },
+                        {
+                            "key": "ip",
+                            "type": "string",
+                            "value": "10.0.1.226"
+                        },
+                        {
+                            "key": "jaeger.version",
+                            "type": "string",
+                            "value": "Go-2.11.2"
+                        }
+                    ]
+                },
+                "p6": {
+                    "serviceName": "search",
+                    "tags": [
+                        {
+                            "key": "hostname",
+                            "type": "string",
+                            "value": "search-786c88dd85-lv95x"
+                        },
+                        {
+                            "key": "ip",
+                            "type": "string",
+                            "value": "10.0.1.105"
+                        },
+                        {
+                            "key": "jaeger.version",
+                            "type": "string",
+                            "value": "Go-2.11.2"
+                        }
+                    ]
+                }
+            },
+            "warnings": null
+        }
+    ],
+    "total": 0,
+    "limit": 0,
+    "offset": 0,
+    "errors": null
+}

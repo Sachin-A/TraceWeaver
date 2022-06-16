@@ -1,0 +1,180 @@
+{
+    "data": [
+        {
+            "traceID": "14fa695fd28a0502",
+            "spans": [
+                {
+                    "traceID": "14fa695fd28a0502",
+                    "spanID": "2eb7140bac4d359b",
+                    "flags": 1,
+                    "operationName": "/user.User/CheckUser",
+                    "references": [
+                        {
+                            "refType": "CHILD_OF",
+                            "traceID": "14fa695fd28a0502",
+                            "spanID": "0dab1e2e69b25876"
+                        }
+                    ],
+                    "startTime": 1655312397041416,
+                    "duration": 487,
+                    "tags": [
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "server"
+                        },
+                        {
+                            "key": "component",
+                            "type": "string",
+                            "value": "gRPC"
+                        },
+                        {
+                            "key": "internal.span.format",
+                            "type": "string",
+                            "value": "proto"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p1",
+                    "warnings": null
+                },
+                {
+                    "traceID": "14fa695fd28a0502",
+                    "spanID": "0dab1e2e69b25876",
+                    "flags": 1,
+                    "operationName": "/user.User/CheckUser",
+                    "references": [
+                        {
+                            "refType": "CHILD_OF",
+                            "traceID": "14fa695fd28a0502",
+                            "spanID": "14fa695fd28a0502"
+                        }
+                    ],
+                    "startTime": 1655312397039577,
+                    "duration": 6622,
+                    "tags": [
+                        {
+                            "key": "component",
+                            "type": "string",
+                            "value": "gRPC"
+                        },
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "client"
+                        },
+                        {
+                            "key": "internal.span.format",
+                            "type": "string",
+                            "value": "proto"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p2",
+                    "warnings": null
+                },
+                {
+                    "traceID": "14fa695fd28a0502",
+                    "spanID": "14fa695fd28a0502",
+                    "flags": 1,
+                    "operationName": "HTTP GET /user",
+                    "references": [],
+                    "startTime": 1655312397039553,
+                    "duration": 6675,
+                    "tags": [
+                        {
+                            "key": "sampler.type",
+                            "type": "string",
+                            "value": "probabilistic"
+                        },
+                        {
+                            "key": "sampler.param",
+                            "type": "float64",
+                            "value": 0.3
+                        },
+                        {
+                            "key": "span.kind",
+                            "type": "string",
+                            "value": "server"
+                        },
+                        {
+                            "key": "http.method",
+                            "type": "string",
+                            "value": "GET"
+                        },
+                        {
+                            "key": "http.url",
+                            "type": "string",
+                            "value": "/user?username=Cornell_496\u0026password=496496496496496496496496496496"
+                        },
+                        {
+                            "key": "component",
+                            "type": "string",
+                            "value": "net/http"
+                        },
+                        {
+                            "key": "http.status_code",
+                            "type": "int64",
+                            "value": 200
+                        },
+                        {
+                            "key": "internal.span.format",
+                            "type": "string",
+                            "value": "proto"
+                        }
+                    ],
+                    "logs": [],
+                    "processID": "p2",
+                    "warnings": null
+                }
+            ],
+            "processes": {
+                "p1": {
+                    "serviceName": "user",
+                    "tags": [
+                        {
+                            "key": "hostname",
+                            "type": "string",
+                            "value": "user-7c9c8f65f8-cjmks"
+                        },
+                        {
+                            "key": "ip",
+                            "type": "string",
+                            "value": "10.0.2.59"
+                        },
+                        {
+                            "key": "jaeger.version",
+                            "type": "string",
+                            "value": "Go-2.11.2"
+                        }
+                    ]
+                },
+                "p2": {
+                    "serviceName": "frontend",
+                    "tags": [
+                        {
+                            "key": "hostname",
+                            "type": "string",
+                            "value": "frontend-55fcd587c6-l6ffw"
+                        },
+                        {
+                            "key": "ip",
+                            "type": "string",
+                            "value": "10.0.1.169"
+                        },
+                        {
+                            "key": "jaeger.version",
+                            "type": "string",
+                            "value": "Go-2.11.2"
+                        }
+                    ]
+                }
+            },
+            "warnings": null
+        }
+    ],
+    "total": 0,
+    "limit": 0,
+    "offset": 0,
+    "errors": null
+}
