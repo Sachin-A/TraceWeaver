@@ -1,6 +1,7 @@
 import json
 import sys
 import os
+from fcfs import FCFS
 
 VERBOSE = False
 
@@ -35,17 +36,24 @@ class Span(object):
     def GetChildProcess(self):
         assert self.span_kind == "client"
         assert len(self.children_spans) == 1
-        return all_processes[self.trace_id][all_spans[self.children_spans[0]].process_id]
+        return all_processes[self.trace_id][
+            all_spans[self.children_spans[0]].process_id
+        ]
 
     def GetParentProcess(self):
-        if len(self.references) == 0: # root
+        if len(self.references) == 0:  # root
             return "client"
         assert len(self.references) == 1
         parent_span_id, _ = self.references[0]
         return all_processes[self.trace_id][all_spans[parent_span_id].process_id]
 
     def __repr__(self):
-        return "Span:(%s, %d, %d, %s)"%(self.op_name, self.start_mus, self.duration_mus, self.span_kind)
+        return "Span:(%s, %d, %d, %s)" % (
+            self.op_name,
+            self.start_mus,
+            self.duration_mus,
+            self.span_kind,
+        )
 
     def __str__(self):
         return self.__repr__()
@@ -57,6 +65,7 @@ def GetAllTracesInDir(directory):
     full_path = os.path.abspath(directory)
     files = [full_path + "/" + f for f in files]
     return files
+
 
 def ParseSpansJson(spans_json):
     spans = {}
@@ -116,10 +125,8 @@ def ParseJsonTrace(trace_json):
     trace_id, spans = ret[0]
     return trace_id, spans, processes
 
-
 incoming_spans_by_process = dict()
 outgoing_spans_by_process = dict()
-
 
 def ProcessTraceData(data):
     trace_id, spans, processes = data
@@ -167,7 +174,7 @@ def ProcessTraceData(data):
             )
         for child in span.children_spans:
             ExploreSubTree(child, depth + 1)
-   
+
     # comment out if condition to consider all microservice kinds
     if spans[root_span_id].op_name == "HTTP GET /hotels":
         ExploreSubTree(root_span_id, 0)
@@ -189,16 +196,16 @@ for trace in traces:
     if cnt > 10000:
         break
 
-'''
-print("Incoming spans")
-for p, s in incoming_spans_by_process.items():
-    print("  %s: %s"%(p, s))
-print("Outgoing spans")
-for p, s in outgoing_spans_by_process.items():
-    print("  %s: %s"%(p, s))
-print("\n\n\n")
-'''
+if VERBOSE:
+    print("Incoming spans")
+    for p, s in incoming_spans_by_process.items():
+        print("  %s: %s" % (p, s))
+    print("Outgoing spans")
+    for p, s in outgoing_spans_by_process.items():
+        print("  %s: %s" % (p, s))
+    print("\n\n\n")
 
+predictor = FCFS(all_spans, all_processes)
 for process in outgoing_spans_by_process.keys():
     incoming_spans = incoming_spans_by_process[process]
     outgoing_spans = outgoing_spans_by_process[process]
@@ -220,10 +227,14 @@ for process in outgoing_spans_by_process.keys():
             print("  ", k, v)
 
     # partition spans by subservice at the other end
-    incoming_span_partitions = PartitionSpansByEndPoint(incoming_spans, lambda x: x.GetParentProcess())
+    incoming_span_partitions = PartitionSpansByEndPoint(
+        incoming_spans, lambda x: x.GetParentProcess()
+    )
     print("Incoming span partitions", process, incoming_span_partitions.keys())
     print("\n")
-    outgoing_span_partitions = PartitionSpansByEndPoint(outgoing_spans, lambda x: x.GetChildProcess())
+    outgoing_span_partitions = PartitionSpansByEndPoint(
+        outgoing_spans, lambda x: x.GetChildProcess()
+    )
     print("Outgoing span partitions", process, outgoing_span_partitions.keys())
     print("\n\n")
 
@@ -232,22 +243,13 @@ for process in outgoing_spans_by_process.keys():
         cnt = 0
         for i in range(len(trace_id_seq1)):
             cnt += int((trace_id_seq1[i] == trace_id_seq2[i]))
-        return cnt/float(len(trace_id_seq1))
+        return cnt / float(len(trace_id_seq1))
 
-    # decide a trace id sequence for an outgoing list of spans (to a particular subservice)
-    def FCFS(subservice):
-        # fcfs doesn't use any info about the subservice
-        assert len(incoming_span_partitions) == 1
-        ep = list(incoming_span_partitions.keys())[0]
-        trace_id_seq = [s.trace_id for s in incoming_span_partitions[ep]]
-        return trace_id_seq
-
-    def FCFC_timing(subservice):
-        pass
-    
-    # iterate over each subservice
+    trace_id_seqs = predictor.PredictTraceIdSequences(
+        process, incoming_span_partitions, outgoing_span_partitions
+    )
     for ep, part in outgoing_span_partitions.items():
-        trace_id_seq = [s.trace_id for s in part]
-        trace_id_seq_pred = FCFS(ep)
-        accuracy = ComputeAccuracy(trace_id_seq, trace_id_seq_pred)
+        trace_id_seq_pred = trace_id_seqs[ep]
+        trace_id_seq_act = [s.trace_id for s in part]
+        accuracy = ComputeAccuracy(trace_id_seq_act, trace_id_seq_pred)
         print("Accuracy", accuracy)
