@@ -31,7 +31,7 @@ class Timing(object):
             assert len(t1) == len(t2)
             mean = (sum(t2) - sum(t1)) / len(t1)
             batch_means = []
-            nbatches = 10
+            nbatches = 25
             for i in range(nbatches):
                 batch_size = int((len(t1) + nbatches - 1) / nbatches)
                 start = min(len(t1), i * batch_size)
@@ -41,7 +41,7 @@ class Timing(object):
                         end - start
                     )
                     batch_means.append(batch_mean)
-            std = scipy.stats.tstd(batch_means)
+            std = math.sqrt(len(batch_means)) * scipy.stats.tstd(batch_means)
             #std = 1
             print("Assigning ep pair (%s, %s), distribution params: %f, %f" % (ep1, ep2, mean, std))
             self.services_times[(ep1, ep2)] = mean, std
@@ -72,11 +72,14 @@ class Timing(object):
 
     def GetEpPairCost(self, ep1, ep2, t1, t2):
         mean, std = self.services_times[(ep1, ep2)]
-        p = scipy.stats.norm(mean, std).pdf(t2 - t1)
+        p = scipy.stats.norm.logpdf(t2 - t1, loc=mean, scale=std)
+        return p
+        '''
         if p==0:
             return -math.inf
         else:
             return math.log(p)
+        '''
 
     def ScoreAssignment(self, stack):
         cost = 0
@@ -126,18 +129,15 @@ class Timing(object):
                     best_assignment = stack
                     best_score = score
             else:
+                #!TODO: filter out branches that have high cost
                 ep = outgoing_eps[i-1]
                 for s in outgoing_span_partitions[ep]:
                     if i == 1:
                         # first ep
                         if incoming_span.start_mus < s.start_mus:
                             DfsTraverse(stack + [s])
-                    elif i < len(outgoing_eps):
-                        # intermediate ep
-                        if last_span.start_mus + last_span.duration_mus < s.start_mus:
-                            DfsTraverse(stack + [s])
-                    elif i == len(outgoing_eps):
-                        # last ep
+                    elif i <= len(outgoing_eps):
+                        # all other eps 
                         if (
                             last_span.start_mus + last_span.duration_mus < s.start_mus
                             and s.start_mus + s.duration_mus
@@ -186,6 +186,8 @@ class Timing(object):
         )
         outgoing_span_partitions_copy = copy.deepcopy(outgoing_span_partitions)
         assignments_dict = {}
+        cnt = 0
+        cnt_na = 0
         for incoming_span in incoming_spans:
             # find the minimimum cost label assignment for span
             min_cost_assignment = self.FindMinCostAssignment(
@@ -198,6 +200,10 @@ class Timing(object):
                 outgoing_span_partitions_copy,
                 outgoing_eps,
             )
+            cnt += 1
+            cnt_na += (len(min_cost_assignment) == 0)
+            if cnt % 50 == 0:
+                print("Finished %d spans, unassigned spans: %d"%(cnt, cnt_na))
             #!TODO: update mean, std of service times using EWMA
-        print("Assignment_dict", assignments_dict)
+        #print("Assignment_dict", assignments_dict)
         return assignments_dict
