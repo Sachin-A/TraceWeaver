@@ -209,7 +209,7 @@ if VERBOSE:
         print("  %s: %s" % (p, s))
     print("\n\n\n")
 
-#predictor = FCFS(all_spans, all_processes)
+predictor_fcfs = FCFS(all_spans, all_processes)
 predictor = Timing(all_spans, all_processes)
 for process in outgoing_spans_by_process.keys():
     incoming_spans = incoming_spans_by_process[process]
@@ -256,10 +256,14 @@ for process in outgoing_spans_by_process.keys():
     trace_id_seqs = predictor.PredictTraceIdSequences(
         process, incoming_span_partitions, outgoing_span_partitions
     )
+    #trace_id_seqs_fcfs = predictor_fcfs.PredictTraceIdSequences(
+    #    process, incoming_span_partitions, outgoing_span_partitions
+    #)
     for ep, part in outgoing_span_partitions.items():
-        trace_id_seq_act = [s.trace_id for s in part]
-        trace_id_seq_pred = trace_id_seqs[ep]
+        trace_id_seq1 = [s.trace_id for s in part]
+        #trace_id_seq1 = trace_id_seqs_fcfs[ep]
+        trace_id_seq2 = trace_id_seqs[ep]
         if VERBOSE:
-            print("Trace id seq:", trace_id_seq_act, trace_id_seq_pred)
-        accuracy = ComputeAccuracy(trace_id_seq_act, trace_id_seq_pred)
-        print("Accuracy", accuracy)
+            print("Trace id seq:", trace_id_seq1, trace_id_seq2)
+        accuracy = ComputeAccuracy(trace_id_seq1, trace_id_seq2)
+        print("Accuracy for endpoint %s at node %s = %f"%(ep, process, accuracy))

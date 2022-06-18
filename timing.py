@@ -11,9 +11,19 @@ class Timing(object):
         self.services_times = {}
 
     # verify that all outgoing request dependencies are serial
-    def VerifySerialDependency(self, outgoing_span_partitions):
-        #!TODO
-        pass
+    def VerifySerialDependency(self, incoming_spans, outgoing_eps, outgoing_span_partitions):
+        def FindSpanTraceId(trace_id, spans):
+            for s in spans:
+                if s.trace_id == trace_id:
+                    return s
+            return None
+        for s in incoming_spans:
+            trace_id = s.trace_id
+            prev_time = s.start_mus
+            for ep in outgoing_eps:
+                out_span = FindSpanTraceId(trace_id, outgoing_span_partitions[ep])
+                assert out_span.start_mus > prev_time
+                prev_time = out_span.start_mus + out_span.duration_mus
 
     def GetOutgoingSpanOrder(self, outgoing_span_partitions):
         # ep: endpoint
@@ -25,15 +35,17 @@ class Timing(object):
         return [x[0] for x in eps]
 
     def PopulateEpPairDistributions(
-        self, incoming_span_partitions, outgoing_span_partitions, outgoing_eps
+        self, incoming_span_partitions, outgoing_span_partitions, outgoing_eps, start_ind, end_ind
     ):
         def ComputeDistParams(ep1, ep2, t1, t2):
+            t1 = t1[start_ind: end_ind]
+            t2 = t2[start_ind: end_ind]
             assert len(t1) == len(t2)
             mean = (sum(t2) - sum(t1)) / len(t1)
             batch_means = []
-            nbatches = 25
+            nbatches = 10
+            batch_size = int((len(t1) + nbatches - 1) / nbatches)
             for i in range(nbatches):
-                batch_size = int((len(t1) + nbatches - 1) / nbatches)
                 start = min(len(t1), i * batch_size)
                 end = min(len(t1), (i + 1) * batch_size)
                 if end - start > 0:
@@ -41,9 +53,9 @@ class Timing(object):
                         end - start
                     )
                     batch_means.append(batch_mean)
-            std = math.sqrt(len(batch_means)) * scipy.stats.tstd(batch_means)
-            #std = 1
-            print("Assigning ep pair (%s, %s), distribution params: %f, %f" % (ep1, ep2, mean, std))
+            std = math.sqrt(batch_size) * scipy.stats.tstd(batch_means)
+            if VERBOSE:
+                print("Assigning ep pair (%s, %s), distribution params: %f, %f" % (ep1, ep2, mean, std))
             self.services_times[(ep1, ep2)] = mean, std
 
         # between incoming -- first outgoing
@@ -73,13 +85,15 @@ class Timing(object):
     def GetEpPairCost(self, ep1, ep2, t1, t2):
         mean, std = self.services_times[(ep1, ep2)]
         p = scipy.stats.norm.logpdf(t2 - t1, loc=mean, scale=std)
-        return p
         '''
-        if p==0:
+        x = scipy.stats.norm.cdf(t2 - t1, loc=mean, scale=std)
+        cp = 2 * min(x, 1-x)
+        if cp==0:
             return -math.inf
         else:
-            return math.log(p)
+            return math.log(cp)
         '''
+        return p
 
     def ScoreAssignment(self, stack):
         cost = 0
@@ -181,14 +195,18 @@ class Timing(object):
         assert len(incoming_span_partitions) == 1
         ep, incoming_spans = list(incoming_span_partitions.items())[0]
         outgoing_eps = self.GetOutgoingSpanOrder(outgoing_span_partitions)
-        self.PopulateEpPairDistributions(
-            incoming_span_partitions, outgoing_span_partitions, outgoing_eps
-        )
+        # self.VerifySerialDependency(incoming_spans, outgoing_eps, outgoing_span_partitions)
         outgoing_span_partitions_copy = copy.deepcopy(outgoing_span_partitions)
         assignments_dict = {}
         cnt = 0
         cnt_na = 0
+        batch_size = 100
         for incoming_span in incoming_spans:
+            if cnt % batch_size == 0:
+                self.PopulateEpPairDistributions(
+                    incoming_span_partitions, outgoing_span_partitions, outgoing_eps, cnt, min(len(incoming_spans), cnt + batch_size)
+                )
+                print("Finished %d spans, unassigned spans: %d"%(cnt, cnt_na))
             # find the minimimum cost label assignment for span
             min_cost_assignment = self.FindMinCostAssignment(
                 incoming_span, outgoing_eps, outgoing_span_partitions_copy
@@ -202,8 +220,6 @@ class Timing(object):
             )
             cnt += 1
             cnt_na += (len(min_cost_assignment) == 0)
-            if cnt % 50 == 0:
-                print("Finished %d spans, unassigned spans: %d"%(cnt, cnt_na))
             #!TODO: update mean, std of service times using EWMA
         #print("Assignment_dict", assignments_dict)
         return assignments_dict
