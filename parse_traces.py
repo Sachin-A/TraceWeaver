@@ -2,11 +2,13 @@ import json
 import sys
 import os
 from fcfs import FCFS
+from timing import Timing
 
 VERBOSE = False
 
 all_spans = dict()
 all_processes = dict()
+
 
 class Span(object):
     def __init__(
@@ -125,8 +127,10 @@ def ParseJsonTrace(trace_json):
     trace_id, spans = ret[0]
     return trace_id, spans, processes
 
+
 incoming_spans_by_process = dict()
 outgoing_spans_by_process = dict()
+
 
 def ProcessTraceData(data):
     trace_id, spans, processes = data
@@ -193,7 +197,7 @@ for trace in traces:
         print("\n\n\n")
     data = ParseJsonTrace(trace)
     cnt += ProcessTraceData(data)
-    if cnt > 10000:
+    if cnt > 1000:  # 10000:
         break
 
 if VERBOSE:
@@ -205,10 +209,14 @@ if VERBOSE:
         print("  %s: %s" % (p, s))
     print("\n\n\n")
 
-predictor = FCFS(all_spans, all_processes)
+#predictor = FCFS(all_spans, all_processes)
+predictor = Timing(all_spans, all_processes)
 for process in outgoing_spans_by_process.keys():
     incoming_spans = incoming_spans_by_process[process]
     outgoing_spans = outgoing_spans_by_process[process]
+
+    if len(outgoing_spans) == 0:
+        continue
 
     # partition spans by the other endpoint
     def PartitionSpansByEndPoint(spans, endpoint_lambda):
@@ -249,7 +257,9 @@ for process in outgoing_spans_by_process.keys():
         process, incoming_span_partitions, outgoing_span_partitions
     )
     for ep, part in outgoing_span_partitions.items():
-        trace_id_seq_pred = trace_id_seqs[ep]
         trace_id_seq_act = [s.trace_id for s in part]
+        trace_id_seq_pred = trace_id_seqs[ep]
+        if VERBOSE:
+            print("Trace id seq:", trace_id_seq_act, trace_id_seq_pred)
         accuracy = ComputeAccuracy(trace_id_seq_act, trace_id_seq_pred)
         print("Accuracy", accuracy)

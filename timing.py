@@ -1,6 +1,8 @@
 import math
-from scipy.stats import norm
+import scipy.stats
+import copy
 
+VERBOSE = False
 
 class Timing(object):
     def __init__(self, all_spans, all_processes):
@@ -23,15 +25,9 @@ class Timing(object):
         return [x[0] for x in eps]
 
     def PopulateEpPairDistributions(
-        incoming_span_partitions, outgoing_span_partitions, outgoing_eps
+        self, incoming_span_partitions, outgoing_span_partitions, outgoing_eps
     ):
-        for i in range(len(outgoing_eps) - 1):
-            ep1 = outgoing_eps[i]
-            ep2 = outgoing_eps[i + 1]
-            t1 = sorted(
-                [s.start_mus + s.duration_mus for s in outgoing_span_partitions[ep1]]
-            )
-            t2 = sorted([s.start_mus for s in outgoing_span_partitions[ep2]])
+        def ComputeDistParams(ep1, ep2, t1, t2):
             assert len(t1) == len(t2)
             mean = (sum(t2) - sum(t1)) / len(t1)
             batch_means = []
@@ -45,13 +41,42 @@ class Timing(object):
                         end - start
                     )
                     batch_means.append(batch_mean)
-            std = scipy.stats.std(batch_means)
-            self.services_times = mean, std
+            std = scipy.stats.tstd(batch_means)
+            #std = 1
+            print("Assigning ep pair (%s, %s), distribution params: %f, %f" % (ep1, ep2, mean, std))
+            self.services_times[(ep1, ep2)] = mean, std
 
-    def GetEpPairCost(ep1, ep2, t1, t2):
+        # between incoming -- first outgoing
+        ep1 = list(incoming_span_partitions.keys())[0]
+        ep2 = outgoing_eps[0]
+        t1 = sorted([s.start_mus for s in incoming_span_partitions[ep1]])
+        t2 = sorted([s.start_mus for s in outgoing_span_partitions[ep2]])
+        ComputeDistParams(ep1, ep2, t1, t2)
+
+        # between outgoing -- outgoing
+        for i in range(len(outgoing_eps) - 1):
+            ep1 = outgoing_eps[i]
+            ep2 = outgoing_eps[i + 1]
+            t1 = sorted(
+                [s.start_mus + s.duration_mus for s in outgoing_span_partitions[ep1]]
+            )
+            t2 = sorted([s.start_mus for s in outgoing_span_partitions[ep2]])
+            ComputeDistParams(ep1, ep2, t1, t2)
+
+        # between last outgoing -- incoming
+        ep1 = outgoing_eps[-1]
+        ep2 = list(incoming_span_partitions.keys())[0]
+        t1 = sorted([s.start_mus + s.duration_mus for s in outgoing_span_partitions[ep1]])
+        t2 = sorted([s.start_mus + s.duration_mus for s in incoming_span_partitions[ep2]])
+        ComputeDistParams(ep1, ep2, t1, t2)
+
+    def GetEpPairCost(self, ep1, ep2, t1, t2):
         mean, std = self.services_times[(ep1, ep2)]
         p = scipy.stats.norm(mean, std).pdf(t2 - t1)
-        return math.log(p)
+        if p==0:
+            return -math.inf
+        else:
+            return math.log(p)
 
     def ScoreAssignment(self, stack):
         cost = 0
@@ -76,25 +101,32 @@ class Timing(object):
                 if next_i == 0
                 else stack[next_i].start_mus
             )
-            cost += GetEpPairCost(curr_ep, next_ep, curr_time, next_time)
+            if VERBOSE:
+                print("Computing cost between", curr_ep, next_ep)
+            cost += self.GetEpPairCost(curr_ep, next_ep, curr_time, next_time)
         return cost
 
     def FindMinCostAssignment(
         self, incoming_span, outgoing_eps, outgoing_span_partitions
     ):
+        global best_assignment
+        global best_score
         best_assignment = None
-        best_score = -math.inf
-
+        best_score = -1000000.0
         def DfsTraverse(stack):
+            global best_assignment
+            global best_score
             i = len(stack)
+            if VERBOSE:
+                print("DFSTraverse", i, outgoing_eps, stack)
             last_span = stack[-1]
-            ep = outgoing_eps[i - 1]
             if i == len(outgoing_span_partitions) + 1:
-                score = ScoreAssignment(stack)
+                score = self.ScoreAssignment(stack)
                 if best_score < score:
                     best_assignment = stack
                     best_score = score
             else:
+                ep = outgoing_eps[i-1]
                 for s in outgoing_span_partitions[ep]:
                     if i == 1:
                         # first ep
@@ -109,27 +141,39 @@ class Timing(object):
                         if (
                             last_span.start_mus + last_span.duration_mus < s.start_mus
                             and s.start_mus + s.duration_mus
-                            < incoming_span.start_mus + incoming.duration_mus
+                            < incoming_span.start_mus + incoming_span.duration_mus
                         ):
                             DfsTraverse(stack + [s])
 
         DfsTraverse([incoming_span])
-        # return a dictionary of {ep: trace_id}
         ret = {}
-        for ep, span in zip(outgoing_eps):
-            ret[ep] = span
+        if best_assignment is not None:
+            # return a dictionary of {ep: trace_id}
+            assert len(outgoing_eps) == len(best_assignment) - 1
+            for i in range(len(outgoing_eps)):
+                ret[outgoing_eps[i]] = best_assignment[i + 1]
         return ret
 
     def AssignSpans(
-        self, incoming_span, assignment, assignments_dict, outgoing_span_partitions
+        self,
+        incoming_span,
+        assignment,
+        assignments_dict,
+        outgoing_span_partitions,
+        outgoing_eps,
     ):
         # update assignments dict
-        for ep, trace_id in min_cost_assignments:
+        for ep in outgoing_eps:
             if ep not in assignments_dict:
                 assignments_dict[ep] = []
+            span = assignment.get(ep, None)
+            trace_id = span.trace_id if span is not None else "NA"
             assignments_dict[ep].append(trace_id)
 
-        #!TODO: remove assignment spans so that they can't be assigned again
+        # remove assignment spans so that they can't be assigned again
+        #!TODO: this implementation is not efficient
+        for ep, span in assignment.items():
+            outgoing_span_partitions[ep].remove(span)
 
     def PredictTraceIdSequences(
         self, process, incoming_span_partitions, outgoing_span_partitions
@@ -137,14 +181,23 @@ class Timing(object):
         assert len(incoming_span_partitions) == 1
         ep, incoming_spans = list(incoming_span_partitions.items())[0]
         outgoing_eps = self.GetOutgoingSpanOrder(outgoing_span_partitions)
-        ret = {}
-        for span in incoming_spans:
+        self.PopulateEpPairDistributions(
+            incoming_span_partitions, outgoing_span_partitions, outgoing_eps
+        )
+        outgoing_span_partitions_copy = copy.deepcopy(outgoing_span_partitions)
+        assignments_dict = {}
+        for incoming_span in incoming_spans:
             # find the minimimum cost label assignment for span
-            min_cost_assignments = FindMinCostAssignment(
-                span, outgoing_eps, outgoing_span_partitions
+            min_cost_assignment = self.FindMinCostAssignment(
+                incoming_span, outgoing_eps, outgoing_span_partitions_copy
             )
-            AssignSpans(
-                incoming_span, assignment, assignments_dict, outgoing_span_partitions
+            self.AssignSpans(
+                incoming_span,
+                min_cost_assignment,
+                assignments_dict,
+                outgoing_span_partitions_copy,
+                outgoing_eps,
             )
             #!TODO: update mean, std of service times using EWMA
-        return ret
+        print("Assignment_dict", assignments_dict)
+        return assignments_dict

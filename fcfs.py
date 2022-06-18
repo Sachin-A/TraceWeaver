@@ -10,7 +10,7 @@ class FCFS(object):
         trace_id_seq = [s.trace_id for s in incoming_span_partitions[ep]]
         return trace_id_seq
 
-   def PredictTraceIdSequences(
+    def PredictTraceIdSequences(
         self, process, incoming_span_partitions, outgoing_span_partitions
     ):
         ret = {}
