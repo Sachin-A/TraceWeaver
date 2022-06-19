@@ -37,7 +37,8 @@ class FCFS2(object):
             # picking intermediate services
             else:
                 in_spans = in_span_partitions[i_eps[0]]
-                out_spans_0 = out_span_partitions[o_eps[i - 2]]
+                # out_spans_0 = out_span_partitions[o_eps[i - 2]]
+                out_spans_0 = out_spans
 
                 sort_order = np.argsort([x.start_mus + x.duration_mus for x in out_spans_0])
                 out_spans = list(np.array(out_span_partitions[o_eps[i - 1]])[sort_order])

@@ -2,6 +2,7 @@ import json
 import sys
 import os
 from fcfs import FCFS
+from fcfs2 import FCFS2
 from timing import Timing
 from timing2 import Timing2
 
@@ -201,7 +202,7 @@ for trace in traces:
         print("\n\n\n")
     data = ParseJsonTrace(trace)
     cnt += ProcessTraceData(data)
-    if cnt > 1000:  # 10000:
+    if cnt > 10000:  # 10000:
         break
 
 if VERBOSE:
@@ -264,8 +265,9 @@ def AccuracyEndToEnd(
 
 
 #predictor = FCFS(all_spans, all_processes)
-#predictor = Timing(all_spans, all_processes)
-predictor = Timing2(all_spans, all_processes)
+# predictor = FCFS2(all_spans, all_processes)
+predictor = Timing(all_spans, all_processes)
+# predictor = Timing2(all_spans, all_processes)
 
 true_assignments_by_process = {}
 pred_assignments_by_process = {}
