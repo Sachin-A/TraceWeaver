@@ -29,7 +29,6 @@ class Timing2(Timing):
                 if len(top_assignments) > K:
                     top_assignments.heappop()
             else:
-                #!TODO: filter out branches that have high cost
                 ep = outgoing_eps[i-1]
                 for s in outgoing_span_partitions[ep]:
                     if i == 1:
@@ -72,3 +71,9 @@ class Timing2(Timing):
 
     def CreateMaxIndSetInstance(top_assignments, incoming_spans, outgoing_eps, outgoing_span_partitions):
         #!TODO
+        # create max independent set(MIS) based on top_assignments for each incoming span
+        # each assignment consists of an ordered list of spans, starting with the incoming span and the subsequent spans are outgoing spans in order of dependence
+        # For the MIS instance, add one vertex for each incoming span, and one vertex for each possible assignment
+        # For an incoming span s, add edges between the top assignments for s (since only one of them need to be chosen)
+        # For an assignment a1 for incoming span1 and an assignment a2 for incoming span2, add an edge between a1 and a2 if the assignments a1 and a2 intersect
+        # Once the MIS instance is created, call the algorithm and post process the results
