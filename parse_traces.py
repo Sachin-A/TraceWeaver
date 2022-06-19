@@ -3,6 +3,7 @@ import sys
 import os
 from fcfs import FCFS
 from timing import Timing
+from timing2 import Timing2
 
 VERBOSE = False
 
@@ -48,6 +49,9 @@ class Span(object):
         assert len(self.references) == 1
         parent_span_id, _ = self.references[0]
         return all_processes[self.trace_id][all_spans[parent_span_id].process_id]
+
+    def GetId(self):
+        return (self.trace_id, self.span_id)
 
     def __repr__(self):
         return "Span:(%s, %d, %d, %s)" % (
@@ -128,9 +132,8 @@ def ParseJsonTrace(trace_json):
     return trace_id, spans, processes
 
 
-incoming_spans_by_process = dict()
-outgoing_spans_by_process = dict()
-
+in_spans_by_process = dict()
+out_spans_by_process = dict()
 
 def ProcessTraceData(data):
     trace_id, spans, processes = data
@@ -143,13 +146,13 @@ def ProcessTraceData(data):
         span = spans[span_id]
         process = GetProcessOfSpan(span_id)
         if span.span_kind == "client":
-            if process not in outgoing_spans_by_process:
-                outgoing_spans_by_process[process] = []
-            outgoing_spans_by_process[process].append(span)
+            if process not in out_spans_by_process:
+                out_spans_by_process[process] = []
+            out_spans_by_process[process].append(span)
         elif span.span_kind == "server":
-            if process not in incoming_spans_by_process:
-                incoming_spans_by_process[process] = []
-            incoming_spans_by_process[process].append(span)
+            if process not in in_spans_by_process:
+                in_spans_by_process[process] = []
+            in_spans_by_process[process].append(span)
         else:
             assert False
 
@@ -202,20 +205,45 @@ for trace in traces:
 
 if VERBOSE:
     print("Incoming spans")
-    for p, s in incoming_spans_by_process.items():
+    for p, s in in_spans_by_process.items():
         print("  %s: %s" % (p, s))
     print("Outgoing spans")
-    for p, s in outgoing_spans_by_process.items():
+    for p, s in out_spans_by_process.items():
         print("  %s: %s" % (p, s))
     print("\n\n\n")
 
-predictor_fcfs = FCFS(all_spans, all_processes)
-predictor = Timing(all_spans, all_processes)
-for process in outgoing_spans_by_process.keys():
-    incoming_spans = incoming_spans_by_process[process]
-    outgoing_spans = outgoing_spans_by_process[process]
+def GetGroundTruth(in_span_partitions, out_span_partitions):
+    assert len(in_span_partitions) == 1
+    _, in_spans = list(in_span_partitions.items())[0]
+    true_assignments = { ep: {} for ep in out_span_partitions.keys() } 
+    for in_span in in_spans:
+        for ep in out_span_partitions.keys():
+            for span in out_span_partitions[ep]:
+                if span.trace_id == in_span.trace_id:
+                    true_assignments[ep][in_span.GetId()] = span.GetId()
+                    break
+    return true_assignments
 
-    if len(outgoing_spans) == 0:
+def AccuracyForService(pred_assignments, true_assignments, in_span_partitions, out_span_partitions):
+    assert len(in_span_partitions) == 1
+    _, in_spans = list(in_span_partitions.items())[0]
+    cnt = 0
+    for in_span in in_spans:
+        correct = True
+        for ep in out_span_partitions.keys():
+            correct = correct and (pred_assignments[ep][in_span.GetId()] == true_assignments[ep][in_span.GetId()])
+        cnt += int(correct)
+    return float(cnt)/len(in_spans)
+
+#predictor = FCFS(all_spans, all_processes)
+#predictor = Timing(all_spans, all_processes)
+predictor = Timing2(all_spans, all_processes)
+
+for process in out_spans_by_process.keys():
+    in_spans = in_spans_by_process[process]
+    out_spans = out_spans_by_process[process]
+
+    if len(out_spans) == 0:
         continue
 
     # partition spans by the other endpoint
@@ -230,40 +258,20 @@ for process in outgoing_spans_by_process.keys():
             part.sort(key=lambda x: x.start_mus)
         return partitions
 
-    def PrintDict(d):
-        for k, v in d.items():
-            print("  ", k, v)
-
     # partition spans by subservice at the other end
-    incoming_span_partitions = PartitionSpansByEndPoint(
-        incoming_spans, lambda x: x.GetParentProcess()
+    in_span_partitions = PartitionSpansByEndPoint(
+        in_spans, lambda x: x.GetParentProcess()
     )
-    print("Incoming span partitions", process, incoming_span_partitions.keys())
+    print("Incoming span partitions", process, in_span_partitions.keys())
+    out_span_partitions = PartitionSpansByEndPoint(
+        out_spans, lambda x: x.GetChildProcess()
+    )
+    print("Outgoing span partitions", process, out_span_partitions.keys())
     print("\n")
-    outgoing_span_partitions = PartitionSpansByEndPoint(
-        outgoing_spans, lambda x: x.GetChildProcess()
-    )
-    print("Outgoing span partitions", process, outgoing_span_partitions.keys())
-    print("\n\n")
 
-    def ComputeAccuracy(trace_id_seq1, trace_id_seq2):
-        assert len(trace_id_seq1) == len(trace_id_seq2)
-        cnt = 0
-        for i in range(len(trace_id_seq1)):
-            cnt += int((trace_id_seq1[i] == trace_id_seq2[i]))
-        return cnt / float(len(trace_id_seq1))
-
-    trace_id_seqs = predictor.PredictTraceIdSequences(
-        process, incoming_span_partitions, outgoing_span_partitions
+    true_assignments = GetGroundTruth(in_span_partitions, out_span_partitions)
+    pred_assignments = predictor.FindAssignments(
+        process, in_span_partitions, out_span_partitions
     )
-    #trace_id_seqs_fcfs = predictor_fcfs.PredictTraceIdSequences(
-    #    process, incoming_span_partitions, outgoing_span_partitions
-    #)
-    for ep, part in outgoing_span_partitions.items():
-        trace_id_seq1 = [s.trace_id for s in part]
-        #trace_id_seq1 = trace_id_seqs_fcfs[ep]
-        trace_id_seq2 = trace_id_seqs[ep]
-        if VERBOSE:
-            print("Trace id seq:", trace_id_seq1, trace_id_seq2)
-        accuracy = ComputeAccuracy(trace_id_seq1, trace_id_seq2)
-        print("Accuracy for endpoint %s at node %s = %f"%(ep, process, accuracy))
+    acc = AccuracyForService(pred_assignments, true_assignments, in_span_partitions, out_span_partitions)
+    print("Accuracy for service %s: %f" % (process, acc))

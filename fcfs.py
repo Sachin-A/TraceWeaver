@@ -3,19 +3,13 @@ class FCFS(object):
         self.all_spans = all_spans
         self.all_processes = all_processes
 
-    def FCFS_TraceSeq(self, incoming_span_partitions):
-        # fcfs doesn't use any info about the subservice
-        assert len(incoming_span_partitions) == 1
-        ep = list(incoming_span_partitions.keys())[0]
-        trace_id_seq = [s.trace_id for s in incoming_span_partitions[ep]]
-        return trace_id_seq
-
-    def PredictTraceIdSequences(
-        self, process, incoming_span_partitions, outgoing_span_partitions
+    def FindAssignments(
+        self, process, in_span_partitions, out_span_partitions
     ):
-        ret = {}
-        trace_id_seq_pred = self.FCFS_TraceSeq(incoming_span_partitions)
-        # iterate over each subservice
-        for ep, part in outgoing_span_partitions.items():
-            ret[ep] = trace_id_seq_pred
-        return ret
+        assert len(in_span_partitions) == 1
+        _, in_spans = list(in_span_partitions.items())[0]
+        all_assignments = { ep: {} for ep in out_span_partitions.keys() }
+        for ind in range(len(in_spans)):
+            for ep, out_spans in out_span_partitions.items():
+                all_assignments[ep][in_spans[ind].GetId()] = out_spans[ind].GetId()
+        return all_assignments
