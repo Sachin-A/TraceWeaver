@@ -9,7 +9,6 @@ from networkx.algorithms import approximation
 
 VERBOSE = False
 
-
 class Timing2(Timing):
     def __init__(self, all_spans, all_processes):
         super().__init__(all_spans, all_processes)
@@ -22,7 +21,6 @@ class Timing2(Timing):
     ):
         global top_assignments
         top_assignments = []
-
         def DfsTraverse(stack):
             global top_assignments
             i = len(stack)
@@ -54,7 +52,9 @@ class Timing2(Timing):
         DfsTraverse([in_span])
         for i in range(len(top_assignments)):
             s, a = top_assignments[i]
-            top_assignments[i] = -s, a  # restore original scores
+            # undo negative scores
+            top_assignments[i] = -s, a
+        top_assignments.sort()
         return top_assignments
 
     def FindAssignments(
@@ -64,7 +64,7 @@ class Timing2(Timing):
         ep, in_spans = list(in_span_partitions.items())[0]
         out_eps = self.GetOutEpsInOrder(out_span_partitions)
         batch_size = 100
-        topK = 5
+        topK = 10
         cnt = 0
         top_assignments = []
         out_span_partitions_copy = copy.deepcopy(out_span_partitions)
@@ -84,7 +84,7 @@ class Timing2(Timing):
                 )
             )
             cnt += 1
-        assignments = self.CreateMaxIndSetInstance(
+        assignments = self.GetAssignmentsMIS(
             top_assignments, in_spans, out_eps, out_span_partitions_copy
         )
         all_assignments = {}
@@ -105,7 +105,7 @@ class Timing2(Timing):
             )
         return all_assignments
 
-    def CreateMaxIndSetInstance(
+    def GetAssignmentsMIS(
         self, top_assignments, in_spans, out_eps, out_span_partitions
     ):
         # create max independent set(MIS) based on top_assignments for each incoming span
@@ -127,32 +127,33 @@ class Timing2(Timing):
             start = batch_size * b
             end = min(len(in_spans), batch_size * (b + 1))
             G = nx.Graph()
-            for ind in range(start, end):
-                assignments = top_assignments[ind]
-                for i in range(len(assignments)):
-                    assert assignments[i][1][0] == in_spans[ind]
-                    aid = (ind, i)
-                    G.add_node(aid)
-                    for j in range(0, i):
-                        aid2 = (ind, j)
-                        G.add_edge(aid2, aid)
-                    for ind0 in range(start, ind):
-                        assignments0 = top_assignments[ind0]
-                        for i0 in range(len(assignments0)):
+            for ind1 in range(start, end):
+                for i1 in range(len(top_assignments[ind1])):
+                    aid1 = (ind1, i1)
+                    G.add_node(aid1)
+                    # add edges from previous assignments for the same incoming span
+                    for i0 in range(0, i1):
+                        aid0 = (ind1, i0)
+                        G.add_edge(aid0, aid1)
+
+                    # add edges from previous intersecting assignments for previous incoming spans
+                    for ind0 in range(start, ind1):
+                        for i0 in range(len(top_assignments[ind0])):
                             if AssignmentIntersect(
-                                assignments0[i0][1], assignments[i][1]
+                                top_assignments[ind0][i0][1], top_assignments[ind1][i1][1]
                             ):
                                 aid0 = (ind0, i0)
-                                G.add_edge(aid0, aid)
-            best_mis = approximation.independent_set.maximum_independent_set(G)
+                                G.add_edge(aid0, aid1)
+            mis = approximation.independent_set.maximum_independent_set(G)
             '''
-            best_mis = None
+            mis = None
             for i in range(20000):
-                mis = nx.maximal_independent_set(G)
-                if best_mis is None or len(mis) > len(best_mis):
-                    best_mis = mis
+                random_mis = nx.maximal_independent_set(G)
+                if random_mis is None or len(random_mis) > len(mis):
+                    mis = random_mis
             '''
-            print("Best MIS %d/%d" % (len(best_mis), end - start))
-            for span_ind, a_ind in best_mis:
-                mis_assignments[span_ind] = top_assignments[span_ind][a_ind][1]
+            print("MIS- num assigned: %d/%d" % (len(mis), end - start))
+            for span_ind, a_ind in mis:
+                score, a = top_assignments[span_ind][a_ind]
+                mis_assignments[span_ind] = a
         return mis_assignments

@@ -135,6 +135,7 @@ def ParseJsonTrace(trace_json):
 in_spans_by_process = dict()
 out_spans_by_process = dict()
 
+
 def ProcessTraceData(data):
     trace_id, spans, processes = data
 
@@ -212,10 +213,11 @@ if VERBOSE:
         print("  %s: %s" % (p, s))
     print("\n\n\n")
 
+
 def GetGroundTruth(in_span_partitions, out_span_partitions):
     assert len(in_span_partitions) == 1
     _, in_spans = list(in_span_partitions.items())[0]
-    true_assignments = { ep: {} for ep in out_span_partitions.keys() } 
+    true_assignments = {ep: {} for ep in out_span_partitions.keys()}
     for in_span in in_spans:
         for ep in out_span_partitions.keys():
             for span in out_span_partitions[ep]:
@@ -224,21 +226,49 @@ def GetGroundTruth(in_span_partitions, out_span_partitions):
                     break
     return true_assignments
 
-def AccuracyForService(pred_assignments, true_assignments, in_span_partitions, out_span_partitions):
+
+def AccuracyForService(pred_assignments, true_assignments, in_span_partitions):
     assert len(in_span_partitions) == 1
     _, in_spans = list(in_span_partitions.items())[0]
     cnt = 0
     for in_span in in_spans:
         correct = True
-        for ep in out_span_partitions.keys():
-            correct = correct and (pred_assignments[ep][in_span.GetId()] == true_assignments[ep][in_span.GetId()])
+        for ep in true_assignments.keys():
+            correct = correct and (
+                pred_assignments[ep][in_span.GetId()]
+                == true_assignments[ep][in_span.GetId()]
+            )
         cnt += int(correct)
-    return float(cnt)/len(in_spans)
+    return float(cnt) / len(in_spans)
+
+
+def AccuracyEndToEnd(
+    pred_assignments_by_process, true_assignments_by_process, in_spans_by_process
+):
+    processes = true_assignments_by_process.keys()
+    trace_acc = {}
+    for process in processes:
+        for in_span in in_spans_by_process[process]:
+            if in_span.trace_id not in trace_acc:
+                trace_acc[in_span.trace_id] = True
+            true_assignments = true_assignments_by_process[process]
+            pred_assignments = pred_assignments_by_process[process]
+            for ep in true_assignments.keys():
+                if (
+                    true_assignments[ep][in_span.GetId()]
+                    != pred_assignments[ep][in_span.GetId()]
+                ):
+                    trace_acc[in_span.trace_id] = False
+    correct = sum(trace_acc[tid] for tid in trace_acc)
+    return float(correct) / len(trace_acc)
+
 
 #predictor = FCFS(all_spans, all_processes)
 #predictor = Timing(all_spans, all_processes)
 predictor = Timing2(all_spans, all_processes)
 
+true_assignments_by_process = {}
+pred_assignments_by_process = {}
 for process in out_spans_by_process.keys():
     in_spans = in_spans_by_process[process]
     out_spans = out_spans_by_process[process]
@@ -273,5 +303,12 @@ for process in out_spans_by_process.keys():
     pred_assignments = predictor.FindAssignments(
         process, in_span_partitions, out_span_partitions
     )
-    acc = AccuracyForService(pred_assignments, true_assignments, in_span_partitions, out_span_partitions)
-    print("Accuracy for service %s: %f" % (process, acc))
+    acc = AccuracyForService(pred_assignments, true_assignments, in_span_partitions)
+    print("Accuracy for service %s: %.3f" % (process, acc))
+    true_assignments_by_process[process] = true_assignments
+    pred_assignments_by_process[process] = pred_assignments
+
+acc_e2e = AccuracyEndToEnd(
+    pred_assignments_by_process, true_assignments_by_process, in_spans_by_process
+)
+print("End-to-end accuracy: %.3f" % acc_e2e)
