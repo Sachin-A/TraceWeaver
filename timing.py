@@ -35,7 +35,7 @@ class Timing(object):
         eps.sort(key=lambda x: x[1])
         return [x[0] for x in eps]
 
-    def PopulateEpPairDistributions(
+    def ComputeEpPairDistParams(
         self,
         in_span_partitions,
         out_span_partitions,
@@ -50,15 +50,14 @@ class Timing(object):
             mean = (sum(t2) - sum(t1)) / len(t1)
             batch_means = []
             nbatches = 10
-            batch_size = math.ceil(float(len(t1))/nbatches)
+            batch_size = math.ceil(float(len(t1)) / nbatches)
             for i in range(nbatches):
                 start = i * batch_size
                 end = min(len(t1), (i + 1) * batch_size)
                 if end - start > 0:
-                    batch_mean = (sum(t2[start:end]) - sum(t1[start:end])) / (
-                        end - start
+                    batch_means.append(
+                        (sum(t2[start:end]) - sum(t1[start:end])) / (end - start)
                     )
-                    batch_means.append(batch_mean)
             std = math.sqrt(batch_size) * scipy.stats.tstd(batch_means)
             if VERBOSE:
                 print(
@@ -175,19 +174,19 @@ class Timing(object):
         ret = {}
         if best_assignment is not None:
             assert len(out_eps) == len(best_assignment) - 1
-            for i in range(len(out_eps)):
-                ret[out_eps[i]] = best_assignment[i + 1]
+            ret = {out_eps[i]: best_assignment[i + 1] for i in range(len(out_eps))}
         return ret
 
-    def AssignSpans(
+    def AddAssignment(
         self,
         in_span,
         assignment,
         all_assignments,
         out_span_partitions,
         out_eps,
+        delete_out_spans=False
     ):
-        # update assignments dict
+        # add assignment to all_assignments
         for ep in out_eps:
             if ep not in all_assignments:
                 all_assignments[ep] = {}
@@ -195,10 +194,12 @@ class Timing(object):
             out_span_id = out_span.GetId() if out_span is not None else ("NA", "NA")
             all_assignments[ep][in_span.GetId()] = out_span_id
 
-        # remove assignment spans so that they can't be assigned again
-        #!TODO: this implementation is not efficient
-        for ep, span in assignment.items():
-            out_span_partitions[ep].remove(span)
+        if delete_out_spans:
+            # remove spans of this assignment so they can't be assigned again
+            #!TODO: this implementation is not efficient
+            for ep, span in assignment.items():
+                # print(ep, in_span, span)
+                out_span_partitions[ep].remove(span)
 
     def FindAssignments(self, process, in_span_partitions, out_span_partitions):
         assert len(in_span_partitions) == 1
@@ -211,7 +212,7 @@ class Timing(object):
         batch_size = 100
         for in_span in in_spans:
             if cnt % batch_size == 0:
-                self.PopulateEpPairDistributions(
+                self.ComputeEpPairDistParams(
                     in_span_partitions,
                     out_span_partitions,
                     out_eps,
@@ -223,12 +224,13 @@ class Timing(object):
             min_cost_assignment = self.FindMinCostAssignment(
                 in_span, out_eps, out_span_partitions_copy
             )
-            self.AssignSpans(
+            self.AddAssignment(
                 in_span,
                 min_cost_assignment,
                 all_assignments,
                 out_span_partitions_copy,
                 out_eps,
+                delete_out_spans=True
             )
             cnt += 1
             cnt_unassigned += len(min_cost_assignment) == 0

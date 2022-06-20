@@ -266,8 +266,8 @@ def AccuracyEndToEnd(
 
 #predictor = FCFS(all_spans, all_processes)
 # predictor = FCFS2(all_spans, all_processes)
-predictor = Timing(all_spans, all_processes)
-# predictor = Timing2(all_spans, all_processes)
+#predictor = Timing(all_spans, all_processes)
+predictor = Timing2(all_spans, all_processes)
 
 true_assignments_by_process = {}
 pred_assignments_by_process = {}
@@ -299,14 +299,13 @@ for process in out_spans_by_process.keys():
         out_spans, lambda x: x.GetChildProcess()
     )
     print("Outgoing span partitions", process, out_span_partitions.keys())
-    print("\n")
 
     true_assignments = GetGroundTruth(in_span_partitions, out_span_partitions)
     pred_assignments = predictor.FindAssignments(
         process, in_span_partitions, out_span_partitions
     )
     acc = AccuracyForService(pred_assignments, true_assignments, in_span_partitions)
-    print("Accuracy for service %s: %.3f" % (process, acc))
+    print("Accuracy for service %s: %.3f\n\n" % (process, acc))
     true_assignments_by_process[process] = true_assignments
     pred_assignments_by_process[process] = pred_assignments
 
