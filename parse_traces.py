@@ -5,6 +5,7 @@ from fcfs import FCFS
 from fcfs2 import FCFS2
 from timing import Timing
 from timing2 import Timing2
+import math
 
 VERBOSE = False
 
@@ -246,14 +247,29 @@ def AccuracyForService(pred_assignments, true_assignments, in_span_partitions):
         cnt += int(correct)
     return float(cnt) / len(in_spans)
 
-'''
-def BinAccuracyByResponseTimes(self, trace_acc):
-    bins = dict()
-    for span in all_spans:
+
+def BinAccuracyByResponseTimes(trace_acc):
+    all_traces = []
+    for _, span in all_spans.items():
         if span.IsRoot():
-            correct = trace_acc[tid]
-        pass
-'''
+            correct = trace_acc[span.trace_id]
+            all_traces.append((span.duration_mus, span.trace_id, correct, 1))
+    all_traces.sort()
+    # accumulate
+    for i in range(1, len(all_traces)):
+        _, _, c, n = all_traces[i - 1]
+        t0, s0, c0, n0 = all_traces[i]
+        all_traces[i] = (t0, s0, c + c0, n + n0)
+    nbins = 10
+    prev_c, prev_n = 0, 0
+    for b in range(nbins):
+        d, _, c, n = all_traces[int((len(all_traces) * (b + 1)) / nbins - 1)]
+        c, n = c - prev_c, n - prev_n
+        prev_c, prev_n = prev_c + c, prev_n + n
+        print(
+            "Accuracy of %d-percentile bin: %.3f, response_time (ms): %.1f"
+            % ((b + 1) * 100 / nbins, c / n, d / 1000.0)
+        )
 
 def AccuracyEndToEnd(
     pred_assignments_by_process, true_assignments_by_process, in_spans_by_process
@@ -273,13 +289,14 @@ def AccuracyEndToEnd(
                 ):
                     trace_acc[in_span.trace_id] = False
     correct = sum(trace_acc[tid] for tid in trace_acc)
+    BinAccuracyByResponseTimes(trace_acc)
     return float(correct) / len(trace_acc)
 
 
-#predictor = FCFS(all_spans, all_processes)
+# predictor = FCFS(all_spans, all_processes)
 # predictor = FCFS2(all_spans, all_processes)
 predictor = Timing(all_spans, all_processes)
-#predictor = Timing2(all_spans, all_processes)
+# predictor = Timing2(all_spans, all_processes)
 
 true_assignments_by_process = {}
 pred_assignments_by_process = {}

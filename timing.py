@@ -222,7 +222,6 @@ class Timing(object):
                     in_span_start=cnt,
                     in_span_end=min(len(in_spans), cnt + batch_size),
                 )
-                print("Finished %d spans, unassigned spans: %d" % (cnt, cnt_unassigned))
             # find the min-cost assignment for in_span
             min_cost_assignment = self.FindMinCostAssignment(
                 in_span, out_eps, out_span_partitions_copy
@@ -238,4 +237,5 @@ class Timing(object):
             cnt += 1
             cnt_unassigned += len(min_cost_assignment) == 0
             #!TODO: update mean, std of service times using EWMA
+        print("Finished %d spans, unassigned spans: %d" % (cnt, cnt_unassigned))
         return all_assignments
