@@ -156,19 +156,22 @@ class Timing(object):
                 #!TODO: filter out branches that have high cost
                 ep = out_eps[i - 1]
                 for s in out_span_partitions[ep]:
-                    if i == 1:
-                        # first ep
-                        if in_span.start_mus < s.start_mus:
-                            DfsTraverse(stack + [s])
-                    elif i <= len(out_eps):
-                        # all other eps
-                        if (
-                            last_span.start_mus + last_span.duration_mus < s.start_mus
-                            and s.start_mus + s.duration_mus
-                            < in_span.start_mus + in_span.duration_mus
-                        ):
-                            DfsTraverse(stack + [s])
-
+                    # first ep
+                    if (
+                        i == 1
+                        and in_span.start_mus < s.start_mus
+                        and s.start_mus + s.duration_mus
+                        < in_span.start_mus + in_span.duration_mus
+                    ):
+                        DfsTraverse(stack + [s])
+                    # all other eps
+                    elif (
+                        i <= len(out_eps)
+                        and last_span.start_mus + last_span.duration_mus < s.start_mus
+                        and s.start_mus + s.duration_mus
+                        < in_span.start_mus + in_span.duration_mus
+                    ):
+                        DfsTraverse(stack + [s])
         DfsTraverse([in_span])
         # return a dictionary of {ep: span}
         ret = {}

@@ -16,7 +16,7 @@ class Span(object):
     def __init__(
         self,
         trace_id,
-        span_id,
+        sid,
         start_mus,
         duration_mus,
         op_name,
@@ -24,7 +24,7 @@ class Span(object):
         process_id,
         span_kind,
     ):
-        self.span_id = span_id
+        self.sid = sid
         self.trace_id = trace_id
         self.start_mus = start_mus
         self.duration_mus = duration_mus
@@ -45,14 +45,17 @@ class Span(object):
         ]
 
     def GetParentProcess(self):
-        if len(self.references) == 0:  # root
-            return "client"
+        if self.IsRoot():
+            return "client_" + self.op_name
         assert len(self.references) == 1
-        parent_span_id, _ = self.references[0]
+        parent_span_id = self.references[0]
         return all_processes[self.trace_id][all_spans[parent_span_id].process_id]
 
     def GetId(self):
-        return (self.trace_id, self.span_id)
+        return (self.trace_id, self.sid)
+
+    def IsRoot(self):
+        return len(self.references) == 0
 
     def __repr__(self):
         return "Span:(%s, %d, %d, %s)" % (
@@ -79,9 +82,10 @@ def ParseSpansJson(spans_json):
     for span in spans_json:
         references = []
         for ref in span["references"]:
-            references.append((ref["spanID"], ref["traceID"]))
+            references.append((ref["traceID"], ref["spanID"]))
         trace_id = span["traceID"]
-        span_id = span["spanID"]
+        sid = span["spanID"]
+        span_id = (trace_id, sid)
         start_mus = span["startTime"]
         duration_mus = span["duration"]
         op_name = span.get("operationName", None)
@@ -92,7 +96,7 @@ def ParseSpansJson(spans_json):
                 span_kind = tag["value"]
         spans[span_id] = Span(
             trace_id,
-            span_id,
+            sid,
             start_mus,
             duration_mus,
             op_name,
@@ -163,8 +167,8 @@ def ProcessTraceData(data):
     for span_id, span in spans.items():
         if len(span.references) == 0:
             root_span_id = span_id
-        for par_sid, par_tid in span.references:
-            spans[par_sid].AddChild(span_id)
+        for par_id in span.references:
+            spans[par_id].AddChild(span.GetId())
     for span_id, span in spans.items():
         span.children_spans.sort(
             key=lambda child_span_id: spans[child_span_id].start_mus
@@ -242,6 +246,14 @@ def AccuracyForService(pred_assignments, true_assignments, in_span_partitions):
         cnt += int(correct)
     return float(cnt) / len(in_spans)
 
+'''
+def BinAccuracyByResponseTimes(self, trace_acc):
+    bins = dict()
+    for span in all_spans:
+        if span.IsRoot():
+            correct = trace_acc[tid]
+        pass
+'''
 
 def AccuracyEndToEnd(
     pred_assignments_by_process, true_assignments_by_process, in_spans_by_process
@@ -266,8 +278,8 @@ def AccuracyEndToEnd(
 
 #predictor = FCFS(all_spans, all_processes)
 # predictor = FCFS2(all_spans, all_processes)
-#predictor = Timing(all_spans, all_processes)
-predictor = Timing2(all_spans, all_processes)
+predictor = Timing(all_spans, all_processes)
+#predictor = Timing2(all_spans, all_processes)
 
 true_assignments_by_process = {}
 pred_assignments_by_process = {}
