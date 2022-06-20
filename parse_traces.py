@@ -1,6 +1,7 @@
 import json
 import sys
 import os
+import pickle
 from fcfs import FCFS
 from fcfs2 import FCFS2
 from timing import Timing
@@ -293,52 +294,67 @@ def AccuracyEndToEnd(
     return float(correct) / len(trace_acc)
 
 
-# predictor = FCFS(all_spans, all_processes)
-# predictor = FCFS2(all_spans, all_processes)
-predictor = Timing(all_spans, all_processes)
-# predictor = Timing2(all_spans, all_processes)
+predictors = [
+    FCFS(all_spans, all_processes),
+    FCFS2(all_spans, all_processes),
+    Timing(all_spans, all_processes),
+    Timing2(all_spans, all_processes)
+]
+methods = ["fcfs", "fcfs++", "timing", "timing++"]
 
-true_assignments_by_process = {}
-pred_assignments_by_process = {}
-for process in out_spans_by_process.keys():
-    in_spans = in_spans_by_process[process]
-    out_spans = out_spans_by_process[process]
+#predictors = [FCFS(all_spans, all_processes)]
+#methods = ["fcfs"]
+accuracy_overall = {}
 
-    if len(out_spans) == 0:
-        continue
+for i in range(len(predictors)):
 
-    # partition spans by the other endpoint
-    def PartitionSpansByEndPoint(spans, endpoint_lambda):
-        partitions = {}
-        for span in spans:
-            ep = endpoint_lambda(span)
-            if ep not in partitions:
-                partitions[ep] = []
-            partitions[ep].append(span)
-        for ep, part in partitions.items():
-            part.sort(key=lambda x: x.start_mus)
-        return partitions
+    true_assignments_by_process = {}
+    pred_assignments_by_process = {}
+    for process in out_spans_by_process.keys():
+        in_spans = in_spans_by_process[process]
+        out_spans = out_spans_by_process[process]
 
-    # partition spans by subservice at the other end
-    in_span_partitions = PartitionSpansByEndPoint(
-        in_spans, lambda x: x.GetParentProcess()
+        if len(out_spans) == 0:
+            continue
+
+        # partition spans by the other endpoint
+        def PartitionSpansByEndPoint(spans, endpoint_lambda):
+            partitions = {}
+            for span in spans:
+                ep = endpoint_lambda(span)
+                if ep not in partitions:
+                    partitions[ep] = []
+                partitions[ep].append(span)
+            for ep, part in partitions.items():
+                part.sort(key=lambda x: x.start_mus)
+            return partitions
+
+        # partition spans by subservice at the other end
+        in_span_partitions = PartitionSpansByEndPoint(
+            in_spans, lambda x: x.GetParentProcess()
+        )
+        print("Incoming span partitions", process, in_span_partitions.keys())
+        out_span_partitions = PartitionSpansByEndPoint(
+            out_spans, lambda x: x.GetChildProcess()
+        )
+        print("Outgoing span partitions", process, out_span_partitions.keys())
+
+        true_assignments = GetGroundTruth(in_span_partitions, out_span_partitions)
+        pred_assignments = predictors[i].FindAssignments(
+            process, in_span_partitions, out_span_partitions
+        )
+        acc = AccuracyForService(pred_assignments, true_assignments, in_span_partitions)
+        print("Accuracy for service %s: %.3f\n\n" % (process, acc))
+        true_assignments_by_process[process] = true_assignments
+        pred_assignments_by_process[process] = pred_assignments
+
+    acc_e2e = AccuracyEndToEnd(
+        pred_assignments_by_process, true_assignments_by_process, in_spans_by_process
     )
-    print("Incoming span partitions", process, in_span_partitions.keys())
-    out_span_partitions = PartitionSpansByEndPoint(
-        out_spans, lambda x: x.GetChildProcess()
-    )
-    print("Outgoing span partitions", process, out_span_partitions.keys())
+    print("End-to-end accuracy: %.3f" % acc_e2e)
 
-    true_assignments = GetGroundTruth(in_span_partitions, out_span_partitions)
-    pred_assignments = predictor.FindAssignments(
-        process, in_span_partitions, out_span_partitions
-    )
-    acc = AccuracyForService(pred_assignments, true_assignments, in_span_partitions)
-    print("Accuracy for service %s: %.3f\n\n" % (process, acc))
-    true_assignments_by_process[process] = true_assignments
-    pred_assignments_by_process[process] = pred_assignments
+    accuracy_overall[methods[i]] = acc_e2e
 
-acc_e2e = AccuracyEndToEnd(
-    pred_assignments_by_process, true_assignments_by_process, in_spans_by_process
-)
-print("End-to-end accuracy: %.3f" % acc_e2e)
+load_level = sys.argv[2]
+with open('accuracy_' + str(load_level) + '.pickle', 'wb') as handle:
+    pickle.dump(accuracy_overall, handle, protocol = pickle.HIGHEST_PROTOCOL)
