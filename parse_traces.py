@@ -13,7 +13,6 @@ VERBOSE = False
 all_spans = dict()
 all_processes = dict()
 
-
 class Span(object):
     def __init__(
         self,
@@ -263,14 +262,20 @@ def BinAccuracyByResponseTimes(trace_acc):
         all_traces[i] = (t0, s0, c + c0, n + n0)
     nbins = 10
     prev_c, prev_n = 0, 0
+    accuracy = []
     for b in range(nbins):
         d, _, c, n = all_traces[int((len(all_traces) * (b + 1)) / nbins - 1)]
         c, n = c - prev_c, n - prev_n
         prev_c, prev_n = prev_c + c, prev_n + n
-        print(
-            "Accuracy of %d-percentile bin: %.3f, response_time (ms): %.1f"
-            % ((b + 1) * 100 / nbins, c / n, d / 1000.0)
-        )
+        percentile = (b + 1) * 100 / nbins
+        acc = c / n
+        if VERBOSE:
+            print(
+                "Accuracy of %d-percentile bin: %.3f, response_time (ms): %.1f"
+                % (percentile, acc, d / 1000.0)
+            )
+        accuracy.append((percentile, acc, d / 1000.0))
+    return accuracy
 
 def AccuracyEndToEnd(
     pred_assignments_by_process, true_assignments_by_process, in_spans_by_process
@@ -290,23 +295,20 @@ def AccuracyEndToEnd(
                 ):
                     trace_acc[in_span.trace_id] = False
     correct = sum(trace_acc[tid] for tid in trace_acc)
-    BinAccuracyByResponseTimes(trace_acc)
-    return float(correct) / len(trace_acc)
+    return trace_acc, float(correct) / len(trace_acc)
 
 
 predictors = [
-    FCFS(all_spans, all_processes),
-    FCFS2(all_spans, all_processes),
-    Timing(all_spans, all_processes),
-    Timing2(all_spans, all_processes)
+    ("Greedy++", Timing2(all_spans, all_processes)),
+    ("Greedy", Timing(all_spans, all_processes)),
+    ("FCFS", FCFS(all_spans, all_processes)),
+    ("FCFS++", FCFS2(all_spans, all_processes)),
 ]
-methods = ["fcfs", "fcfs++", "timing", "timing++"]
 
-#predictors = [FCFS(all_spans, all_processes)]
-#methods = ["fcfs"]
 accuracy_overall = {}
+accuracy_percentile_bins = {}
 
-for i in range(len(predictors)):
+for method, predictor in predictors:
 
     true_assignments_by_process = {}
     pred_assignments_by_process = {}
@@ -340,21 +342,23 @@ for i in range(len(predictors)):
         print("Outgoing span partitions", process, out_span_partitions.keys())
 
         true_assignments = GetGroundTruth(in_span_partitions, out_span_partitions)
-        pred_assignments = predictors[i].FindAssignments(
+        pred_assignments = predictor.FindAssignments(
             process, in_span_partitions, out_span_partitions
         )
         acc = AccuracyForService(pred_assignments, true_assignments, in_span_partitions)
-        print("Accuracy for service %s: %.3f\n\n" % (process, acc))
+        print("Accuracy for service %s: %.3f\n" % (process, acc))
         true_assignments_by_process[process] = true_assignments
         pred_assignments_by_process[process] = pred_assignments
 
-    acc_e2e = AccuracyEndToEnd(
+    trace_acc, acc_e2e = AccuracyEndToEnd(
         pred_assignments_by_process, true_assignments_by_process, in_spans_by_process
     )
-    print("End-to-end accuracy: %.3f" % acc_e2e)
-
-    accuracy_overall[methods[i]] = acc_e2e
+    print("End-to-end accuracy for method %s: %.3f\n\n" % (method, acc_e2e))
+    accuracy_overall[method] = acc_e2e
+    accuracy_percentile_bins[method] = BinAccuracyByResponseTimes(trace_acc)
 
 load_level = sys.argv[2]
+with open('plots/bin_acc_' + str(load_level) + '.pickle', 'wb') as handle:
+    pickle.dump(accuracy_percentile_bins, handle, protocol = pickle.HIGHEST_PROTOCOL)
 with open('accuracy_' + str(load_level) + '.pickle', 'wb') as handle:
     pickle.dump(accuracy_overall, handle, protocol = pickle.HIGHEST_PROTOCOL)
