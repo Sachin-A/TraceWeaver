@@ -360,5 +360,5 @@ for method, predictor in predictors:
 load_level = sys.argv[2]
 with open('plots/bin_acc_' + str(load_level) + '.pickle', 'wb') as handle:
     pickle.dump(accuracy_percentile_bins, handle, protocol = pickle.HIGHEST_PROTOCOL)
-with open('accuracy_' + str(load_level) + '.pickle', 'wb') as handle:
+with open('plots/accuracy_' + str(load_level) + '.pickle', 'wb') as handle:
     pickle.dump(accuracy_overall, handle, protocol = pickle.HIGHEST_PROTOCOL)
