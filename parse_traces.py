@@ -1,6 +1,7 @@
-import json
-import sys
 import os
+import sys
+import json
+import math
 import pickle
 from fcfs import FCFS
 from fcfs2 import FCFS2
@@ -59,6 +60,9 @@ class Span(object):
     def IsRoot(self):
         return len(self.references) == 0
 
+    def __lt__(self, other):
+        return self.start_mus < other.start_mus
+
     def __repr__(self):
         return "Span:(%s, %d, %d, %s)" % (
             self.op_name,
@@ -69,6 +73,85 @@ class Span(object):
 
     def __str__(self):
         return self.__repr__()
+
+'''
+FOR all e2e requests
+WHICH
+    were in the top 5% response latency bracket AND
+    were initiated after time X,
+FIND
+    the worst performing service AND
+    its mean service latency for these requests
+'''
+
+def sampleQuery():
+
+    for j in range(4, 5):
+
+        query_latency = {}
+
+        with open("plots/e2e_" + str((j + 1) * 25) + "_version2.pickle", 'rb') as afile:
+            e2e_traces = pickle.load(afile)
+
+        for method in e2e_traces.keys():
+
+            true_traces = e2e_traces[method][0]
+
+            true_traces = dict(
+                sorted(
+                    true_traces.items(),
+                    key=lambda x: x[1][-1].start_mus + x[1][-1].duration_mus - x[1][0].start_mus
+                )
+            )
+
+            p1 = int(0.9 * len(true_traces))
+            # p1 = int(0 * len(true_traces))
+            start_time = list(true_traces.items())[200][1][0].start_mus
+
+            # true_traces = list(
+            #     filter(
+            #         lambda x: x[1][0].start_mus > start_time,
+            #         list(true_traces.items())[p1:]
+            #     )
+            # )
+            # true_traces = list(
+            #     filter(
+            #         lambda x: x[1][0].start_mus < start_time,
+            #         list(true_traces.items())[p1:]
+            #     )
+            # )
+            true_traces = list(
+                filter(
+                    lambda x: x[1][0].start_mus > 0,
+                    list(true_traces.items())[p1:]
+                )
+            )
+
+            pred_traces = e2e_traces[method][1]
+            pred_traces_assigned = []
+
+            for trace in true_traces:
+                if not any(x is None for x in pred_traces[trace[0]]):
+                    pred_traces_assigned.append((trace[0], pred_traces[trace[0]]))
+
+            latency_per_service_true = [[] for i in range(5)]
+            latency_per_service_pred = [[] for i in range(5)]
+
+            for _, trace in true_traces:
+                for i, span in enumerate(trace):
+                    latency_per_service_true[i].append((span.trace_id, span.sid, span.start_mus, span.duration_mus))
+            for _, trace in pred_traces_assigned:
+                for i, span in enumerate(trace):
+                    latency_per_service_pred[i].append((span.trace_id, span.sid, span.start_mus, span.duration_mus))
+
+            query_latency[method] = [latency_per_service_true, latency_per_service_pred]
+
+        load_level = (j + 1) * 25
+
+        with open('plots/query_latency_' + str(load_level) + '_version2_top10.pickle', 'wb') as handle:
+            pickle.dump(query_latency, handle, protocol = pickle.HIGHEST_PROTOCOL)
+        # with open('plots/query_latency_' + str(load_level) + '_all_version2.pickle', 'wb') as handle:
+            # pickle.dump(query_latency, handle, protocol = pickle.HIGHEST_PROTOCOL)
 
 
 def GetAllTracesInDir(directory):
@@ -313,6 +396,37 @@ def AccuracyEndToEnd(
     correct = sum(trace_acc[tid] for tid in trace_acc)
     return trace_acc, float(correct) / len(trace_acc)
 
+def ConstructEndToEndTraces(
+    pred_assignments_by_process, true_assignments_by_process, in_spans_by_process
+):
+    def OrderTraces(end_to_end_traces):
+        for trace_id in end_to_end_traces:
+            end_to_end_traces[trace_id].sort(
+                key=lambda x: float('inf') if x is None else x.start_mus
+            )
+
+    processes = true_assignments_by_process.keys()
+    true_traces = {}
+    pred_traces = {}
+    for process in processes:
+        for in_span in in_spans_by_process[process]:
+            if in_span.trace_id not in pred_traces:
+                true_traces[in_span.trace_id] = []
+                pred_traces[in_span.trace_id] = []
+            true_assignments = true_assignments_by_process[process]
+            pred_assignments = pred_assignments_by_process[process]
+            for ep in true_assignments.keys():
+                true_traces[in_span.trace_id].append(
+                    all_spans.get(true_assignments[ep][in_span.GetId()])
+                )
+                pred_traces[in_span.trace_id].append(
+                    all_spans.get(pred_assignments[ep][in_span.GetId()])
+                )
+    OrderTraces(true_traces)
+    OrderTraces(pred_traces)
+
+    return true_traces, pred_traces
+
 predictors = [
 #    ("Greedy++", Timing2(all_spans, all_processes)),
     ("Greedy", Timing(all_spans, all_processes)),
@@ -322,6 +436,7 @@ predictors = [
 
 accuracy_overall = {}
 accuracy_percentile_bins = {}
+traces_overall = {}
 
 for method, predictor in predictors:
 
@@ -368,13 +483,23 @@ for method, predictor in predictors:
     trace_acc, acc_e2e = AccuracyEndToEnd(
         pred_assignments_by_process, true_assignments_by_process, in_spans_by_process
     )
+    true_traces_e2e, pred_traces_e2e = ConstructEndToEndTraces(
+        pred_assignments_by_process, true_assignments_by_process, in_spans_by_process
+    )
+    traces_overall[method] = [true_traces_e2e, pred_traces_e2e]
+
     print("End-to-end accuracy for method %s: %.3f\n\n" % (method, acc_e2e))
     accuracy_overall[method] = acc_e2e
     accuracy_percentile_bins[method] = BinAccuracyByResponseTimes(trace_acc)
     #PrintLatency12(trace_acc)
 
 load_level = sys.argv[2]
-with open('plots/bin_acc_' + str(load_level) + '.pickle', 'wb') as handle:
+
+with open('plots/bin_acc_' + str(load_level) + '_version2.pickle', 'wb') as handle:
     pickle.dump(accuracy_percentile_bins, handle, protocol = pickle.HIGHEST_PROTOCOL)
-with open('plots/accuracy_' + str(load_level) + '.pickle', 'wb') as handle:
+with open('plots/accuracy_' + str(load_level) + '_version2.pickle', 'wb') as handle:
     pickle.dump(accuracy_overall, handle, protocol = pickle.HIGHEST_PROTOCOL)
+with open('plots/e2e_' + str(load_level) + '_version2.pickle', 'wb') as handle:
+        pickle.dump(traces_overall, handle, protocol = pickle.HIGHEST_PROTOCOL)
+
+sampleQuery()
