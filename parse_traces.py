@@ -7,6 +7,7 @@ from fcfs2 import FCFS2
 from timing import Timing
 from timing2 import Timing2
 import math
+import copy
 
 VERBOSE = False
 
@@ -137,10 +138,8 @@ def ParseJsonTrace(trace_json):
     trace_id, spans = ret[0]
     return trace_id, spans, processes
 
-
 in_spans_by_process = dict()
 out_spans_by_process = dict()
-
 
 def ProcessTraceData(data):
     trace_id, spans, processes = data
@@ -220,6 +219,8 @@ if VERBOSE:
     print("\n\n\n")
 
 
+
+
 def GetGroundTruth(in_span_partitions, out_span_partitions):
     assert len(in_span_partitions) == 1
     _, in_spans = list(in_span_partitions.items())[0]
@@ -247,6 +248,21 @@ def AccuracyForService(pred_assignments, true_assignments, in_span_partitions):
         cnt += int(correct)
     return float(cnt) / len(in_spans)
 
+def PrintLatency12(trace_acc):
+    all_traces = []
+    min_time = 1.0e40
+    for _, span in all_spans.items():
+        if span.IsRoot():
+            child_spans = copy.deepcopy(span.children_spans)
+            child_spans.sort(key=lambda s: all_spans[s].start_mus)
+            processing_delay = all_spans[child_spans[0]].start_mus - span.start_mus
+            correct = trace_acc[span.trace_id]
+            all_traces.append((span.start_mus, processing_delay, span.trace_id, correct, 1))
+            min_time = min(span.start_mus, min_time)
+    all_traces.sort()
+    for x in all_traces:
+        x = x[0] - min_time, x[1], x[2], x[3], x[4]
+        print(x)
 
 def BinAccuracyByResponseTimes(trace_acc):
     all_traces = []
@@ -297,12 +313,11 @@ def AccuracyEndToEnd(
     correct = sum(trace_acc[tid] for tid in trace_acc)
     return trace_acc, float(correct) / len(trace_acc)
 
-
 predictors = [
-    ("Greedy++", Timing2(all_spans, all_processes)),
+#    ("Greedy++", Timing2(all_spans, all_processes)),
     ("Greedy", Timing(all_spans, all_processes)),
-    ("FCFS", FCFS(all_spans, all_processes)),
-    ("FCFS++", FCFS2(all_spans, all_processes)),
+#    ("FCFS", FCFS(all_spans, all_processes)),
+#    ("FCFS++", FCFS2(all_spans, all_processes)),
 ]
 
 accuracy_overall = {}
@@ -356,6 +371,7 @@ for method, predictor in predictors:
     print("End-to-end accuracy for method %s: %.3f\n\n" % (method, acc_e2e))
     accuracy_overall[method] = acc_e2e
     accuracy_percentile_bins[method] = BinAccuracyByResponseTimes(trace_acc)
+    #PrintLatency12(trace_acc)
 
 load_level = sys.argv[2]
 with open('plots/bin_acc_' + str(load_level) + '.pickle', 'wb') as handle:

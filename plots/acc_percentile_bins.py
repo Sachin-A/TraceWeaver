@@ -35,7 +35,7 @@ def plot_lines(xs, ys, labels, xlabel, ylabel, outfile):
     assert (len(ys) == nlines and len(labels) == nlines)
     for i in range(nlines):
         pcolor = pcolors[i]
-        ax.plot(xs[i], ys[i], '-', color=pcolor,  lw=2.5,  marker=markers[i], mew = 1.5, markersize = 10, markerfacecolor='none', markeredgecolor=pcolor, dash_capstyle='round', label=labels[i])
+        ax.plot(xs[i], ys[i], '-', color=pcolor,  lw=2.5,  marker=markers[i], mew = 1.5, markersize = 9, markerfacecolor='none', markeredgecolor=pcolor, dash_capstyle='round', label=labels[i])
         #ax.plot(xs[i], ys[i], '-', color=pcolor,  lw=2.5,  dash_capstyle='round', label=labels[i])
 
     label_fontsize=20
@@ -45,7 +45,6 @@ def plot_lines(xs, ys, labels, xlabel, ylabel, outfile):
     xmax, ymax = 200, 60
     plt.xlim(xmax=100.0)
     plt.ylim(ymin=0, ymax=1.0)
-    #plt.ylim(ymin=-0.1, ymax=1.0) #ymax=1.01*max([max(y) for y in ys]))
     #plt.annotate('correct prediction', xy=(0.45, 0.90), xycoords='axes fraction', fontsize=label_fontsize)
     #ax.axhspan(0.0, xmax, alpha=0.6, color='grey')
     ax.grid(linestyle=':', linewidth=1, color='grey')
@@ -54,7 +53,12 @@ def plot_lines(xs, ys, labels, xlabel, ylabel, outfile):
     #ax.xaxis.set_ticks(xticks)
     #xticks = np.array([string(x) for x in xticks])
     #ax.set_xticklabels(xticks, color=ticklabelcolor)
-    leg = ax.legend(bbox_to_anchor=(0.28, 0.45), borderaxespad=0, loc=2, numpoints=2, handlelength=2, prop=gs_font, fontsize=label_fontsize)
+    handles, labels = plt.gca().get_legend_handles_labels()
+    handles, labels = zip(*[ (handles[i], labels[i]) for i in sorted(range(len(handles)), key=lambda k: list(labels)[k])])
+    print(labels)
+    order = [3,2,1,0]
+    print([labels[idx] for idx in order])
+    leg = ax.legend([handles[idx] for idx in order],[labels[idx] for idx in order], bbox_to_anchor=(0.28, 0.45), borderaxespad=0, loc=2, numpoints=2, handlelength=2, prop=gs_font, fontsize=label_fontsize)
     leg.get_frame().set_linewidth(0.0)
     plt.tick_params(labelsize=label_fontsize)
     axcolor='black'
@@ -96,7 +100,7 @@ with open(infile, 'rb') as afile:
         for p, a, t in acc:
             x.append(p)
             y.append(a)
-        labels.append(method)
+        labels.append(method.lower())
         xs.append(x)
         ys.append(y)
 
