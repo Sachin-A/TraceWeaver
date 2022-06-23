@@ -427,21 +427,12 @@ def ConstructEndToEndTraces(
 
     return true_traces, pred_traces
 
-<<<<<<< HEAD
-predictors = [
-#    ("Greedy++", Timing2(all_spans, all_processes)),
-    ("Greedy", Timing(all_spans, all_processes)),
-#    ("FCFS", FCFS(all_spans, all_processes)),
-#    ("FCFS++", FCFS2(all_spans, all_processes)),
-]
-=======
 # predictors = [
 #     ("Greedy++", Timing2(all_spans, all_processes)),
 #     ("Greedy", Timing(all_spans, all_processes)),
 #     ("FCFS", FCFS(all_spans, all_processes)),
 #     ("FCFS++", FCFS2(all_spans, all_processes)),
 # ]
->>>>>>> 3e900e8 (Updated dataset (batch-152) with +30 ms delay at Geo)
 
 # accuracy_overall = {}
 # accuracy_percentile_bins = {}
