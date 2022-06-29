@@ -1,12 +1,12 @@
 import numpy as np
-import pickle
+import pickle5 as pickle
 import sys
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
  
 
 pcolors = ['#0e326d', '#028413', '#a5669f', '#db850d', '#00112d', '#af0505']
-pcolors = ['#000080', '#008000', '#990000', '#a5669f',  '#db850d',  '#00112d']
+pcolors = ['#008000', '#000080', '#990000', '#a5669f',  '#db850d',  '#00112d']
 markers = ['s', 'o', 'x', '^', 'v', '*', 'p', 'h']
 linestyle = ['-', '.', '--']
 
@@ -58,7 +58,7 @@ def plot_lines(xs, ys, labels, xlabel, ylabel, outfile):
     print(labels)
     order = [3,2,1,0]
     print([labels[idx] for idx in order])
-    leg = ax.legend([handles[idx] for idx in order],[labels[idx] for idx in order], bbox_to_anchor=(0.28, 0.45), borderaxespad=0, loc=2, numpoints=2, handlelength=2, prop=gs_font, fontsize=label_fontsize)
+    leg = ax.legend([handles[idx] for idx in order],[labels[idx] for idx in order], bbox_to_anchor=(0.29, 0.48), borderaxespad=0, loc=2, numpoints=2, handlelength=2, prop=gs_font, fontsize=label_fontsize)
     leg.get_frame().set_linewidth(0.0)
     plt.tick_params(labelsize=label_fontsize)
     axcolor='black'
@@ -91,16 +91,18 @@ def string_to_numeric_array(s):
 
 xs = []
 ys = []
-labels = []
+methods = ['Greedy++', "Greedy", "FCFS++", "FCFS"]
+labels = ["MaxScoreBatch", "MaxScore", "FCFS", "ArrivalOrder"]
 with open(infile, 'rb') as afile:
     accuracy_percentile_bins = pickle.load(afile)
-    for method, acc in accuracy_percentile_bins.items():
+    for method in methods:
+        acc = accuracy_percentile_bins[method]
         x = []
         y = []
+        print(acc)
         for p, a, t in acc:
             x.append(p)
             y.append(a)
-        labels.append(method.lower())
         xs.append(x)
         ys.append(y)
 

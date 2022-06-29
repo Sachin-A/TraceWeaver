@@ -1,12 +1,12 @@
 import numpy as np
-import pickle
+import pickle5 as pickle
 import sys
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 
 
 pcolors = ['#0e326d', '#028413', '#a5669f', '#db850d', '#00112d', '#af0505']
-pcolors = ['#000080', '#008000', '#990000', '#a5669f',  '#db850d',  '#00112d']
+pcolors = ['#008000', '#000080', '#990000', '#a5669f',  '#db850d',  '#00112d']
 markers = ['s', 'o', 'x', '^', 'v', '*', 'p', 'h']
 linestyle = ['-', '.', '--']
 
@@ -43,7 +43,7 @@ def plot_lines(xs, ys, labels, xlabel, ylabel, outfile):
     ax.set_ylabel(ylabel, fontproperties=gs_font, fontsize=label_fontsize)
     xmax=1.05*max([max(x) for x in xs])
     xmax, ymax = 200, 60
-    plt.xlim(xmax=155.0)
+    plt.xlim(xmax=152.0)
     plt.ylim(ymin=0, ymax=1.05)
     #plt.ylim(ymin=-0.1, ymax=1.0) #ymax=1.01*max([max(y) for y in ys]))
     #plt.annotate('correct prediction', xy=(0.45, 0.90), xycoords='axes fraction', fontsize=label_fontsize)
@@ -54,7 +54,7 @@ def plot_lines(xs, ys, labels, xlabel, ylabel, outfile):
     #ax.xaxis.set_ticks(xticks)
     #xticks = np.array([string(x) for x in xticks])
     #ax.set_xticklabels(xticks, color=ticklabelcolor)
-    leg = ax.legend(bbox_to_anchor=(0.28, 0.45), borderaxespad=0, loc=2, numpoints=2, handlelength=2, prop=gs_font, fontsize=label_fontsize)
+    leg = ax.legend(bbox_to_anchor=(0.22, 0.5), borderaxespad=0, loc=2, numpoints=2, handlelength=2, prop=gs_font, fontsize=label_fontsize)
     leg.get_frame().set_linewidth(0.0)
     plt.tick_params(labelsize=label_fontsize)
     axcolor='black'
@@ -87,16 +87,23 @@ def string_to_numeric_array(s):
 
 xs = []
 ys = []
-methods = ["Greedy++", "Greedy", "FCFS++", "FCFS"]
+methods = ['Greedy++', "Greedy", "FCFS++", "FCFS"]
+labels = ["MaxScoreBatch", "MaxScore", "FCFS", "ArrivalOrder"]
 for i in range(4):
     x = []
     y = []
     for j in range(6):
-        with open("accuracy_" + str((j + 1) * 25) + ".pickle", 'rb') as afile:
+        filename = "accuracy_" + str((j + 1) * 25) + ".pickle"
+        if j==5:
+            filename = "vipul/" + filename 
+        with open(filename, 'rb') as afile:
             accuracy_load = pickle.load(afile)
-        x.append((j + 1) * 25)
-        y.append(accuracy_load[methods[i]])
+            print(accuracy_load.keys())
+            if len(list(accuracy_load.keys())) < 4:
+                continue
+            x.append((j + 1) * 25)
+            y.append(accuracy_load[methods[i]])
     xs.append(x)
     ys.append(y)
 
-plot_lines(xs, ys, methods, "System load (RPS)", "Accuracy", outfile)
+plot_lines(xs, ys, labels, "System load (RPS)", "Accuracy", outfile)

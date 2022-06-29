@@ -2,7 +2,7 @@ import os
 import sys
 import json
 import math
-import pickle
+import pickle5 as pickle
 from fcfs import FCFS
 from fcfs2 import FCFS2
 from timing import Timing
@@ -83,30 +83,48 @@ FIND
     the worst performing service AND
     its mean service latency for these requests
 '''
-
+#maindir = "152"
+maindir = "10-1"
 def sampleQuery():
-
-    for j in range(4, 5):
+    rrange = range(4, 5)
+    if "25-1" in maindir or "10-1" in maindir:
+        rrange = range(0, 1)
+    for j in rrange:
 
         query_latency = {}
 
-        with open("plots/e2e_" + str((j + 1) * 25) + "_version2.pickle", 'rb') as afile:
+        filename = "plots/vipul/" + maindir + "/e2e_" + str((j + 1) * 25) + ".pickle"
+        if "153" in sys.argv[1]:
+            filename = "plots/vipul/153/e2e_" + str((j + 1) * 25) + ".pickle"
+        #elif "25-1" in sys.argv[1]:
+        #    filename = "plots/vipul/25-1/e2e_" + str((j + 1) * 25) + ".pickle"
+
+        with open(filename, 'rb') as afile:
             e2e_traces = pickle.load(afile)
 
         for method in e2e_traces.keys():
 
             true_traces = e2e_traces[method][0]
 
-            true_traces = dict(
+            true_traces = list(
                 sorted(
                     true_traces.items(),
-                    key=lambda x: x[1][-1].start_mus + x[1][-1].duration_mus - x[1][0].start_mus
+                    key=lambda x: x[1][0].start_mus
                 )
             )
+            percentile = 98
+            nreq = 0
+            nreq2 = nreq + 500
 
-            # p1 = int(0.95 * len(true_traces))
-            p1 = int(0 * len(true_traces))
-            start_time = list(true_traces.items())[100][1][0].start_mus
+            #p1 = int(0.80 * len(true_traces))
+            start_time = true_traces[nreq][1][0].start_mus
+            end_time = true_traces[nreq2][1][0].start_mus
+
+            def FilterSpan(span, all_spans=False):
+                return (
+                    (hash(span.trace_id) % 1 == 0 or all_spans) and
+                    span.start_mus > start_time and span.start_mus < end_time
+                )
 
             # true_traces = list(
             #     filter(
@@ -114,44 +132,76 @@ def sampleQuery():
             #         list(true_traces.items())[p1:]
             #     )
             # )
-            true_traces = list(
-                filter(
-                    lambda x: x[1][0].start_mus < start_time,
-                    list(true_traces.items())[p1:]
+            if "all_spans" not in sys.argv[-1]:
+                true_traces = list(
+                    filter(
+                        lambda x: FilterSpan(x[1][0]),
+                        true_traces,
+                    )
                 )
-            )
-            # true_traces = list(
-            #     filter(
-            #         lambda x: x[1][0].start_mus > 0,
-            #         list(true_traces.items())[p1:]
-            #     )
-            # )
+                print(len(true_traces))
+                true_traces.sort(
+                        key=lambda x: x[1][-1].start_mus + x[1][-1].duration_mus - x[1][0].start_mus
+                    )
+                p1 = int(percentile * float(len(true_traces)/100))
+                true_traces = true_traces[p1:]
+                # true_traces = list(
+                #     filter(
+                #         lambda x: x[1][0].start_mus > 0,
+                #         list(true_traces.items())[p1:]
+                #     )
+                # )
+                pred_traces = e2e_traces[method][1]
+                pred_traces_assigned = []
 
-            pred_traces = e2e_traces[method][1]
-            pred_traces_assigned = []
+                for trace in true_traces:
+                    if not any(x is None for x in pred_traces[trace[0]]):
+                        pred_traces_assigned.append((trace[0], pred_traces[trace[0]]))
 
-            for trace in true_traces:
-                if not any(x is None for x in pred_traces[trace[0]]):
-                    pred_traces_assigned.append((trace[0], pred_traces[trace[0]]))
+                latency_per_service_true = [[] for i in range(5)]
+                latency_per_service_pred = [[] for i in range(5)]
 
-            latency_per_service_true = [[] for i in range(5)]
-            latency_per_service_pred = [[] for i in range(5)]
+                for _, trace in true_traces:
+                    for i, span in enumerate(trace):
+                        latency_per_service_true[i].append((span.trace_id, span.sid, span.start_mus, span.duration_mus))
+                for _, trace in pred_traces_assigned:
+                    for i, span in enumerate(trace):
+                        latency_per_service_pred[i].append((span.trace_id, span.sid, span.start_mus, span.duration_mus))
 
-            for _, trace in true_traces:
-                for i, span in enumerate(trace):
-                    latency_per_service_true[i].append((span.trace_id, span.sid, span.start_mus, span.duration_mus))
-            for _, trace in pred_traces_assigned:
-                for i, span in enumerate(trace):
-                    latency_per_service_pred[i].append((span.trace_id, span.sid, span.start_mus, span.duration_mus))
+
+            else:
+                latency_per_service_true = [[] for i in range(5)]
+                latency_per_service_pred = [[] for i in range(5)]
+                for i in range(5):
+                    traces_i = list(
+                        filter(
+                            lambda x: FilterSpan(x[1][i], all_spans=True),
+                            true_traces
+                            #list(true_traces.items())[p1:]
+                        )
+                    )
+                    traces_i.sort(
+                        key=lambda x: x[1][i].duration_mus
+                    )
+                    p1 = int(percentile * float(len(traces_i)/100))
+                    print("p1", p1, len(traces_i))
+                    traces_i = traces_i[p1:]
+                    #print(traces_i)
+                    for _, trace in traces_i:
+                        span = trace[i]
+                        latency_per_service_true[i].append((span.trace_id, span.sid, span.start_mus, span.duration_mus))
+                        latency_per_service_pred[i].append((span.trace_id, span.sid, span.start_mus, span.duration_mus))
 
             query_latency[method] = [latency_per_service_true, latency_per_service_pred]
-
         load_level = (j + 1) * 25
-
-        # with open('plots/query_latency_' + str(load_level) + '_version2_before100.pickle', 'wb') as handle:
-            # pickle.dump(query_latency, handle, protocol = pickle.HIGHEST_PROTOCOL)
-        with open('plots/query_latency_' + str(load_level) + '_all_version2_before100.pickle', 'wb') as handle:
-            pickle.dump(query_latency, handle, protocol = pickle.HIGHEST_PROTOCOL)
+        nreq = "_na_"
+        percentile = "_na_"
+        if "all_spans" in sys.argv[-1]:
+            with open('plots/vipul/query_latency_' + str(load_level) + '_all_version2_before' + str(nreq) + '_p' + str(percentile) + '.pickle', 'wb') as handle:
+                pickle.dump(query_latency, handle, protocol = pickle.HIGHEST_PROTOCOL)
+        else:
+            with open('plots/vipul/query_latency_' + str(load_level) + '_version2_before' + str(nreq) + '_p' + str(percentile) + '.pickle', 'wb') as handle:
+                pickle.dump(query_latency, handle, protocol = pickle.HIGHEST_PROTOCOL)
 
 
 def GetAllTracesInDir(directory):
@@ -301,9 +351,6 @@ if VERBOSE:
         print("  %s: %s" % (p, s))
     print("\n\n\n")
 
-
-
-
 def GetGroundTruth(in_span_partitions, out_span_partitions):
     assert len(in_span_partitions) == 1
     _, in_spans = list(in_span_partitions.items())[0]
@@ -427,78 +474,78 @@ def ConstructEndToEndTraces(
 
     return true_traces, pred_traces
 
-# predictors = [
-#     ("Greedy++", Timing2(all_spans, all_processes)),
-#     ("Greedy", Timing(all_spans, all_processes)),
-#     ("FCFS", FCFS(all_spans, all_processes)),
-#     ("FCFS++", FCFS2(all_spans, all_processes)),
-# ]
+predictors = [
+    ("Greedy++", Timing2(all_spans, all_processes)),
+    ("Greedy", Timing(all_spans, all_processes)),
+    ("FCFS", FCFS(all_spans, all_processes)),
+    ("FCFS++", FCFS2(all_spans, all_processes)),
+]
 
-# accuracy_overall = {}
-# accuracy_percentile_bins = {}
-# traces_overall = {}
+accuracy_overall = {}
+accuracy_percentile_bins = {}
+traces_overall = {}
+'''
+for method, predictor in predictors:
 
-# for method, predictor in predictors:
+    true_assignments_by_process = {}
+    pred_assignments_by_process = {}
+    for process in out_spans_by_process.keys():
+        in_spans = in_spans_by_process[process]
+        out_spans = out_spans_by_process[process]
 
-#     true_assignments_by_process = {}
-#     pred_assignments_by_process = {}
-#     for process in out_spans_by_process.keys():
-#         in_spans = in_spans_by_process[process]
-#         out_spans = out_spans_by_process[process]
+        if len(out_spans) == 0:
+            continue
 
-#         if len(out_spans) == 0:
-#             continue
+        # partition spans by the other endpoint
+        def PartitionSpansByEndPoint(spans, endpoint_lambda):
+            partitions = {}
+            for span in spans:
+                ep = endpoint_lambda(span)
+                if ep not in partitions:
+                    partitions[ep] = []
+                partitions[ep].append(span)
+            for ep, part in partitions.items():
+                part.sort(key=lambda x: x.start_mus)
+            return partitions
 
-#         # partition spans by the other endpoint
-#         def PartitionSpansByEndPoint(spans, endpoint_lambda):
-#             partitions = {}
-#             for span in spans:
-#                 ep = endpoint_lambda(span)
-#                 if ep not in partitions:
-#                     partitions[ep] = []
-#                 partitions[ep].append(span)
-#             for ep, part in partitions.items():
-#                 part.sort(key=lambda x: x.start_mus)
-#             return partitions
+         # partition spans by subservice at the other end
+        in_span_partitions = PartitionSpansByEndPoint(
+            in_spans, lambda x: x.GetParentProcess()
+        )
+        print("Incoming span partitions", process, in_span_partitions.keys())
+        out_span_partitions = PartitionSpansByEndPoint(
+            out_spans, lambda x: x.GetChildProcess()
+        )
+        print("Outgoing span partitions", process, out_span_partitions.keys())
 
-#         # partition spans by subservice at the other end
-#         in_span_partitions = PartitionSpansByEndPoint(
-#             in_spans, lambda x: x.GetParentProcess()
-#         )
-#         print("Incoming span partitions", process, in_span_partitions.keys())
-#         out_span_partitions = PartitionSpansByEndPoint(
-#             out_spans, lambda x: x.GetChildProcess()
-#         )
-#         print("Outgoing span partitions", process, out_span_partitions.keys())
+        true_assignments = GetGroundTruth(in_span_partitions, out_span_partitions)
+        pred_assignments = predictor.FindAssignments(
+            process, in_span_partitions, out_span_partitions
+        )
+        acc = AccuracyForService(pred_assignments, true_assignments, in_span_partitions)
+        print("Accuracy for service %s: %.3f\n" % (process, acc))
+        true_assignments_by_process[process] = true_assignments
+        pred_assignments_by_process[process] = pred_assignments
 
-#         true_assignments = GetGroundTruth(in_span_partitions, out_span_partitions)
-#         pred_assignments = predictor.FindAssignments(
-#             process, in_span_partitions, out_span_partitions
-#         )
-#         acc = AccuracyForService(pred_assignments, true_assignments, in_span_partitions)
-#         print("Accuracy for service %s: %.3f\n" % (process, acc))
-#         true_assignments_by_process[process] = true_assignments
-#         pred_assignments_by_process[process] = pred_assignments
+    trace_acc, acc_e2e = AccuracyEndToEnd(
+        pred_assignments_by_process, true_assignments_by_process, in_spans_by_process
+    )
+    true_traces_e2e, pred_traces_e2e = ConstructEndToEndTraces(
+        pred_assignments_by_process, true_assignments_by_process, in_spans_by_process
+    )
+    traces_overall[method] = [true_traces_e2e, pred_traces_e2e]
 
-#     trace_acc, acc_e2e = AccuracyEndToEnd(
-#         pred_assignments_by_process, true_assignments_by_process, in_spans_by_process
-#     )
-#     true_traces_e2e, pred_traces_e2e = ConstructEndToEndTraces(
-#         pred_assignments_by_process, true_assignments_by_process, in_spans_by_process
-#     )
-#     traces_overall[method] = [true_traces_e2e, pred_traces_e2e]
-
-#     print("End-to-end accuracy for method %s: %.3f\n\n" % (method, acc_e2e))
-#     accuracy_overall[method] = acc_e2e
-#     accuracy_percentile_bins[method] = BinAccuracyByResponseTimes(trace_acc)
-
-# load_level = sys.argv[2]
-
-# with open('plots/bin_acc_' + str(load_level) + '_version2.pickle', 'wb') as handle:
-#     pickle.dump(accuracy_percentile_bins, handle, protocol = pickle.HIGHEST_PROTOCOL)
-# with open('plots/accuracy_' + str(load_level) + '_version2.pickle', 'wb') as handle:
-#     pickle.dump(accuracy_overall, handle, protocol = pickle.HIGHEST_PROTOCOL)
-# with open('plots/e2e_' + str(load_level) + '_version2.pickle', 'wb') as handle:
-#         pickle.dump(traces_overall, handle, protocol = pickle.HIGHEST_PROTOCOL)
-
+    print("End-to-end accuracy for method %s: %.3f\n\n" % (method, acc_e2e))
+    accuracy_overall[method] = acc_e2e
+    accuracy_percentile_bins[method] = BinAccuracyByResponseTimes(trace_acc)
+load_level = sys.argv[2]
+with open('plots/vipul/' + maindir + '/e2e_' + str(load_level) + '.pickle', 'wb') as handle:
+    pickle.dump(traces_overall, handle, protocol = pickle.HIGHEST_PROTOCOL)
+'''
+'''
+with open('plots/vipul/' + maindir + '/bin_acc_' + str(load_level) + '.pickle', 'wb') as handle:
+    pickle.dump(accuracy_percentile_bins, handle, protocol = pickle.HIGHEST_PROTOCOL)
+with open('plots/vipul/' + maindir + '/accuracy_' + str(load_level) + '.pickle', 'wb') as handle:
+    pickle.dump(accuracy_overall, handle, protocol = pickle.HIGHEST_PROTOCOL)
+'''
 sampleQuery()
