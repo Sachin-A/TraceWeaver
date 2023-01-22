@@ -1,5 +1,5 @@
-#ifndef __DISTSPAN_SPAN__
-#define __DISTSPAN_SPAN__
+#ifndef __DISTTRACE_SPAN__
+#define __DISTTRACE_SPAN__
 
 class Span{
 public:
