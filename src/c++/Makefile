@@ -4,9 +4,10 @@ CFLAGS = -std=c++17 -O3
 OBJS = trace.o span.o call_graph.o
 INCLUDE = -I. # place holder for now !TODO
 
-all: OBJS
+SCHEMES = scheme fcfs
+all: $(SCHEMES)
 
-$(ESTIMATOR_MAINS): %: %.cpp $(OBJS)
+$(SCHEMES): %: %.cpp $(OBJS)
 	$(CC) $(INCLUDE) $(CFLAGS) $(OBJS) -o $@ $<
 
 call_graph.o: call_graph.cpp call_graph.h trace.cpp trace.h span.cpp span.h
@@ -19,4 +20,4 @@ span.o: span.cpp span.h
 	$(CC) $(INCLUDE) $(CFLAGS) -c span.cpp
 
 clean:	
-	rm -f *.o
+	rm -f *.o $(SCHEMES)
