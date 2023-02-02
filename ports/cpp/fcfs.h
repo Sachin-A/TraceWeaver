@@ -3,12 +3,13 @@
 
 #include "scheme.h"
 
-class Fcfs : public Scheme{
- public:
+class Fcfs : public Scheme
+{
+public:
     Fcfs();
-    
-    //!TODO
-    virtual FindAssignments();
+
+    //! TODO
+    void FindAssignments();
 };
 
 #endif
