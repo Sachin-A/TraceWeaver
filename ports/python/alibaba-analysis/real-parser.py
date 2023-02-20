@@ -37,23 +37,24 @@ def fixDuplicates(trace):
         rpc_id_duplicates[span[3]].append(list(span))
 
     fake_duplicates = set()
-    true_duplicates = set()
+    true_duplicates_a = set()
+    true_duplicates_b = set()
     for i in range(len(trace)):
         pos = i + 1
         for j in range(pos, len(trace)):
             if trace[i][3] == trace[j][3]:
                 if len(rpc_id_duplicates[trace[i][3]]) == 2:
-                    if checkCopyStrict(trace[i], trace[j], -1):
+                    if checkCopyRelaxed(trace[i], trace[j], -1):
                         fake_duplicates.add(j)
                     else:
-                        true_duplicates.add(j)
+                        true_duplicates_a.add(j)
                 elif len(rpc_id_duplicates[trace[i][3]]) > 2:
-                    true_duplicates.add(j)
+                    true_duplicates_b.add(j)
 
     for k in sorted(fake_duplicates, reverse = True):
         del trace[k]
 
-    return len(true_duplicates)
+    return len(true_duplicates_a), len(true_duplicates_b)
 
 def noSpanWith(trace, rpc_id):
     for span in trace:
@@ -83,18 +84,20 @@ def isLeaf(span, trace):
 
 def checkCopyRelaxed(span1, span2, col):
     if col == 4:
-        indices = [1, 2, 3, 5, 6]
+        indices = [1, 3, 5, 6]
     elif col == 6:
-        indices = [1, 2, 3, 4, 5]
+        indices = [1, 3, 4, 5]
     elif col == -1:
-        indices = [1, 2, 3, 4, 5, 6]
+        indices = [1, 3, 4, 5, 6]
 
     sublist1 = [span1[x] for x in indices]
     sublist2 = [span2[x] for x in indices]
     if sublist1 == sublist2:
-        if ((int(span1[8]) >= 0 and int(span2[8]) <= 0) or
-            (int(span2[8]) >= 0 and int(span1[8]) <= 0)):
-                return True
+        if ((int(span1[8]) > 0 and int(span2[8]) < 0) or
+            (int(span1[8]) < 0 and int(span2[8]) > 0) or
+            (int(span1[8]) == 0 and int(span2[8]) == 0)):
+            return True
+
     return False
 
 def checkCopyStrict(span1, span2, col):
@@ -110,8 +113,9 @@ def checkCopyStrict(span1, span2, col):
     if sublist1 == sublist2:
         if abs(int(span1[8])) == abs(int(span2[8])):
             if ((int(span1[8]) > 0 and int(span2[8]) < 0) or
-                (int(span2[8]) > 0 and int(span1[8]) < 0)):
-                    return True
+                (int(span1[8]) < 0 and int(span2[8]) > 0)):
+                return True
+
     return False
 
 def hasSameCallee(trace, parent_rpc_id):
@@ -212,8 +216,6 @@ def fixMissingInTrace(trace):
 
     missing_count = 0
     rpc_id_count = {}
-    root_flag = False
-    multiple_root_flag = False
 
     len_root = len(trace[0][3].split("."))
 
@@ -229,11 +231,11 @@ def fixMissingInTrace(trace):
 
         if missingInfo(sublist0):
 
+            if fixMissingInSpan(trace, i, rpc_id_count):
+                continue
+
             sublist1 = sublist0[:4] + sublist0[4+1:]
             if isRoot2(span, len_root) and not missingInfo(sublist1):
-                if root_flag:
-                    multiple_root_flag = True
-                root_flag = True
                 fixRoot(trace, i, collapse = True)
                 continue
 
@@ -242,12 +244,18 @@ def fixMissingInTrace(trace):
                 fixLeaf(trace, i, collapse = True)
                 continue
 
-            if fixMissingInSpan(trace, i, rpc_id_count):
-                continue
-
             missing_count += 1
 
-    return missing_count, multiple_root_flag
+    return missing_count
+
+def checkMultiRoot(trace):
+    multi_root = 0
+    len_root = len(trace[0][3].split("."))
+    for i, span in enumerate(trace):
+        if i != 0 and len(span[3].split(".")) == len_root:
+            multi_root += 1
+
+    return multi_root
 
 def checkOrphans(trace):
     num_orphans = 0
@@ -272,20 +280,29 @@ def checkOrphans(trace):
 def buildCallGraph(trace):
     trace_cg = {}
     trace_cg['root'] = trace[0][3]
+    len_root = len(trace[0][3].split("."))
 
-    for span in trace:
-        print(span[3])
+    for i, span in enumerate(trace):
+        if i != 0 and len(span[3].split(".")) == len_root:
+            print(trace[0])
+            print(span)
+            print("A")
+            input()
+            return {}, False
 
-    input()
-
-    for span in trace:
         if span[3] not in trace_cg:
             trace_cg[span[3]] = []
         else:
+            print("B")
             return {}, False
-        parent_rpc_id = ".".join(span[3].split(".")[:-1])
-        if parent_rpc_id in trace_cg:
-            trace_cg[parent_rpc_id].append(span[3])
+
+        if i != 0:
+            parent_rpc_id = ".".join(span[3].split(".")[:-1])
+            if parent_rpc_id in trace_cg:
+                trace_cg[parent_rpc_id].append(span[3])
+            else:
+                print("C")
+                return {}, False
 
     return trace_cg, True
 
@@ -318,13 +335,13 @@ for dataset_id in range(0, num_shards + 1):
         trace_count += 1
         if trace_count % 1000 == 0:
             print("Reading: ", dataset_id, trace_count,
-                  "\nMissing: ", overall_missing, (overall_missing * 100) / trace_count,
-                  "\nDuplicates: ", overall_duplicates, (overall_duplicates * 100) / trace_count,
-                  "\nOrphans: ", overall_orphans, (overall_orphans * 100) / trace_count,
+                  "\nMissing (a): ", overall_missing, (overall_missing * 100) / trace_count,
+                  "\nDuplicates (b): ", overall_duplicates, (overall_duplicates * 100) / trace_count,
+                  "\nOrphans (c): ", overall_orphans, (overall_orphans * 100) / trace_count,
                   "\nBoth (a, b): ", (both * 100) / trace_count,
                   "\nNeither (a, b): ", neither, (neither * 100) / trace_count,
                   "\nRoot missing: ", overall_root_missing, (overall_root_missing * 100) / trace_count,
-                  "\nMulti-root: ", overall_multi_root, (overall_multi_root * 100) / trace_count,
+                  "\nMulti-root (d): ", overall_multi_root, (overall_multi_root * 100) / trace_count,
                   "\nNot valid: ", overall_not_valid, (overall_not_valid * 100) / trace_count,
                   "\nDistinct roots: ", len(distinct_roots),
                   "\nNo errors (a, b, c, d): ", no_errors, (no_errors * 100) / trace_count)
@@ -344,34 +361,34 @@ for dataset_id in range(0, num_shards + 1):
         if len(trace) > 200:
             continue
 
-        a, multi_root = fixMissingInTrace(trace)
-        b = fixDuplicates(trace)
+        a = fixMissingInTrace(trace)
+        b1, b2 = fixDuplicates(trace)
         c = checkOrphans(trace)
+        d = checkMultiRoot(trace)
 
         if a > 0:
             overall_missing += 1
 
-        if b > 0:
+        if (b1 + b2) > 0:
             overall_duplicates += 1
 
         if c > 0:
             overall_orphans += 1
 
-        if a > 0 and b > 0:
+        if a > 0 and (b1 + b2) > 0:
             both += 1
 
-        if a == 0 and b == 0:
+        if a == 0 and (b1 + b2) == 0:
             neither += 1
 
-        if multi_root:
+        if d > 0:
             overall_multi_root += 1
 
-        if a == 0 and b == 0 and c == 0 and not multi_root:
+        if a == 0 and (b1 + b2) == 0 and c == 0 and d == 0:
             no_errors += 1
 
-            # trace_cg, valid = buildCallGraph(trace)
-            # if not valid:
-            #     overall_not_valid += 1
-            # print(trace_cg)
-            # print(valid)
-            # input()
+            trace_cg, valid = buildCallGraph(trace)
+            if not valid:
+                print("Not valid")
+                # input()
+                overall_not_valid += 1
