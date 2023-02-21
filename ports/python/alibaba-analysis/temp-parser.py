@@ -316,19 +316,7 @@ if int(sys.argv[2]) == 0:
                 span1 = list(span)
                 span1[8] = abs(int(span[8]))
                 span1[6] = "leaf"
-                # leafs = unique_leaf.get(span[4], [])
-                # span1[6] = "leaf_" + str(len(leafs) + 1)
-                # if span[4] not in unique_leaf:
-                #     unique_leaf[span[4]] = []
-                # unique_leaf[span[4]].append(span1[6])
                 process_spans[span[4]][1].append(span1)
-                # span2 = list(span)
-                # span2[8] = abs(int(span[8]))
-                # span2[6] = span2[4]
-                # span2[4] = "leaf"
-                # if span2[6] not in process_spans:
-                #     process_spans[span2[6]] = [[], []]
-                # process_spans[span2[6]][0].append(span2)
 
             if not missingCol(span[6]):
                 if span[6] not in process_spans:
@@ -337,21 +325,19 @@ if int(sys.argv[2]) == 0:
                 span3[8] = abs(int(span[8]))
                 span3[4] = "browser"
                 process_spans[span[6]][0].append(span3)
-                # span4 = list(span)
-                # span4[4] = span4[6]
-                # span4[6] = "browser"
-                # if span4[4] not in process_spans:
-                #     process_spans[span4[4]] = [[], []]
-                # process_spans[span4[4]][1].append(span4)
 
     with open(r"process-spans-" + dataset + ".pickle", "wb") as output_file:
         cPickle.dump(process_spans, output_file)
 
 if int(sys.argv[2]) == 1:
     print("Loading process spans ...")
+<<<<<<< HEAD
     with open(
         r"../../../data/process-spans-" + dataset + ".pickle", "rb"
     ) as input_file:
+=======
+    with open(r"process-spans-" + dataset + ".pickle", "rb") as input_file:
+>>>>>>> e25799227959642f2a12dc037c0b2e92a1db708c
         process_spans = cPickle.load(input_file)
     print("Loaded process spans")
 
@@ -372,6 +358,7 @@ predictors = [
 ]
 
 per_method_accuracy = {}
+<<<<<<< HEAD
 for method, predictor in predictors:
     process_accuracy = []
     cgs = []
@@ -379,39 +366,88 @@ for method, predictor in predictors:
         #!TODO: remove DEBUG
         if i != 7201:
             continue
+=======
+cgs = {}
+for i, process in enumerate(process_spans.keys()):
 
-        in_spans = process_spans[process][0]
-        out_spans = process_spans[process][1]
+    # if i != 2539:
+    #     continue
 
-        if len(in_spans) != len(out_spans) or len(in_spans) < 5:
+    in_spans = process_spans[process][0]
+    out_spans = process_spans[process][1]
+>>>>>>> e25799227959642f2a12dc037c0b2e92a1db708c
+
+    if len(in_spans) != len(out_spans) or len(in_spans) < 5:
+        continue
+
+    # if len(in_spans) < 5:
+    #     continue
+
+    in_span_partitions = PartitionSpansByEndPoint(
+        in_spans, 4
+    )
+    print("Incoming span partitions", process, in_span_partitions.keys())
+    out_span_partitions = PartitionSpansByEndPoint(
+        out_spans, 6
+    )
+    print("Outgoing span partitions", process, out_span_partitions.keys())
+
+    ep_in = list(in_span_partitions.keys())[0]
+    ep_out = list(out_span_partitions.keys())[0]
+
+    # true_assignments, in_spans, out_spans = GetGroundTruth(in_spans, out_spans)
+    true_assignments, in_span_partitions, out_span_partitions = GetGroundTruth2(in_span_partitions, out_span_partitions)
+
+    removeDuplicates(in_span_partitions)
+    removeDuplicates(out_span_partitions)
+
+    ep_in = list(in_span_partitions.keys())[0]
+    if len(in_span_partitions[ep_in]) <= 1:
+        continue
+    for ep_out in out_span_partitions.keys():
+        if len(in_span_partitions[ep_in]) != len(out_span_partitions[ep_out]):
             continue
 
-        # if len(in_spans) < 5:
-        #     continue
+    # with open(str(i) + "-raw-data-in-before.csv", 'w') as csvfile:
+    #     csvwriter = csv.writer(csvfile)
+    #     csvwriter.writerows(in_span_partitions[ep_in])
+    # with open(str(i) + "-raw-data-out-before.csv", 'w') as csvfile:
+    #     csvwriter = csv.writer(csvfile)
+    #     csvwriter.writerows(out_span_partitions[ep_out])
 
+<<<<<<< HEAD
         in_span_partitions = PartitionSpansByEndPoint(in_spans, 4)
         print("Incoming span partitions", process, in_span_partitions.keys())
         out_span_partitions = PartitionSpansByEndPoint(out_spans, 6)
         print("Outgoing span partitions", process, out_span_partitions.keys())
+=======
+    true_assignments, in_span_partitions, out_span_partitions = GetGroundTruth2(in_span_partitions, out_span_partitions)
+>>>>>>> e25799227959642f2a12dc037c0b2e92a1db708c
 
-        ep_in = list(in_span_partitions.keys())[0]
-        ep_out = list(out_span_partitions.keys())[0]
+    changeRateByFactor2(in_span_partitions, out_span_partitions, int(sys.argv[6]))
+    repeatSpans(in_span_partitions, out_span_partitions, int(sys.argv[7]))
 
+<<<<<<< HEAD
         # true_assignments, in_spans, out_spans = GetGroundTruth(in_spans, out_spans)
         true_assignments, in_span_partitions, out_span_partitions = GetGroundTruth2(
             in_span_partitions, out_span_partitions
         )
+=======
+    true_assignments, in_span_partitions, out_span_partitions = GetGroundTruth2(in_span_partitions, out_span_partitions)
+>>>>>>> e25799227959642f2a12dc037c0b2e92a1db708c
 
-        removeDuplicates(in_span_partitions)
-        removeDuplicates(out_span_partitions)
+    # pred_assignments = predictor.FindAssignments(
+    #     process, in_spans, out_spans
+    # )
 
-        ep_in = list(in_span_partitions.keys())[0]
-        if len(in_span_partitions[ep_in]) <= 1:
-            continue
-        for ep_out in out_span_partitions.keys():
-            if len(in_span_partitions[ep_in]) != len(out_span_partitions[ep_out]):
-                continue
+    # with open(str(i) + "-raw-data-in.csv", 'w') as csvfile:
+    #     csvwriter = csv.writer(csvfile)
+    #     csvwriter.writerows(in_span_partitions[ep_in])
+    # with open(str(i) + "-raw-data-out.csv", 'w') as csvfile:
+    #     csvwriter = csv.writer(csvfile)
+    #     csvwriter.writerows(out_span_partitions[ep_out])
 
+<<<<<<< HEAD
         # with open(str(i) + "-raw-data-in-before.csv", 'w') as csvfile:
         #     csvwriter = csv.writer(csvfile)
         #     csvwriter.writerows(in_span_partitions[ep_in])
@@ -440,11 +476,15 @@ for method, predictor in predictors:
         # with open(str(i) + "-raw-data-out.csv", 'w') as csvfile:
         #     csvwriter = csv.writer(csvfile)
         #     csvwriter.writerows(out_span_partitions[ep_out])
+=======
+    for method, predictor in predictors:
+>>>>>>> e25799227959642f2a12dc037c0b2e92a1db708c
 
         pred_assignments = predictor.FindAssignments(
             process, in_span_partitions, out_span_partitions
         )
 
+<<<<<<< HEAD
         acc = AccuracyForService2(
             pred_assignments, true_assignments, in_span_partitions
         )
@@ -452,18 +492,28 @@ for method, predictor in predictors:
         print("Accuracy for service %s: %.3f, nspans: %d\n" % (i, acc, len(in_span_partitions[ep_in])))
         # if acc < 1:
         cgs.append([i, acc, len(in_span_partitions[ep_in])])
+=======
+        acc = AccuracyForService2(pred_assignments, true_assignments, in_span_partitions)
+        if method not in per_method_accuracy:
+            per_method_accuracy[method] = []
+        per_method_accuracy[method].append(acc)
+        if method not in cgs:
+            cgs[method] = []
+        cgs[method].append([i, acc, len(in_span_partitions[ep_in])])
+        print("Accuracy for method %s, service %s: %.3f\n" % (method, i, acc))
+>>>>>>> e25799227959642f2a12dc037c0b2e92a1db708c
 
-    per_method_accuracy[method] = process_accuracy
-    print("Accuracy for method: ", method, process_accuracy)
-    # print(r"CGs with less than 100% accuracy: ", cgs)
-    print("[index, accuracy, num_spans]: ", cgs)
+for method, _ in predictors:
 
-    if len(process_accuracy) == 0:
+    print("Accuracy for method: ", method, per_method_accuracy[method])
+    print("[index, accuracy, num_spans]: ", cgs[method])
+
+    if len(per_method_accuracy[method]) == 0:
         print("No processes qualify")
         continue
 
     plt.ylim((0, 1))
-    plt.bar([i for i in range(len(process_accuracy))], process_accuracy)
+    plt.bar([i for i in range(len(per_method_accuracy[method]))], per_method_accuracy[method])
     # plt.xticks([x for x in range(0, len(process_accuracy))])
     plt.savefig(
         "/home/vharsh2/disttrace/ports/python/alibaba-analysis/plots/unique-"
@@ -480,4 +530,4 @@ for method, predictor in predictors:
     )
     plt.clf()
     print("Done plotting.")
-    print("CG (avg): ", np.mean([i[1] for i in cgs]))
+    print("CG (avg): ", np.mean([i[1] for i in cgs[method]]))
