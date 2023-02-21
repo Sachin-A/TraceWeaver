@@ -330,6 +330,22 @@ def ProcessTraceData(data):
     return 0
 
 
+def ParseInputPickle(filename):
+    with open(filename, 'rb') as pfile:
+        data = pickle.load(pfile)
+        print (len(data.keys()))
+        for k in data.keys():
+            print(k, type(data[k]))
+            for t in data[k]:
+                print("new entry")
+                for x in t:
+                    print(x)
+            sys.exit()
+
+
+input_pickle_file = sys.argv[1]
+ParseInputPickle(input_pickle_file)
+
 traces_dir = sys.argv[1]
 traces = GetAllTracesInDir(traces_dir)
 traces.sort()
@@ -476,15 +492,14 @@ def ConstructEndToEndTraces(
 
 predictors = [
     ("Greedy++", Timing2(all_spans, all_processes)),
-    ("Greedy", Timing(all_spans, all_processes)),
-    ("FCFS", FCFS(all_spans, all_processes)),
-    ("FCFS++", FCFS2(all_spans, all_processes)),
+    #("Greedy", Timing(all_spans, all_processes)),
+    #("FCFS", FCFS(all_spans, all_processes)),
+    #("FCFS++", FCFS2(all_spans, all_processes)),
 ]
 
 accuracy_overall = {}
 accuracy_percentile_bins = {}
 traces_overall = {}
-'''
 for method, predictor in predictors:
 
     true_assignments_by_process = {}
@@ -538,14 +553,14 @@ for method, predictor in predictors:
     print("End-to-end accuracy for method %s: %.3f\n\n" % (method, acc_e2e))
     accuracy_overall[method] = acc_e2e
     accuracy_percentile_bins[method] = BinAccuracyByResponseTimes(trace_acc)
+#'''
+'''
 load_level = sys.argv[2]
 with open('plots/vipul/' + maindir + '/e2e_' + str(load_level) + '.pickle', 'wb') as handle:
     pickle.dump(traces_overall, handle, protocol = pickle.HIGHEST_PROTOCOL)
-'''
-'''
 with open('plots/vipul/' + maindir + '/bin_acc_' + str(load_level) + '.pickle', 'wb') as handle:
     pickle.dump(accuracy_percentile_bins, handle, protocol = pickle.HIGHEST_PROTOCOL)
 with open('plots/vipul/' + maindir + '/accuracy_' + str(load_level) + '.pickle', 'wb') as handle:
     pickle.dump(accuracy_overall, handle, protocol = pickle.HIGHEST_PROTOCOL)
 '''
-sampleQuery()
+#sampleQuery()
