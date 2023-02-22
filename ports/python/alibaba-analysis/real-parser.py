@@ -1,5 +1,6 @@
 import os
 import csv
+import copy
 import json
 import shutil
 import random
@@ -30,6 +31,7 @@ def getAllTracesInDir(directory):
     files = [f for f in files if f.endswith("tar.gz")]
     return files
 
+# TODO: preserve original server record
 def fixDuplicates(trace):
     true_duplicate_count = 0
     rpc_id_duplicates = {}
@@ -316,39 +318,39 @@ def convertToJaegerFormat(trace, trace_cg, span_id_to_index, dataset_id):
             print("Skipped a span")
             continue
 
-        client_record = {}
-        client_record['traceID'] = span[1]
-        client_record['spanID'] = span[3]
-        client_record['startTime'] = int(span[2]) * 1000
-        client_record['duration'] = abs(int(span[8]) * 1000)
+        server_record = {}
+        server_record['traceID'] = span[1]
+        server_record['startTime'] = int(span[2]) * 1000
+        server_record['spanID'] = span[3]
+        server_record['caller'] = span[4]
+        server_record['requestType'] = span[5]
+        server_record['callee'] = span[6]
+        server_record['interface'] = span[7]
+        server_record['duration'] = abs(int(span[8]) * 1000)
 
-        client_record['tags'] = []
+        server_record['tags'] = []
         tags_data = {}
         tags_data['key'] = "span.kind"
-        tags_data['value'] = "client"
-        client_record['tags'].append(tags_data)
+        tags_data['value'] = "server"
+        server_record['tags'].append(tags_data)
 
-        client_record['references'] = []
+        server_record['references'] = []
         references_data = {}
-        if span[3] == trace_cg['root']:
-            pass
-        else:
+        if span[3] != trace_cg['root']:
             references_data['refType'] = "CHILD_OF"
             parent_rpc_id = ".".join(span[3].split(".")[:-1])
             references_data['traceID'] = span[1]
             references_data['spanID'] = parent_rpc_id
+            server_record['references'].append(references_data)
 
-        client_record['references'].append(references_data)
-        client_record['processID'] = span[4]
-        trace_data['spans'].append(client_record)
+        server_record['processID'] = span[6]
+        trace_data['spans'].append(server_record)
 
-        if span[3] == trace_cg['root']:
-            pass
-        else:
-            server_record = dict(client_record)
-            server_record['tags'][0]['value'] = "server"
-            server_record['processID'] = span[6]
-            trace_data['spans'].append(server_record)
+        if span[3] != trace_cg['root']:
+            client_record = copy.deepcopy(server_record)
+            client_record['tags'][0]['value'] = "client"
+            client_record['processID'] = span[4]
+            trace_data['spans'].append(client_record)
 
     trace_dict['data'].append(trace_data)
 
@@ -375,7 +377,7 @@ overall_not_valid = 0
 overall_valid = 0
 trace_count = 0
 
-for dataset_id in range(1, num_shards + 1):
+for dataset_id in range(0, num_shards + 1):
 
     shard_directory = path + "shard" + str(dataset_id) + "/"
     trace_paths = getAllTracesInDir(shard_directory)
