@@ -3,7 +3,7 @@ import scipy.stats
 import copy
 
 VERBOSE = False
-ERROR_WINDOW = True
+ERROR_WINDOW = False #True
 
 class Timing(object):
     def __init__(self):
@@ -96,12 +96,34 @@ class Timing(object):
         t2 = sorted([float(s[2]) + float(s[8]) for s in in_span_partitions[ep2]])
         ComputeDistParams(ep1, ep2, t1, t2)
 
+    def GetLogNormalPDF(self, t, mean, std):
+        if mean < 1.0e-10 or std < 1.0e-10:
+            return 1
+        scale = mean
+        # s = standard deviation of log x
+        s = (1 + math.sqrt(1 + 4 * ((mean/std)**2)))/2
+        s = math.sqrt(math.log(s))
+        p = scipy.stats.lognorm.logpdf(t, s=s, scale=scale)
+        return p
+
+    def GetParetoPDF(self, t, mean, std):
+        assert (std > 0.0)
+        alpha = 1 + math.sqrt(1 + (mean / (std**2)))
+        scale = (mean * (alpha - 1)) / alpha
+        loc = -1
+        p = scipy.stats.pareto.logcdf(t, alpha, loc=loc, scale=scale)
+        return p
+
+
     def GetEpPairCost(self, ep1, ep2, t1, t2):
         mean, std = self.services_times[(ep1, ep2)]
         # print("mean, std:", mean, std)
-        if std == 0:
+        if std < 1.0e-12:
             std = 0.001
+        # !TODO uncomment next line
         p = scipy.stats.norm.logpdf(t2 - t1, loc=mean, scale=std)
+        # p = self.GetParetoPDF(t2 - t1, mean, std)
+        # p = self.GetLogNormalPDF(t2 - t1, mean, std)
         # print(t2, t1)
         # print("x:", t2-t1)
         # print("p:", p)
@@ -144,6 +166,9 @@ class Timing(object):
             if VERBOSE:
                 print("Computing cost between", curr_ep, next_ep)
             cost += self.GetEpPairCost(curr_ep, next_ep, curr_time, next_time)
+            if assignment[i][1] in ["eg9d6u4jwelh6he6acx2fai6385q8br0", "3m6q1llsb1w49543sallcg07eyllj05n"]:
+                mean, std = self.services_times[(curr_ep, next_ep)]
+                print("Service times", curr_ep, next_ep, mean, std)
         return cost
 
     def FindMinCostAssignment(self, in_span, out_eps, out_span_partitions):
@@ -166,9 +191,9 @@ class Timing(object):
             last_span = stack[-1]
             if i == len(out_span_partitions) + 1:
                 score = self.ScoreAssignment(stack)
-                # print([i[2] for i in stack])
-                # print(score)
-                # input()
+                if in_span[1] in ["eg9d6u4jwelh6he6acx2fai6385q8br0", "3m6q1llsb1w49543sallcg07eyllj05n"]:
+                    print("scores: ", [ii[1] for ii in stack], [ii[2] for ii in stack], score)
+                    # input()
                 if best_score < score:
                     best_assignment = stack
                     best_score = score

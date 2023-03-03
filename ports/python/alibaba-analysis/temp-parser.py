@@ -13,8 +13,11 @@ import matplotlib.pyplot as plt
 from collections import OrderedDict
 from distutils.version import LooseVersion
 
+
 search_strings = ["(?)", "NAN", "nan", ""]
 
+random.seed(4242)
+np.random.seed(42)
 
 def noSpanWith(trace, rpc_id):
     for span in trace:
@@ -66,7 +69,6 @@ def removeDuplicates(span_partitions):
 
 
 def GetGroundTruth2(in_span_partitions, out_span_partitions):
-    print(len(in_span_partitions))
     assert len(in_span_partitions) == 1
     _, in_spans = list(in_span_partitions.items())[0]
     true_assignments = {ep: {} for ep in out_span_partitions.keys()}
@@ -176,10 +178,63 @@ def shiftSpans(chosen_spans, in_spans):
     last = float(in_spans[-1][2])
     for i in range(len(chosen_spans)):
         new_delta = float(random.choices(deltas)[0])
+        print("random new delta", new_delta, last)
         last = last + new_delta
         chosen_spans[i][2] = last
 
     return chosen_spans
+
+
+def repeatChangeSpans(in_span_partitions, out_span_partitions, repeats, factor):
+    assert len(in_span_partitions) == 1
+    in_span_partitions_old = copy.deepcopy(in_span_partitions)
+    out_span_partitions_old = copy.deepcopy(out_span_partitions)
+    ep_in, in_spans = list(in_span_partitions_old.items())[0]
+
+    span_inds = []
+    for ind, in_span in enumerate(in_spans):
+        time_order = True
+        for ep_out in out_span_partitions.keys():
+            out_span = out_span_partitions[ep_out][ind]
+            time_order = (
+                time_order
+                and (float(in_span[2]) <= float(out_span[2]))
+                and (
+                    float(out_span[2]) + float(out_span[8])
+                    <= float(in_span[2]) + float(in_span[8])
+                )
+            )
+        if time_order:
+            span_inds.append(ind)
+
+    in_span_partitions[ep_in] = []
+    for ep_out in out_span_partitions_old.keys():
+        out_span_partitions[ep_out] = []
+
+    span_inds = span_inds * repeats
+    random.shuffle(span_inds)
+    min_start_t = min(float(in_span[2]) for in_span in in_spans) / factor
+    max_start_t = max(float(in_span[2]) for in_span in in_spans) / factor
+    start_ts = sorted([random.uniform(min_start_t, max_start_t) for _ in span_inds])
+    for ind, start_t in zip(span_inds, start_ts):
+        # if len(in_span_partitions[ep_in]) > 40:
+        #    continue
+        span_id = "".join(
+            random.choice(string.ascii_lowercase + string.digits) for _ in range(32)
+        )
+        in_span = in_spans[ind].copy()
+        in_span[2] = float(in_span[2])
+        offset = start_t - in_span[2]
+        in_span[1] = span_id
+        in_span[2] += offset
+        in_span_partitions[ep_in].append(in_span)
+        for ep_out in out_span_partitions_old.keys():
+            out_span = out_span_partitions_old[ep_out][ind].copy()
+            out_span[2] = float(out_span[2])
+            out_span[1] = span_id
+            out_span[2] += offset
+            out_span_partitions[ep_out].append(out_span)
+    return in_span_partitions, out_span_partitions
 
 
 def repeatSpans(in_span_partitions, out_span_partitions, repeats):
@@ -194,8 +249,11 @@ def repeatSpans(in_span_partitions, out_span_partitions, repeats):
         ep_in, in_spans = list(in_span_partitions_copy.items())[0]
         repeat_num = max(1, random.randint(len(in_spans) // 2, len(in_spans)))
         indices = random.sample(range(len(in_spans)), repeat_num)
+        print("random indices", indices)
         chosen_in_spans = list(np.array(in_spans)[indices])
+        # print("Before", chosen_in_spans)
         chosen_in_spans = shiftSpans(chosen_in_spans, in_spans)
+        # print("After", chosen_in_spans)
 
         repeat_ids = []
         for j in range(repeat_num):
@@ -326,18 +384,16 @@ if int(sys.argv[2]) == 0:
                 span3[4] = "browser"
                 process_spans[span[6]][0].append(span3)
 
-    with open(r"process-spans-" + dataset + ".pickle", "wb") as output_file:
+    with open(
+        r"../../../data/process-spans-" + dataset + ".pickle", "wb"
+    ) as output_file:
         cPickle.dump(process_spans, output_file)
 
 if int(sys.argv[2]) == 1:
     print("Loading process spans ...")
-<<<<<<< HEAD
     with open(
         r"../../../data/process-spans-" + dataset + ".pickle", "rb"
     ) as input_file:
-=======
-    with open(r"process-spans-" + dataset + ".pickle", "rb") as input_file:
->>>>>>> e25799227959642f2a12dc037c0b2e92a1db708c
         process_spans = cPickle.load(input_file)
     print("Loaded process spans")
 
@@ -358,24 +414,16 @@ predictors = [
 ]
 
 per_method_accuracy = {}
-<<<<<<< HEAD
-for method, predictor in predictors:
-    process_accuracy = []
-    cgs = []
-    for i, process in enumerate(process_spans.keys()):
-        #!TODO: remove DEBUG
-        if i != 7201:
-            continue
-=======
 cgs = {}
 for i, process in enumerate(process_spans.keys()):
+    random.seed(i)
+    np.random.seed(i)
 
-    # if i != 2539:
-    #     continue
+    # if i != 2979:
+    #    continue
 
     in_spans = process_spans[process][0]
     out_spans = process_spans[process][1]
->>>>>>> e25799227959642f2a12dc037c0b2e92a1db708c
 
     if len(in_spans) != len(out_spans) or len(in_spans) < 5:
         continue
@@ -383,20 +431,18 @@ for i, process in enumerate(process_spans.keys()):
     # if len(in_spans) < 5:
     #     continue
 
-    in_span_partitions = PartitionSpansByEndPoint(
-        in_spans, 4
-    )
+    in_span_partitions = PartitionSpansByEndPoint(in_spans, 4)
     print("Incoming span partitions", process, in_span_partitions.keys())
-    out_span_partitions = PartitionSpansByEndPoint(
-        out_spans, 6
-    )
+    out_span_partitions = PartitionSpansByEndPoint(out_spans, 6)
     print("Outgoing span partitions", process, out_span_partitions.keys())
 
     ep_in = list(in_span_partitions.keys())[0]
     ep_out = list(out_span_partitions.keys())[0]
 
     # true_assignments, in_spans, out_spans = GetGroundTruth(in_spans, out_spans)
-    true_assignments, in_span_partitions, out_span_partitions = GetGroundTruth2(in_span_partitions, out_span_partitions)
+    true_assignments, in_span_partitions, out_span_partitions = GetGroundTruth2(
+        in_span_partitions, out_span_partitions
+    )
 
     removeDuplicates(in_span_partitions)
     removeDuplicates(out_span_partitions)
@@ -415,96 +461,63 @@ for i, process in enumerate(process_spans.keys()):
     #     csvwriter = csv.writer(csvfile)
     #     csvwriter.writerows(out_span_partitions[ep_out])
 
-<<<<<<< HEAD
-        in_span_partitions = PartitionSpansByEndPoint(in_spans, 4)
-        print("Incoming span partitions", process, in_span_partitions.keys())
-        out_span_partitions = PartitionSpansByEndPoint(out_spans, 6)
-        print("Outgoing span partitions", process, out_span_partitions.keys())
-=======
-    true_assignments, in_span_partitions, out_span_partitions = GetGroundTruth2(in_span_partitions, out_span_partitions)
->>>>>>> e25799227959642f2a12dc037c0b2e92a1db708c
+    true_assignments, in_span_partitions, out_span_partitions = GetGroundTruth2(
+        in_span_partitions, out_span_partitions
+    )
 
-    changeRateByFactor2(in_span_partitions, out_span_partitions, int(sys.argv[6]))
-    repeatSpans(in_span_partitions, out_span_partitions, int(sys.argv[7]))
+    factor = int(sys.argv[6])
+    repeats = int(sys.argv[7])
+    repeatChangeSpans(
+        in_span_partitions, out_span_partitions, repeats=repeats, factor=factor
+    )
+    if len(in_span_partitions[ep_in]) < 50:
+        continue
+    # changeRateByFactor2(in_span_partitions, out_span_partitions, int(sys.argv[6]))
+    # repeatSpans(in_span_partitions, out_span_partitions, int(sys.argv[7]))
 
-<<<<<<< HEAD
-        # true_assignments, in_spans, out_spans = GetGroundTruth(in_spans, out_spans)
-        true_assignments, in_span_partitions, out_span_partitions = GetGroundTruth2(
-            in_span_partitions, out_span_partitions
-        )
-=======
-    true_assignments, in_span_partitions, out_span_partitions = GetGroundTruth2(in_span_partitions, out_span_partitions)
->>>>>>> e25799227959642f2a12dc037c0b2e92a1db708c
+    true_assignments, in_span_partitions, out_span_partitions = GetGroundTruth2(
+        in_span_partitions, out_span_partitions
+    )
 
     # pred_assignments = predictor.FindAssignments(
     #     process, in_spans, out_spans
     # )
 
-    # with open(str(i) + "-raw-data-in.csv", 'w') as csvfile:
-    #     csvwriter = csv.writer(csvfile)
-    #     csvwriter.writerows(in_span_partitions[ep_in])
-    # with open(str(i) + "-raw-data-out.csv", 'w') as csvfile:
-    #     csvwriter = csv.writer(csvfile)
-    #     csvwriter.writerows(out_span_partitions[ep_out])
+    with open("csvs/" + str(i) + "-raw-data-in.csv", "w") as csvfile:
+        csvwriter = csv.writer(csvfile)
+        csvwriter.writerows(in_span_partitions[ep_in])
+    with open("csvs/" + str(i) + "-raw-data-out.csv", "w") as csvfile:
+        csvwriter = csv.writer(csvfile)
+        csvwriter.writerows(out_span_partitions[ep_out])
 
-<<<<<<< HEAD
-        # with open(str(i) + "-raw-data-in-before.csv", 'w') as csvfile:
-        #     csvwriter = csv.writer(csvfile)
-        #     csvwriter.writerows(in_span_partitions[ep_in])
-        # with open(str(i) + "-raw-data-out-before.csv", 'w') as csvfile:
-        #     csvwriter = csv.writer(csvfile)
-        #     csvwriter.writerows(out_span_partitions[ep_out])
-
-        true_assignments, in_span_partitions, out_span_partitions = GetGroundTruth2(
-            in_span_partitions, out_span_partitions
-        )
-
-        changeRateByFactor2(in_span_partitions, out_span_partitions, int(sys.argv[6]))
-        repeatSpans(in_span_partitions, out_span_partitions, int(sys.argv[7]))
-
-        true_assignments, in_span_partitions, out_span_partitions = GetGroundTruth2(
-            in_span_partitions, out_span_partitions
-        )
-
-        # pred_assignments = predictor.FindAssignments(
-        #     process, in_spans, out_spans
-        # )
-
-        # with open(str(i) + "-raw-data-in.csv", 'w') as csvfile:
-        #     csvwriter = csv.writer(csvfile)
-        #     csvwriter.writerows(in_span_partitions[ep_in])
-        # with open(str(i) + "-raw-data-out.csv", 'w') as csvfile:
-        #     csvwriter = csv.writer(csvfile)
-        #     csvwriter.writerows(out_span_partitions[ep_out])
-=======
     for method, predictor in predictors:
->>>>>>> e25799227959642f2a12dc037c0b2e92a1db708c
-
         pred_assignments = predictor.FindAssignments(
             process, in_span_partitions, out_span_partitions
         )
+        print("Predicted assignments")
+        # print(pred_assignments)
+        for k, v in pred_assignments["leaf"].items():
+            print(k, v)
+        print("\nTrue assignments")
+        # print(true_assignments)
+        for k, v in true_assignments["leaf"].items():
+            print(k, v)
 
-<<<<<<< HEAD
         acc = AccuracyForService2(
             pred_assignments, true_assignments, in_span_partitions
         )
-        process_accuracy.append(acc)
-        print("Accuracy for service %s: %.3f, nspans: %d\n" % (i, acc, len(in_span_partitions[ep_in])))
-        # if acc < 1:
-        cgs.append([i, acc, len(in_span_partitions[ep_in])])
-=======
-        acc = AccuracyForService2(pred_assignments, true_assignments, in_span_partitions)
         if method not in per_method_accuracy:
             per_method_accuracy[method] = []
         per_method_accuracy[method].append(acc)
         if method not in cgs:
             cgs[method] = []
         cgs[method].append([i, acc, len(in_span_partitions[ep_in])])
-        print("Accuracy for method %s, service %s: %.3f\n" % (method, i, acc))
->>>>>>> e25799227959642f2a12dc037c0b2e92a1db708c
+        print(
+            "Accuracy for method %s, service %s: %.3f, %d spans\n"
+            % (method, i, acc, len(in_span_partitions[ep_in]))
+        )
 
 for method, _ in predictors:
-
     print("Accuracy for method: ", method, per_method_accuracy[method])
     print("[index, accuracy, num_spans]: ", cgs[method])
 
@@ -513,20 +526,21 @@ for method, _ in predictors:
         continue
 
     plt.ylim((0, 1))
-    plt.bar([i for i in range(len(per_method_accuracy[method]))], per_method_accuracy[method])
+    plt.bar(
+        [i for i in range(len(per_method_accuracy[method]))],
+        per_method_accuracy[method],
+    )
     # plt.xticks([x for x in range(0, len(process_accuracy))])
     plt.savefig(
         "/home/vharsh2/disttrace/ports/python/alibaba-analysis/plots/unique-"
-        +
-        # plt.savefig("/scratch/sachina3/projects/clusterdata/cluster-trace-microservices-v2021/data/analysis/unique-" +
-        dataset
+        + dataset
         + "-method-"
         + method
         + "-factor-"
         + sys.argv[6]
         + "-repeat-"
         + sys.argv[7]
-        + ".pdf"
+        + ".svg"
     )
     plt.clf()
     print("Done plotting.")
