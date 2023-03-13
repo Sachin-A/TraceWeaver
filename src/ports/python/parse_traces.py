@@ -3,10 +3,10 @@ import sys
 import json
 import math
 import pickle5 as pickle
-from fcfs import FCFS
-from fcfs2 import FCFS2
-from timing import Timing
-from timing2 import Timing2
+from algorithms.fcfs import FCFS
+from algorithms.fcfs2 import FCFS2
+from algorithms.timing import Timing
+from algorithms.timing2 import Timing2
 import math
 import copy
 
