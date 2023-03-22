@@ -7,6 +7,8 @@ from algorithms.fcfs import FCFS
 from algorithms.fcfs2 import FCFS2
 from algorithms.timing import Timing
 from algorithms.timing2 import Timing2
+from algorithms.wap5_og import WAP5_OG
+from algorithms.vpath import VPATH
 import math
 import copy
 
