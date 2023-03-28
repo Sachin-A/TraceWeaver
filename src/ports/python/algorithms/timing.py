@@ -1,15 +1,19 @@
 import math
 import scipy.stats
 import copy
+import networkx as nx
 
 VERBOSE = False
-
 
 class Timing(object):
     def __init__(self, all_spans, all_processes):
         self.all_spans = all_spans
         self.all_processes = all_processes
         self.services_times = {}
+        self.parallel = False
+        self.instrumented_hops = []
+        self.true_assignments = None
+        self.normal = True
 
     # verify that all outgoing request dependencies are serial
     def VerifySerialDependency(self, in_spans, out_eps, out_span_partitions):
@@ -66,33 +70,56 @@ class Timing(object):
                 )
             self.services_times[(ep1, ep2)] = mean, std
 
-        # between incoming -- first outgoing
-        ep1 = list(in_span_partitions.keys())[0]
-        ep2 = out_eps[0]
-        t1 = sorted([s.start_mus for s in in_span_partitions[ep1]])
-        t2 = sorted([s.start_mus for s in out_span_partitions[ep2]])
-        ComputeDistParams(ep1, ep2, t1, t2)
-
-        # between outgoing -- outgoing
-        for i in range(len(out_eps) - 1):
-            ep1 = out_eps[i]
-            ep2 = out_eps[i + 1]
-            t1 = sorted(
-                [s.start_mus + s.duration_mus for s in out_span_partitions[ep1]]
-            )
+        if self.parallel:
+            for i in range(len(out_eps)):
+                ep1 = list(in_span_partitions.keys())[0]
+                ep2 = out_eps[i]
+                t1 = sorted([s.start_mus for s in in_span_partitions[ep1]])
+                t2 = sorted([s.start_mus for s in out_span_partitions[ep2]])
+                ComputeDistParams(ep1, ep2, t1, t2)
+        else:
+            # between incoming -- first outgoing
+            ep1 = list(in_span_partitions.keys())[0]
+            ep2 = out_eps[0]
+            t1 = sorted([s.start_mus for s in in_span_partitions[ep1]])
             t2 = sorted([s.start_mus for s in out_span_partitions[ep2]])
             ComputeDistParams(ep1, ep2, t1, t2)
 
-        # between last outgoing -- incoming
-        ep1 = out_eps[-1]
-        ep2 = list(in_span_partitions.keys())[0]
-        t1 = sorted([s.start_mus + s.duration_mus for s in out_span_partitions[ep1]])
-        t2 = sorted([s.start_mus + s.duration_mus for s in in_span_partitions[ep2]])
-        ComputeDistParams(ep1, ep2, t1, t2)
+            # between outgoing -- outgoing
+            for i in range(len(out_eps) - 1):
+                ep1 = out_eps[i]
+                ep2 = out_eps[i + 1]
+                t1 = sorted(
+                    [s.start_mus + s.duration_mus for s in out_span_partitions[ep1]]
+                )
+                t2 = sorted([s.start_mus for s in out_span_partitions[ep2]])
+                ComputeDistParams(ep1, ep2, t1, t2)
 
-    def GetEpPairCost(self, ep1, ep2, t1, t2):
+            # between last outgoing -- incoming
+            ep1 = out_eps[-1]
+            ep2 = list(in_span_partitions.keys())[0]
+            t1 = sorted([s.start_mus + s.duration_mus for s in out_span_partitions[ep1]])
+            t2 = sorted([s.start_mus + s.duration_mus for s in in_span_partitions[ep2]])
+            ComputeDistParams(ep1, ep2, t1, t2)
+
+    def GetExponentialPDF(self, t, mean, std):
+        if mean < 1.0e-10 or std < 1.0e-10:
+            return 1
+        scale = mean
+        p = scipy.stats.expon.logpdf(t, scale=scale)
+        return p
+
+    def GetEpPairCost(self, ep1, ep2, t1, t2, normalized = False):
         mean, std = self.services_times[(ep1, ep2)]
-        p = scipy.stats.norm.logpdf(t2 - t1, loc=mean, scale=std)
+        if std < 1.0e-12:
+            std = 0.001
+        if self.normal:
+            if not normalized:
+                p = scipy.stats.norm.logpdf(t2 - t1, loc=mean, scale=std)
+            else:
+                p = scipy.stats.norm.pdf(t2 - t1, loc=mean, scale=std)
+        else:
+            p = scipy.stats.expon.logpdf(t2 - t1, scale=mean)
         return p
         """
         # CDF
@@ -104,7 +131,7 @@ class Timing(object):
             return math.log(cp)
         """
 
-    def ScoreAssignment(self, assignment):
+    def ScoreAssignmentSequential(self, assignment, normalized = False):
         cost = 0
         for i in range(len(assignment)):
             curr_ep = (
@@ -131,7 +158,39 @@ class Timing(object):
             )
             if VERBOSE:
                 print("Computing cost between", curr_ep, next_ep)
-            cost += self.GetEpPairCost(curr_ep, next_ep, curr_time, next_time)
+            cost += self.GetEpPairCost(curr_ep, next_ep, curr_time, next_time, normalized)
+
+        if normalized:
+            return cost / len(assignment)
+        return cost
+
+    def ScoreAssignmentParallel(self, assignment, normalized = False):
+        cost = 0
+        for i in range(1, len(assignment)):
+            curr_ep = assignment[0].GetParentProcess()
+            curr_time = float(assignment[0].start_mus)
+
+            next_ep = assignment[i].GetChildProcess()
+            next_time = float(assignment[i].start_mus)
+            if VERBOSE:
+                print("Computing cost between", curr_ep, next_ep)
+            cost += self.GetEpPairCost(curr_ep, next_ep, curr_time, next_time, normalized)
+
+        # latest_ep = ""
+        # latest_time = -1
+        # curr_ep = assignment[0][4]
+        # curr_time = float(assignment[0][2])
+
+        # for i in range(1, len(assignment)):
+        #     if float(assignment[i][2]) + float(assignment[i][8]) > latest_time:
+        #         latest_ep = assignment[i][6]
+        #         latest_time = float(assignment[i][2]) + float(assignment[i][8])
+
+        # if latest_ep != "" and latest_time != -1:
+        #     cost += self.GetEpPairCost(curr_ep, latest_ep, curr_time, latest_time)
+
+        if normalized:
+            return cost / len(assignment)
         return cost
 
     def FindMinCostAssignment(self, in_span, out_eps, out_span_partitions):
@@ -139,6 +198,7 @@ class Timing(object):
         global best_score
         best_assignment = None
         best_score = -1000000.0
+        score_list = []
 
         def DfsTraverse(stack):
             global best_assignment
@@ -148,36 +208,62 @@ class Timing(object):
                 print("DFSTraverse", i, out_eps, stack)
             last_span = stack[-1]
             if i == len(out_span_partitions) + 1:
-                score = self.ScoreAssignment(stack)
+                if self.parallel:
+                    score = self.ScoreAssignmentParallel(stack)
+                else:
+                    score = self.ScoreAssignmentSequential(stack)
+                score_list.append(score)
                 if best_score < score:
                     best_assignment = stack
                     best_score = score
+            elif i in self.instrumented_hops:
+                ep = out_eps[i - 1]
+                span_id = self.true_assignments[ep][in_span.GetId()]
+                for s in out_span_partitions[ep]:
+                    if s.GetId() == span_id:
+                        DfsTraverse(stack + [s])
+                        break
             else:
                 #!TODO: filter out branches that have high cost
                 ep = out_eps[i - 1]
                 for s in out_span_partitions[ep]:
-                    # first ep
-                    if (
-                        i == 1
-                        and in_span.start_mus < s.start_mus
-                        and s.start_mus + s.duration_mus
-                        < in_span.start_mus + in_span.duration_mus
-                    ):
-                        DfsTraverse(stack + [s])
-                    # all other eps
-                    elif (
-                        i <= len(out_eps)
-                        and last_span.start_mus + last_span.duration_mus < s.start_mus
-                        and s.start_mus + s.duration_mus
-                        < in_span.start_mus + in_span.duration_mus
-                    ):
-                        DfsTraverse(stack + [s])
+                    # parallel eps
+                    if self.parallel:
+                        if (
+                            in_span.start_mus < s.start_mus
+                            and s.start_mus + s.duration_mus
+                            < in_span.start_mus + in_span.duration_mus
+                        ):
+                            DfsTraverse(stack + [s])
+
+                    # Sequential eps
+                    else:
+                        # first ep
+                        if (
+                            i == 1
+                            and in_span.start_mus < s.start_mus
+                            and s.start_mus + s.duration_mus
+                            < in_span.start_mus + in_span.duration_mus
+                        ):
+                            DfsTraverse(stack + [s])
+                        # all other eps
+                        elif (
+                            i <= len(out_eps)
+                            and last_span.start_mus + last_span.duration_mus < s.start_mus
+                            and s.start_mus + s.duration_mus
+                            < in_span.start_mus + in_span.duration_mus
+                        ):
+                            DfsTraverse(stack + [s])
         DfsTraverse([in_span])
         # return a dictionary of {ep: span}
         ret = {}
         if best_assignment is not None:
             assert len(out_eps) == len(best_assignment) - 1
             ret = {out_eps[i]: best_assignment[i + 1] for i in range(len(out_eps))}
+
+        # print(score_list)
+        # print(scipy.stats.zscore(score_list))
+        # input()
         return ret
 
     def AddAssignment(
@@ -201,11 +287,33 @@ class Timing(object):
             # remove spans of this assignment so they can't be assigned again
             #!TODO: this implementation is not efficient
             for ep, span in assignment.items():
-                # print(ep, in_span, span)
-                out_span_partitions[ep].remove(span)
+                if span.trace_id != "None":
+                    # print(ep, in_span, span)
+                    out_span_partitions[ep].remove(span)
 
-    def FindAssignments(self, process, in_span_partitions, out_span_partitions):
+    def AddTopKAssignments(
+        self,
+        in_span,
+        topk_assignments,
+        all_topk_assignments,
+        out_span_partitions,
+        out_eps
+    ):
+        for i, ep in enumerate(out_eps):
+            if ep not in all_topk_assignments:
+                all_topk_assignments[ep] = {}
+            all_topk_assignments[ep][in_span.GetId()] = []
+            for assignment in topk_assignments:
+                assignment = assignment[1]
+                out_span = assignment[i + 1]
+                out_span_id = out_span.GetId() if out_span is not None else ("NA", "NA")
+                all_topk_assignments[ep][in_span.GetId()].append(out_span_id)
+
+    def FindAssignments(self, process, in_span_partitions, out_span_partitions, parallel, instrumented_hops, true_assignments):
         assert len(in_span_partitions) == 1
+        self.parallel = parallel
+        self.instrumented_hops = instrumented_hops
+        self.true_assignments = true_assignments
         _, in_spans = list(in_span_partitions.items())[0]
         out_eps = self.GetOutEpsInOrder(out_span_partitions)
         out_span_partitions_copy = copy.deepcopy(out_span_partitions)
