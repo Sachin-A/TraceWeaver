@@ -5,6 +5,9 @@ class FCFS2(object):
     def __init__(self, all_spans, all_processes):
         self.all_spans = all_spans
         self.all_processes = all_processes
+        self.parallel = False
+        self.instrumented_hops = []
+        self.true_assignments = None
 
     def GetOutEpsInOrder(self, out_span_partitions):
         eps = []
@@ -15,7 +18,7 @@ class FCFS2(object):
         return [x[0] for x in eps]
 
     def FindAssignments(
-        self, process, in_span_partitions, out_span_partitions
+        self, process, in_span_partitions, out_span_partitions, parallel, instrumented_hops, true_assignments
     ):
 
         assert len(in_span_partitions) == 1
@@ -41,11 +44,15 @@ class FCFS2(object):
                 out_spans_0 = out_spans
 
                 sort_order = np.argsort([x.start_mus + x.duration_mus for x in out_spans_0])
+                sort_order = sort_order[:len(out_span_partitions[o_eps[i - 1]])]
                 out_spans = list(np.array(out_span_partitions[o_eps[i - 1]])[sort_order])
 
                 ep_key = o_eps[i - 1]
 
             for j in range(len(in_spans)):
-                all_assignments[ep_key][in_spans[j].GetId()] = out_spans[j].GetId()
+                if len(out_spans) <= j:
+                    all_assignments[ep_key][in_spans[j].GetId()] = ("NA", "NA")
+                else:
+                    all_assignments[ep_key][in_spans[j].GetId()] = out_spans[j].GetId()
 
         return all_assignments
