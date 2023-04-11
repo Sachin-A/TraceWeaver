@@ -13,9 +13,24 @@ import math
 import copy
 
 VERBOSE = False
+random.seed(10)
 
 all_spans = dict()
 all_processes = dict()
+
+process_map_1 = {
+    "service5": "service3",
+    "service4": "service2",
+    "service2": "service1",
+    "service3": "service1",
+    "service1": "init-service"
+}
+
+satisfied_bool = {}
+satisfied_float = {}
+replica_id = {}
+new_replica_id = {}
+
 
 class Span(object):
     def __init__(
@@ -250,8 +265,181 @@ def ParseProcessessJson(processes_json):
         processes[pid] = processes_json[pid]["serviceName"]
     return processes
 
+def FixSpans(spans, processes):
+
+    process_map_2 = {}
+
+    def GetProcessOfSpan(span_id):
+        pid = spans[span_id].process_id
+        return processes[pid]
+
+    for span_id, span in spans.items():
+        process = GetProcessOfSpan(span_id)
+        process_map_2[process] = span.process_id
+
+    new_spans = {}
+    for span_id, span in spans.items():
+        process = GetProcessOfSpan(span_id)
+        if span.span_kind == "client":
+            span.span_kind = "server"
+        elif span.span_kind == "server":
+            span_copy = copy.deepcopy(span)
+            copy_ref = copy.deepcopy(span.references)
+            span.references[0] = (copy_ref[0][0], span.sid + "_client")
+            client_process = process_map_1[process]
+            span_copy.sid = span_copy.sid + "_client"
+            span_copy.process_id = process_map_2[client_process]
+            span_copy.span_kind = "client"
+            span_copy.references = copy_ref
+            new_spans[(span_copy.trace_id, span_copy.sid)] = span_copy
+
+    spans.update(new_spans)
+    return spans
+
+new_process_count = 0
+new_process_reverse_map = {}
+new_processes = {}
+def FixSpans2(spans, processes):
+
+    def FindParentProcess(id):
+        return spans[id].process_id
+
+    def FindGrandParentProcess(id):
+        for span_id, span in spans.items():
+            if span_id == id and len(span.references) != 0:
+                return FindParentProcess(span.references[0])
+        return None
+
+    def DeleteAncestors(id):
+        if len(spans[id].references) != 0:
+            DeleteAncestors(spans[id].references[0])
+        del new_spans[id]
+
+    def ChangeChildReferences(id):
+        for span_id, span in spans.items():
+            if len(span.references) != 0:
+                if span.references[0] == id:
+                    new_ref = (span.trace_id, span.trace_id)
+                    new_spans[span_id].references[0] = new_ref
+
+    new_spans = copy.deepcopy(spans)
+    for span_id, span in spans.items():
+        if span.op_name == "ComposeReview":
+            DeleteAncestors(span.references[0])
+            ChangeChildReferences(span_id)
+            span.sid = span.trace_id
+            span.references = []
+            new_spans[(span.trace_id, span.sid)] = span
+            del new_spans[span_id]
+
+    spans = copy.deepcopy(new_spans)
+    for span_id, span in spans.items():
+        if len(span.references) != 0:
+            parent_process = FindParentProcess(span.references[0])
+            if parent_process != None:
+                if parent_process == span.process_id:
+                    del new_spans[span_id]
+
+    spans = copy.deepcopy(new_spans)
+    new_spans2 = {}
+
+    for span_id, span in spans.items():
+        span.span_kind = "server"
+        if len(span.references) != 0:
+            span_copy = copy.deepcopy(span)
+            copy_ref = copy.deepcopy(span.references)
+            span.references[0] = (copy_ref[0][0], span.sid + "_client")
+            span_copy.sid = span_copy.sid + "_client"
+            span_copy.process_id = FindParentProcess(copy_ref[0])
+            span_copy.span_kind = "client"
+            span_copy.references = copy_ref
+            new_spans2[(span_copy.trace_id, span_copy.sid)] = span_copy
+
+    spans.update(new_spans2)
+
+    new_process_map = {}
+    spans = {k: v for k, v in sorted(spans.items(), key=lambda item: item[1].start_mus)}
+
+    multiple_map = {}
+
+    def UpdateMap():
+        nonlocal multiple_map
+        multiple_map = {}
+        for span_id, span in spans.items():
+            if span.span_kind == "server":
+                if span.process_id in processes:
+                    process_name = processes[span.process_id]
+                else:
+                    process_name = new_processes[span.process_id]
+
+                if process_name not in multiple_map:
+                    multiple_map[process_name] = []
+                if len(span.references) != 0:
+                    pid = FindParentProcess(span.references[0])
+                    if pid != None:
+                        if pid in processes:
+                            incoming = processes[pid]
+                        else:
+                            incoming = new_processes[pid]
+                        multiple_map[process_name].append(incoming)
+
+    UpdateMap()
+    global new_process_count
+
+    # Fix multiple incoming slicing
+
+    # for span_id, span in spans.items():
+    #     if len(span.references) != 0:
+    #         if span.span_kind == "server":
+    #             process_name = processes[span.process_id]
+    #             if len(multiple_map[process_name]) > 1:
+    #                 pid = FindParentProcess(span.references[0])
+    #                 if pid != None:
+    #                     parent_process = processes[pid]
+    #                     new_process_name = parent_process + "->" + process_name
+    #                     if new_process_name in new_process_reverse_map:
+    #                         span.process_id = new_process_reverse_map[new_process_name]
+    #                     else:
+    #                         new_process_id = "np" + str(new_process_count)
+    #                         new_processes[new_process_id] = new_process_name
+    #                         new_process_reverse_map[new_process_name] = new_process_id
+    #                         span.process_id = new_process_id
+    #                         new_process_count += 1
+
+    #         elif span.span_kind == "client":
+    #             process_name = processes[span.process_id]
+    #             if len(multiple_map[process_name]) > 1:
+    #                 gpid = FindGrandParentProcess(span.references[0])
+    #                 if gpid != None:
+    #                     grand_parent_process = processes[gpid]
+    #                     new_process_name = grand_parent_process + "->" + process_name
+    #                     if new_process_name in new_process_reverse_map:
+    #                         span.process_id = new_process_reverse_map[new_process_name]
+    #                     else:
+    #                         new_process_id = "np" + str(new_process_count)
+    #                         new_processes[new_process_id] = new_process_name
+    #                         new_process_reverse_map[new_process_name] = new_process_id
+    #                         span.process_id = new_process_id
+    #                         new_process_count += 1
+
+    #         UpdateMap()
+
+    # print(new_processes)
+    # input()
+
+    processes.update(new_processes)
+    all_spans.update(spans)
+
+    return spans, processes
 
 def ParseJsonTrace(trace_json):
+    if sys.argv[6] == "fix":
+        first_span = "init-span"
+        # first_span = "ComposeReview"
+    elif sys.argv[6] == "no-fix":
+        # first_span = "HTTP GET /hotels"
+        first_span = "HTTP GET /recommendations"
+        # first_span = "[Todo] CompleteTodoCommandHandler"
     ret = []
     processes = None
     with open(trace_json, "r") as tfile:
@@ -260,7 +448,11 @@ def ParseJsonTrace(trace_json):
         for d in json_data:
             trace_id = d["traceID"]
             spans = ParseSpansJson(d["spans"])
-            processes = ParseProcessessJson(d["processes"])
+            processes = ParseProcessesJson(d["processes"])
+            if first_span == "init-span":
+                spans = FixSpans(spans, processes)
+            if first_span == "ComposeReview":
+                spans, processes = FixSpans2(spans, processes)
 
             root_service = None
             for span_id, span in spans.items():
@@ -271,12 +463,27 @@ def ParseJsonTrace(trace_json):
                 ret.append((trace_id, spans))
     assert len(ret) == 1
     trace_id, spans = ret[0]
+
+    # print(len(spans.keys()))
+    # for span_id, span in spans.items():
+    #     print(span, processes[span.process_id], span.references)
+    #     input()
+
     return trace_id, spans, processes
 
 in_spans_by_process = dict()
 out_spans_by_process = dict()
 
 def ProcessTraceData(data):
+
+    if sys.argv[6] == "fix":
+        first_span = "init-span"
+        # first_span = "ComposeReview"
+    elif sys.argv[6] == "no-fix":
+        # first_span = "HTTP GET /hotels"
+        first_span = "HTTP GET /recommendations"
+        # first_span = "[Todo] CompleteTodoCommandHandler"
+
     trace_id, spans, processes = data
 
     def GetProcessOfSpan(span_id):
@@ -312,25 +519,34 @@ def ProcessTraceData(data):
     def ExploreSubTree(span_id, depth):
         span = spans[span_id]
         AddSpanToProcess(span_id)
-        if VERBOSE:
-            print(
-                (4 * depth) * " ",
-                span.span_id,
-                span.op_name,
-                span.start_mus,
-                span.duration_mus,
-            )
+        # if VERBOSE:
+        # print(
+        #     (4 * depth) * " ",
+        #     span.sid,
+        #     span.op_name,
+        #     span.start_mus,
+        #     span.duration_mus,
+        # )
+        # input()
         for child in span.children_spans:
             ExploreSubTree(child, depth + 1)
 
+    # for span_id, span in spans.items():
+    #     print(span_id)
+    #     print(span)
+    #     print(span.process_id)
+    #     for child_id in span.children_spans:
+    #         print("Child:", spans[child_id])
+    #         print("Process:", spans[child_id].process_id)
+    #     input()
+
     # comment out if condition to consider all microservice kinds
-    if spans[root_span_id].op_name == "HTTP GET /hotels":
+    if spans[root_span_id].op_name == first_span:
         ExploreSubTree(root_span_id, 0)
         all_spans.update(spans)
         all_processes[trace_id] = processes
         return 1
     return 0
-
 
 def ParseInputPickle(filename):
     with open(filename, 'rb') as pfile:
