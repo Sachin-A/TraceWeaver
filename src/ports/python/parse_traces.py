@@ -91,6 +91,74 @@ class Span(object):
     def __str__(self):
         return self.__repr__()
 
+def topological_sort_grouped(G):
+    indegree_map = {v: d for v, d in G.in_degree() if d > 0}
+    zero_indegree = [v for v, d in G.in_degree() if d == 0]
+    grouped_list = []
+    while zero_indegree:
+        # yield zero_indegree
+        grouped_list.append(zero_indegree)
+        new_zero_indegree = []
+        for v in zero_indegree:
+            for _, child in G.edges(v):
+                indegree_map[child] -= 1
+                if not indegree_map[child]:
+                    new_zero_indegree.append(child)
+        zero_indegree = new_zero_indegree
+    return grouped_list
+
+def FindOrder(in_span_partitions, out_span_partitions, true_assignments):
+    assert len(in_span_partitions) == 1
+
+    ep_in, in_spans = list(in_span_partitions.items())[0]
+    order = set()
+    out_eps = list(out_span_partitions.keys())
+    G = nx.DiGraph()
+    G1 = nx.DiGraph()
+    for i in range(len(out_eps)):
+        G.add_node(i)
+        G1.add_node(out_eps[i])
+    for i in range(len(out_eps)):
+        for j in range(len(out_eps)):
+            if i != j:
+                G.add_edge(i, j)
+                G1.add_edge(out_eps[i], out_eps[j])
+    for in_span in in_spans:
+        outgoing_spans = []
+        outgoing_eps = {}
+        for out_ep in out_eps:
+            span = all_spans[true_assignments[out_ep][in_span.GetId()]]
+            outgoing_spans.append([span.start_mus, span.duration_mus, span.GetParentProcess(), span.GetChildProcess()])
+        outgoing_spans.sort(key=lambda x: x[0])
+
+        for i, x in enumerate(outgoing_spans):
+            outgoing_eps[i] = x[3]
+
+        for i, x in enumerate(outgoing_spans):
+            for j, y in enumerate(outgoing_spans):
+                if i != j:
+                    if x[0] + x[1] > y[0]:
+                        if G.has_edge(i, j):
+                            G.remove_edge(i, j)
+                        if G1.has_edge(x[3], y[3]):
+                            G1.remove_edge(x[3], y[3])
+                    if y[0] + y[1] > x[0]:
+                        if G.has_edge(j, i):
+                            G.remove_edge(j, i)
+                        if G1.has_edge(y[3], x[3]):
+                            G1.remove_edge(y[3], x[3])
+
+    sorted_grouped_order = topological_sort_grouped(G)
+    service_order = copy.deepcopy(sorted_grouped_order)
+    for i in range(len(sorted_grouped_order)):
+        for j, service_id in enumerate(sorted_grouped_order[i]):
+            service_order[i][j] = outgoing_eps[sorted_grouped_order[i][j]]
+
+    print(service_order)
+    print(topological_sort_grouped(G1))
+
+    return G1
+
 '''
 FOR all e2e requests
 WHICH
@@ -752,8 +820,9 @@ for method, predictor in predictors:
         print("Outgoing span partitions", process, out_span_partitions.keys())
 
         true_assignments = GetGroundTruth(in_span_partitions, out_span_partitions)
+        invocation_graph = FindOrder(in_span_partitions, out_span_partitions, true_assignments)
         pred_assignments = predictor.FindAssignments(
-            process, in_span_partitions, out_span_partitions
+            process, in_span_partitions, out_span_partitions, invocation_graph
         )
         acc = AccuracyForService(pred_assignments, true_assignments, in_span_partitions)
         print("Accuracy for service %s: %.3f\n" % (process, acc))
