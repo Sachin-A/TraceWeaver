@@ -91,6 +91,57 @@ class Span(object):
     def __str__(self):
         return self.__repr__()
 
+def repeatChangeSpans(in_span_partitions, out_span_partitions, repeats, factor):
+    assert len(in_span_partitions) == 1
+    in_span_partitions_old = copy.deepcopy(in_span_partitions)
+    out_span_partitions_old = copy.deepcopy(out_span_partitions)
+    ep_in, in_spans = list(in_span_partitions_old.items())[0]
+
+    span_inds = []
+    for ind, in_span in enumerate(in_spans):
+        time_order = True
+        for ep_out in out_span_partitions.keys():
+            out_span = out_span_partitions[ep_out][ind]
+            time_order = (
+                time_order
+                and (float(in_span.start_mus) <= float(out_span.start_mus))
+                and (
+                    float(out_span.start_mus) + float(out_span.duration_mus)
+                    <= float(in_span.start_mus) + float(in_span.duration_mus)
+                )
+            )
+        if time_order:
+            span_inds.append(ind)
+
+    in_span_partitions[ep_in] = []
+    for ep_out in out_span_partitions_old.keys():
+        out_span_partitions[ep_out] = []
+
+    span_inds = span_inds * repeats
+    random.shuffle(span_inds)
+    min_start_t = min(float(in_span.start_mus) for in_span in in_spans) / factor
+    max_start_t = max(float(in_span.start_mus) for in_span in in_spans) / factor
+    start_ts = sorted([random.uniform(min_start_t, max_start_t) for _ in span_inds])
+    for ind, start_t in zip(span_inds, start_ts):
+        # if len(in_span_partitions[ep_in]) > 40:
+        #    continue
+        trace_id = "".join(
+            random.choice(string.ascii_lowercase + string.digits) for _ in range(32)
+        )
+        in_span = copy.deepcopy(in_spans[ind])
+        in_span.start_mus = float(in_span.start_mus)
+        offset = start_t - in_span.start_mus
+        in_span.trace_id = trace_id
+        in_span.start_mus += offset
+        in_span_partitions[ep_in].append(in_span)
+        for ep_out in out_span_partitions_old.keys():
+            out_span = copy.deepcopy(out_span_partitions_old[ep_out][ind])
+            out_span.start_mus = float(out_span.start_mus)
+            out_span.trace_id = trace_id
+            out_span.start_mus += offset
+            out_span_partitions[ep_out].append(out_span)
+    return in_span_partitions, out_span_partitions
+
 def topological_sort_grouped(G):
     indegree_map = {v: d for v, d in G.in_degree() if d > 0}
     zero_indegree = [v for v, d in G.in_degree() if d == 0]
