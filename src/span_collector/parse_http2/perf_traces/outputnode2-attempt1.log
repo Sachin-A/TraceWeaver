@@ -1,0 +1,602 @@
+2381798 futex(0xcdf1d8, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+2381797 futex(0xc000080150, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+2381795 futex(0xc000048950, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+2381794 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+2381769 futex(0xcaf470, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+2381799 futex(0xc000080550, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+2381796 futex(0xcaf470, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+2381794 <... nanosleep resumed>NULL)    = 0
+2381794 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+2381796 <... futex resumed>)            = 1
+2381794 <... nanosleep resumed>NULL)    = 0
+2381769 <... futex resumed>)            = 0
+2381794 epoll_pwait(4,  <unfinished ...>
+2381769 getsockopt(8, SOL_SOCKET, SO_ERROR,  <unfinished ...>
+2381796 getsockopt(9, SOL_SOCKET, SO_ERROR,  <unfinished ...>
+2381794 <... epoll_pwait resumed>[], 128, 0, NULL, 392244) = 0
+2381769 <... getsockopt resumed>[ECONNREFUSED], [4]) = 0
+2381794 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+2381769 futex(0xc000048950, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+2381795 <... futex resumed>)            = 0
+2381794 <... nanosleep resumed>NULL)    = 0
+2381769 <... futex resumed>)            = 1
+2381796 <... getsockopt resumed>[ECONNREFUSED], [4]) = 0
+2381795 epoll_pwait(4,  <unfinished ...>
+2381794 epoll_pwait(4,  <unfinished ...>
+2381796 epoll_ctl(4, EPOLL_CTL_DEL, 9, 0xc00013d3a4 <unfinished ...>
+2381769 epoll_ctl(4, EPOLL_CTL_DEL, 8, 0xc0002d33a4 <unfinished ...>
+2381796 <... epoll_ctl resumed>)        = 0
+2381795 <... epoll_pwait resumed>[], 128, 0, NULL, 392244) = 0
+2381794 <... epoll_pwait resumed>[], 128, 0, NULL, 392244) = 0
+2381769 <... epoll_ctl resumed>)        = 0
+2381796 close(9 <unfinished ...>
+2381795 epoll_pwait(4,  <unfinished ...>
+2381794 getpid( <unfinished ...>
+2381769 close(8 <unfinished ...>
+2381796 <... close resumed>)            = 0
+2381794 <... getpid resumed>)           = 1
+2381769 <... close resumed>)            = 0
+2381794 tgkill(1, 1, SIGURG <unfinished ...>
+2381769 futex(0xc000080150, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+2381797 <... futex resumed>)            = 0
+2381794 <... tgkill resumed>)           = 0
+2381769 <... futex resumed>)            = 1
+2381797 nanosleep({tv_sec=0, tv_nsec=3000},  <unfinished ...>
+2381794 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+2381769 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+2381769 rt_sigreturn({mask=[]} <unfinished ...>
+2381796 write(2, "2023/04/25 15:21:24 grpc/lb/consul: error retrieving instances from Consul: Get \"http://consul:8500/v1/health/service/srv-rate?passing=1\": dial tcp 10.107.169.230:8500: connect: connection refused\n", 197) = 197
+2381797 <... nanosleep resumed>NULL)    = 0
+2381794 <... nanosleep resumed>NULL)    = 0
+2381769 <... rt_sigreturn resumed>)     = 1
+2381797 futex(0xc000080550, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+2381794 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+2381769 futex(0xcaf470, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+2381797 <... futex resumed>)            = 1
+2381799 <... futex resumed>)            = 0
+2381797 futex(0xc000080150, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+2381796 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_TCP <unfinished ...>
+2381794 <... nanosleep resumed>NULL)    = 0
+2381799 futex(0xc000080150, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+2381796 <... socket resumed>)           = 8
+2381794 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+2381799 <... futex resumed>)            = 1
+2381797 <... futex resumed>)            = 0
+2381796 close(8 <unfinished ...>
+2381794 <... nanosleep resumed>NULL)    = 0
+2381797 futex(0xcaf470, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+2381799 write(2, "2023/04/25 15:21:24 grpc/lb/consul: error retrieving instances from Consul: Get \"http://consul:8500/v1/health/service/srv-geo?passing=1\": dial tcp 10.107.169.230:8500: connect: connection refused\n", 196 <unfinished ...>
+2381797 <... futex resumed>)            = 1
+2381796 <... close resumed>)            = 0
+2381794 rt_sigprocmask(SIG_SETMASK, ~[RTMIN RT_1],  <unfinished ...>
+2381769 <... futex resumed>)            = 0
+2381799 <... write resumed>)            = 196
+2381797 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+2381796 futex(0xc000048d50, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+2381794 <... rt_sigprocmask resumed>[], 8) = 0
+2381769 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+2381797 <... socket resumed>)           = 8
+2381769 <... socket resumed>)           = 9
+2381797 setsockopt(8, SOL_SOCKET, SO_BROADCAST, [1], 4 <unfinished ...>
+2381769 setsockopt(9, SOL_SOCKET, SO_BROADCAST, [1], 4 <unfinished ...>
+2381797 <... setsockopt resumed>)       = 0
+2381799 socket(AF_INET6, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_TCP <unfinished ...>
+2381797 connect(8, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, 16 <unfinished ...>
+2381769 <... setsockopt resumed>)       = 0
+2381797 <... connect resumed>)          = 0
+2381769 connect(9, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, 16 <unfinished ...>
+2381797 epoll_ctl(4, EPOLL_CTL_ADD, 8, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=3391528672, u64=140148174397152}} <unfinished ...>
+2381769 <... connect resumed>)          = 0
+2381799 <... socket resumed>)           = 10
+2381797 <... epoll_ctl resumed>)        = 0
+2381795 <... epoll_pwait resumed>[{EPOLLOUT, {u32=3391528672, u64=140148174397152}}], 128, 836, NULL, 392245777938577) = 1
+2381794 mmap(NULL, 8392704, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_STACK, -1, 0 <unfinished ...>
+2381769 epoll_ctl(4, EPOLL_CTL_ADD, 9, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=3391528208, u64=140148174396688}} <unfinished ...>
+2381797 getsockname(8,  <unfinished ...>
+2381795 futex(0xc000048950, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+2381794 <... mmap resumed>)             = 0x7f76c81e1000
+2381769 <... epoll_ctl resumed>)        = 0
+2381794 mprotect(0x7f76c81e2000, 8388608, PROT_READ|PROT_WRITE) = 0
+2381794 clone(child_stack=0x7f76c89e0fb0, flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID <unfinished ...>
+2381797 <... getsockname resumed>{sa_family=AF_INET, sin_port=htons(35801), sin_addr=inet_addr("10.0.2.3")}, [112->16]) = 0
+2381769 getsockname(9,  <unfinished ...>
+2381794 <... clone resumed>, parent_tid=[13], tls=0x7f76c89e1700, child_tidptr=0x7f76c89e19d0) = 13
+2381794 rt_sigprocmask(SIG_SETMASK, [],  <unfinished ...>
+2381830 set_robust_list(0x7f76c89e19e0, 24 <unfinished ...>
+2381799 setsockopt(10, SOL_IPV6, IPV6_V6ONLY, [1], 4 <unfinished ...>
+2381797 getpeername(8,  <unfinished ...>
+2381794 <... rt_sigprocmask resumed>NULL, 8) = 0
+2381769 <... getsockname resumed>{sa_family=AF_INET, sin_port=htons(39344), sin_addr=inet_addr("10.0.2.3")}, [112->16]) = 0
+2381830 <... set_robust_list resumed>)  = 0
+2381799 <... setsockopt resumed>)       = 0
+2381797 <... getpeername resumed>{sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, [112->16]) = 0
+2381794 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+2381769 getpeername(9,  <unfinished ...>
+2381830 mmap(0x7f76b0000000, 67108864, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_NORESERVE, -1, 0 <unfinished ...>
+2381799 bind(10, {sa_family=AF_INET6, sin6_port=htons(0), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::1", &sin6_addr), sin6_scope_id=0}, 28 <unfinished ...>
+2381797 write(8, "\251\230\1\0\0\1\0\0\0\0\0\0\6consul\7default\3svc\7cluster\5local\0\0\34\0\1", 50 <unfinished ...>
+2381794 <... nanosleep resumed>NULL)    = 0
+2381769 <... getpeername resumed>{sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, [112->16]) = 0
+2381830 <... mmap resumed>)             = 0x7f76b0000000
+2381799 <... bind resumed>)             = -1 EADDRNOTAVAIL (Cannot assign requested address)
+2381797 <... write resumed>)            = 50
+2381794 epoll_pwait(4,  <unfinished ...>
+2381769 write(9, "\5)\1\0\0\1\0\0\0\0\0\0\6consul\7default\3svc\7cluster\5local\0\0\1\0\1", 50 <unfinished ...>
+2381830 mprotect(0x7f76b0000000, 135168, PROT_READ|PROT_WRITE) = 0
+2381799 socket(AF_INET6, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_TCP <unfinished ...>
+2381797 read(8,  <unfinished ...>
+2381769 <... write resumed>)            = 50
+2381830 sigaltstack(NULL,  <unfinished ...>
+2381799 <... socket resumed>)           = 11
+2381797 <... read resumed>"\251\230\205\0\0\1\0\0\0\1\0\0\6consul\7default\3svc\7cluster\5local\0\0\34\0\1\7cluster\5local\0\0\6\0\1\0\0\0\7\0D\2ns\3dns\7cluster\5local\0\nhostmaster\7cluster\5local\0dG\357\333\0\0\34 \0\0\7\10\0\1Q\200\0\0\0\36", 512) = 143
+2381769 read(9,  <unfinished ...>
+2381797 epoll_ctl(4, EPOLL_CTL_DEL, 8, 0xc00024086c <unfinished ...>
+2381830 <... sigaltstack resumed>{ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=0}) = 0
+2381769 <... read resumed>"\5)\205\0\0\1\0\1\0\0\0\0\6consul\7default\3svc\7cluster\5local\0\0\1\0\1\6consul\7default\3svc\7cluster\5local\0\0\1\0\1\0\0\0\7\0\4\nk\251\346", 512) = 98
+2381830 sigaltstack({ss_sp=0xc000246000, ss_flags=0, ss_size=32768},  <unfinished ...>
+2381799 setsockopt(11, SOL_IPV6, IPV6_V6ONLY, [0], 4 <unfinished ...>
+2381797 <... epoll_ctl resumed>)        = 0
+2381794 <... epoll_pwait resumed>[{EPOLLOUT, {u32=3391528208, u64=140148174396688}}, {EPOLLOUT, {u32=3391528672, u64=140148174397152}}], 128, 0, NULL, 392245) = 2
+2381769 epoll_ctl(4, EPOLL_CTL_DEL, 9, 0xc0001de86c <unfinished ...>
+2381797 close(8 <unfinished ...>
+2381769 <... epoll_ctl resumed>)        = 0
+2381830 <... sigaltstack resumed>NULL)  = 0
+2381830 rt_sigprocmask(SIG_SETMASK, [],  <unfinished ...>
+2381799 <... setsockopt resumed>)       = 0
+2381797 <... close resumed>)            = 0
+2381794 futex(0xc000048950, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+2381769 close(9 <unfinished ...>
+2381830 <... rt_sigprocmask resumed>NULL, 8) = 0
+2381799 bind(11, {sa_family=AF_INET6, sin6_port=htons(0), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::ffff:127.0.0.1", &sin6_addr), sin6_scope_id=0}, 28 <unfinished ...>
+2381797 epoll_pwait(4,  <unfinished ...>
+2381769 <... close resumed>)            = 0
+2381830 gettid( <unfinished ...>
+2381795 <... futex resumed>)            = 0
+2381794 <... futex resumed>)            = 1
+2381830 <... gettid resumed>)           = 13
+2381797 <... epoll_pwait resumed>[], 128, 0, NULL, 392245) = 0
+2381795 epoll_pwait(4,  <unfinished ...>
+2381769 futex(0xcaf470, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+2381830 epoll_pwait(4,  <unfinished ...>
+2381799 <... bind resumed>)             = 0
+2381797 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+2381795 <... epoll_pwait resumed>[], 128, 0, NULL, 1) = 0
+2381794 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+2381830 <... epoll_pwait resumed>[], 128, 0, NULL, 140147735658624) = 0
+2381797 <... socket resumed>)           = 8
+2381795 futex(0xcaf470, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+2381830 close(11 <unfinished ...>
+2381799 futex(0xc000080550, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+2381797 connect(8, {sa_family=AF_INET, sin_port=htons(8500), sin_addr=inet_addr("10.107.169.230")}, 16 <unfinished ...>
+2381795 <... futex resumed>)            = 1
+2381769 <... futex resumed>)            = 0
+2381795 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+2381769 epoll_pwait(4,  <unfinished ...>
+2381830 <... close resumed>)            = 0
+2381797 <... connect resumed>)          = -1 EINPROGRESS (Operation now in progress)
+2381830 close(10 <unfinished ...>
+2381797 epoll_ctl(4, EPOLL_CTL_ADD, 8, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=3391528208, u64=140148174396688}} <unfinished ...>
+2381795 <... socket resumed>)           = 9
+2381769 <... epoll_pwait resumed>[], 128, 0, NULL, 392245) = 0
+2381795 connect(9, {sa_family=AF_INET, sin_port=htons(8500), sin_addr=inet_addr("10.107.169.230")}, 16 <unfinished ...>
+2381769 epoll_pwait(4,  <unfinished ...>
+2381830 <... close resumed>)            = 0
+2381797 <... epoll_ctl resumed>)        = 0
+2381795 <... connect resumed>)          = -1 EINPROGRESS (Operation now in progress)
+2381769 <... epoll_pwait resumed>[{EPOLLIN|EPOLLOUT|EPOLLERR|EPOLLHUP|EPOLLRDHUP, {u32=3391528208, u64=140148174396688}}], 128, 551, NULL, 392245777938577) = 1
+2381830 socket(AF_INET6, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+2381797 futex(0xc000080550, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+2381830 <... socket resumed>)           = 10
+2381797 <... futex resumed>)            = 1
+2381795 epoll_ctl(4, EPOLL_CTL_ADD, 9, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=3391528672, u64=140148174397152}} <unfinished ...>
+2381769 futex(0xcaf470, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+2381799 <... futex resumed>)            = 0
+2381794 <... nanosleep resumed>NULL)    = 0
+2381794 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+2381830 setsockopt(10, SOL_IPV6, IPV6_V6ONLY, [0], 4 <unfinished ...>
+2381799 epoll_pwait(4,  <unfinished ...>
+2381797 getsockopt(8, SOL_SOCKET, SO_ERROR,  <unfinished ...>
+2381795 <... epoll_ctl resumed>)        = 0
+2381830 <... setsockopt resumed>)       = 0
+2381797 <... getsockopt resumed>[ECONNREFUSED], [4]) = 0
+2381795 epoll_pwait(4, [{EPOLLIN|EPOLLOUT|EPOLLERR|EPOLLHUP|EPOLLRDHUP, {u32=3391528672, u64=140148174397152}}], 128, 0, NULL, 392245) = 1
+2381830 openat(AT_FDCWD, "/proc/sys/net/core/somaxconn", O_RDONLY|O_CLOEXEC <unfinished ...>
+2381797 epoll_ctl(4, EPOLL_CTL_DEL, 8, 0xc00013d3a4 <unfinished ...>
+2381830 <... openat resumed>)           = 11
+2381799 <... epoll_pwait resumed>[], 128, 0, NULL, 392245) = 0
+2381797 <... epoll_ctl resumed>)        = 0
+2381795 getsockopt(9, SOL_SOCKET, SO_ERROR,  <unfinished ...>
+2381797 close(8 <unfinished ...>
+2381795 <... getsockopt resumed>[ECONNREFUSED], [4]) = 0
+2381830 epoll_ctl(4, EPOLL_CTL_ADD, 11, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=3391528208, u64=140148174396688}} <unfinished ...>
+2381795 epoll_ctl(4, EPOLL_CTL_DEL, 9, 0xc0002cf3a4 <unfinished ...>
+2381830 <... epoll_ctl resumed>)        = 0
+2381797 <... close resumed>)            = 0
+2381830 fcntl(11, F_GETFL <unfinished ...>
+2381799 epoll_pwait(4,  <unfinished ...>
+2381797 futex(0xcaf470, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+2381795 <... epoll_ctl resumed>)        = 0
+2381797 <... futex resumed>)            = 1
+2381795 close(9 <unfinished ...>
+2381830 <... fcntl resumed>)            = 0x8000 (flags O_RDONLY|O_LARGEFILE)
+2381769 <... futex resumed>)            = 0
+2381795 <... close resumed>)            = 0
+2381769 nanosleep({tv_sec=0, tv_nsec=3000},  <unfinished ...>
+2381797 futex(0xc000080150, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+2381830 fcntl(11, F_SETFL, O_RDONLY|O_NONBLOCK|O_LARGEFILE <unfinished ...>
+2381795 write(2, "2023/04/25 15:21:24 grpc/lb/consul: error retrieving instances from Consul: Get \"http://consul:8500/v1/health/service/srv-rate?passing=1\": dial tcp 10.107.169.230:8500: connect: connection refused\n", 197 <unfinished ...>
+2381830 <... fcntl resumed>)            = 0
+2381799 <... epoll_pwait resumed>[{EPOLLIN|EPOLLOUT, {u32=3391528208, u64=140148174396688}}], 128, 521, NULL, 392245777938577) = 1
+2381795 <... write resumed>)            = 197
+2381769 <... nanosleep resumed>NULL)    = 0
+2381830 read(11,  <unfinished ...>
+2381799 epoll_pwait(4,  <unfinished ...>
+2381795 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+2381794 <... nanosleep resumed>NULL)    = 0
+2381769 epoll_pwait(4,  <unfinished ...>
+2381830 <... read resumed>"4096\n", 65536) = 5
+2381795 <... socket resumed>)           = 8
+2381769 <... epoll_pwait resumed>[], 128, 0, NULL, 0) = 0
+2381830 read(11,  <unfinished ...>
+2381799 <... epoll_pwait resumed>[], 128, 0, NULL, 392245) = 0
+2381795 setsockopt(8, SOL_SOCKET, SO_BROADCAST, [1], 4 <unfinished ...>
+2381794 epoll_pwait(4,  <unfinished ...>
+2381769 write(2, "2023/04/25 15:21:24 grpc/lb/consul: error retrieving instances from Consul: Get \"http://consul:8500/v1/health/service/srv-geo?passing=1\": dial tcp 10.107.169.230:8500: connect: connection refused\n", 196 <unfinished ...>
+2381794 <... epoll_pwait resumed>[], 128, 0, NULL, 392245) = 0
+2381795 <... setsockopt resumed>)       = 0
+2381830 <... read resumed>"", 65531)    = 0
+2381769 <... write resumed>)            = 196
+2381795 connect(8, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, 16 <unfinished ...>
+2381769 epoll_pwait(4,  <unfinished ...>
+2381830 epoll_ctl(4, EPOLL_CTL_DEL, 11, 0xc0000c5444 <unfinished ...>
+2381799 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+2381795 <... connect resumed>)          = 0
+2381830 <... epoll_ctl resumed>)        = 0
+2381795 epoll_ctl(4, EPOLL_CTL_ADD, 8, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=3391528672, u64=140148174397152}} <unfinished ...>
+2381769 <... epoll_pwait resumed>[], 128, 0, NULL, 392245) = 0
+2381830 close(11 <unfinished ...>
+2381795 <... epoll_ctl resumed>)        = 0
+2381769 epoll_pwait(4,  <unfinished ...>
+2381794 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+2381830 <... close resumed>)            = 0
+2381799 <... socket resumed>)           = 9
+2381795 getsockname(8,  <unfinished ...>
+2381794 <... nanosleep resumed>NULL)    = 0
+2381769 <... epoll_pwait resumed>[{EPOLLOUT, {u32=3391528672, u64=140148174397152}}], 128, 444, NULL, 392245777938577) = 1
+2381795 <... getsockname resumed>{sa_family=AF_INET, sin_port=htons(43219), sin_addr=inet_addr("10.0.2.3")}, [112->16]) = 0
+2381830 setsockopt(10, SOL_SOCKET, SO_REUSEADDR, [1], 4 <unfinished ...>
+2381769 epoll_pwait(4,  <unfinished ...>
+2381830 <... setsockopt resumed>)       = 0
+2381795 getpeername(8,  <unfinished ...>
+2381794 getpid( <unfinished ...>
+2381769 <... epoll_pwait resumed>[], 128, 0, NULL, 392245) = 0
+2381830 bind(10, {sa_family=AF_INET6, sin6_port=htons(8082), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::", &sin6_addr), sin6_scope_id=0}, 28 <unfinished ...>
+2381799 setsockopt(9, SOL_SOCKET, SO_BROADCAST, [1], 4 <unfinished ...>
+2381795 <... getpeername resumed>{sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, [112->16]) = 0
+2381769 epoll_pwait(4,  <unfinished ...>
+2381830 <... bind resumed>)             = 0
+2381794 <... getpid resumed>)           = 1
+2381830 listen(10, 4096 <unfinished ...>
+2381795 write(8, "\355\334\1\0\0\1\0\0\0\0\0\0\6consul\7default\3svc\7cluster\5local\0\0\34\0\1", 50 <unfinished ...>
+2381830 <... listen resumed>)           = 0
+2381799 <... setsockopt resumed>)       = 0
+2381795 <... write resumed>)            = 50
+2381794 tgkill(1, 12, SIGURG <unfinished ...>
+2381769 <... epoll_pwait resumed>[{EPOLLIN|EPOLLOUT, {u32=3391528672, u64=140148174397152}}], 128, 401, NULL, 392245777938577) = 1
+2381830 epoll_ctl(4, EPOLL_CTL_ADD, 10, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=3391528208, u64=140148174396688}} <unfinished ...>
+2381795 read(8,  <unfinished ...>
+2381769 epoll_pwait(4,  <unfinished ...>
+2381830 <... epoll_ctl resumed>)        = 0
+2381799 connect(9, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, 16 <unfinished ...>
+2381795 <... read resumed>"\355\334\205\0\0\1\0\0\0\1\0\0\6consul\7default\3svc\7cluster\5local\0\0\34\0\1\7cluster\5local\0\0\6\0\1\0\0\0\7\0D\2ns\3dns\7cluster\5local\0\nhostmaster\7cluster\5local\0dG\357\333\0\0\34 \0\0\7\10\0\1Q\200\0\0\0\36", 512) = 143
+2381769 <... epoll_pwait resumed>[], 128, 0, NULL, 392245) = 0
+2381799 <... connect resumed>)          = 0
+2381794 <... tgkill resumed>)           = 0
+2381830 getsockname(10,  <unfinished ...>
+2381799 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+2381795 epoll_ctl(4, EPOLL_CTL_DEL, 8, 0xc0001da86c <unfinished ...>
+2381769 epoll_pwait(4,  <unfinished ...>
+2381830 <... getsockname resumed>{sa_family=AF_INET6, sin6_port=htons(8082), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::", &sin6_addr), sin6_scope_id=0}, [112->28]) = 0
+2381799 rt_sigreturn({mask=[]} <unfinished ...>
+2381795 <... epoll_ctl resumed>)        = 0
+2381795 close(8 <unfinished ...>
+2381830 socket(AF_NETLINK, SOCK_RAW|SOCK_CLOEXEC, NETLINK_ROUTE <unfinished ...>
+2381799 <... rt_sigreturn resumed>)     = 0
+2381830 <... socket resumed>)           = 8
+2381799 epoll_ctl(4, EPOLL_CTL_ADD, 9, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=3391528672, u64=140148174397152}} <unfinished ...>
+2381795 <... close resumed>)            = 0
+2381794 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+2381799 <... epoll_ctl resumed>)        = 0
+2381799 getsockname(9,  <unfinished ...>
+2381795 futex(0xc000080150, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+2381769 <... epoll_pwait resumed>[{EPOLLOUT, {u32=3391528672, u64=140148174397152}}], 128, 349, NULL, 392245777938577) = 1
+2381830 bind(8, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, 12 <unfinished ...>
+2381797 <... futex resumed>)            = 0
+2381795 <... futex resumed>)            = 1
+2381830 <... bind resumed>)             = 0
+2381799 <... getsockname resumed>{sa_family=AF_INET, sin_port=htons(52255), sin_addr=inet_addr("10.0.2.3")}, [112->16]) = 0
+2381797 futex(0xc000080150, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+2381795 futex(0xc000048950, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+2381769 epoll_pwait(4, [], 128, 0, NULL, 392245) = 0
+2381830 sendto(8, {{len=17, type=0x16 /* NLMSG_??? */, flags=NLM_F_REQUEST|0x300, seq=1, pid=0}, "\x00"}, 17, 0, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, 12) = 17
+2381769 epoll_pwait(4,  <unfinished ...>
+2381799 getpeername(9, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, [112->16]) = 0
+2381830 recvfrom(8,  <unfinished ...>
+2381794 <... nanosleep resumed>NULL)    = 0
+2381799 write(9, "\306\n\1\0\0\1\0\0\0\0\0\0\6consul\7default\3svc\7cluster\5local\0\0\1\0\1", 50) = 50
+2381830 <... recvfrom resumed>[{{len=76, type=0x14 /* NLMSG_??? */, flags=NLM_F_MULTI, seq=1, pid=1}, "\x02\x08\x80\xfe\x01\x00\x00\x00\x08\x00\x01\x00\x7f\x00\x00\x01\x08\x00\x02\x00\x7f\x00\x00\x01\x07\x00\x03\x00\x6c\x6f\x00\x00\x08\x00\x08\x00\x80\x00\x00\x00\x14\x00\x06\x00\xff\xff\xff\xff\xff\xff\xff\xff\x1e\x7e\x56\x02\x1e\x7e\x56\x02"}, {{len=80, type=0x14 /* NLMSG_??? */, flags=NLM_F_MULTI, seq=1, pid=1}, "\x02\x20\x80\x00\x7b\x07\x00\x00\x08\x00\x01\x00\x0a\x00\x02\x03\x08\x00\x02\x00\x0a\x00\x02\x03\x09\x00\x03\x00\x65\x74\x68\x30\x00\x00\x00\x00\x08\x00\x08\x00\x80\x00\x00\x00\x14\x00\x06\x00\xff\xff\xff\xff\xff\xff\xff\xff\xa8\x80\x56\x02\xa8\x80\x56\x02"}], 4096, 0, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, [112->12]) = 156
+2381769 <... epoll_pwait resumed>[{EPOLLIN|EPOLLOUT, {u32=3391528672, u64=140148174397152}}], 128, 302, NULL, 392245777938577) = 1
+2381830 getsockname(8,  <unfinished ...>
+2381799 read(9,  <unfinished ...>
+2381794 getpid( <unfinished ...>
+2381769 epoll_pwait(4,  <unfinished ...>
+2381794 <... getpid resumed>)           = 1
+2381799 <... read resumed>"\306\n\205\0\0\1\0\1\0\0\0\0\6consul\7default\3svc\7cluster\5local\0\0\1\0\1\6consul\7default\3svc\7cluster\5local\0\0\1\0\1\0\0\0\7\0\4\nk\251\346", 512) = 98
+2381830 <... getsockname resumed>{sa_family=AF_NETLINK, nl_pid=1, nl_groups=00000000}, [112->12]) = 0
+2381799 epoll_ctl(4, EPOLL_CTL_DEL, 9, 0xc0001de86c <unfinished ...>
+2381769 <... epoll_pwait resumed>[], 128, 0, NULL, 392245) = 0
+2381799 <... epoll_ctl resumed>)        = 0
+2381799 close(9 <unfinished ...>
+2381769 epoll_pwait(4,  <unfinished ...>
+2381830 getsockname(8, {sa_family=AF_NETLINK, nl_pid=1, nl_groups=00000000}, [112->12]) = 0
+2381794 tgkill(1, 13, SIGURG)           = 0
+2381799 <... close resumed>)            = 0
+2381794 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+2381830 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+2381830 rt_sigreturn({mask=[]})         = 0
+2381799 futex(0xc000080150, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+2381830 recvfrom(8, {{len=20, type=NLMSG_DONE, flags=NLM_F_MULTI, seq=1, pid=1}, 0}, 4096, 0, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, [112->12]) = 20
+2381830 getsockname(8,  <unfinished ...>
+2381799 <... futex resumed>)            = 1
+2381797 <... futex resumed>)            = 0
+2381830 <... getsockname resumed>{sa_family=AF_NETLINK, nl_pid=1, nl_groups=00000000}, [112->12]) = 0
+2381797 nanosleep({tv_sec=0, tv_nsec=3000},  <unfinished ...>
+2381799 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+2381830 close(8)                        = 0
+2381797 <... nanosleep resumed>NULL)    = 0
+2381797 futex(0xc000048950, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+2381830 socket(AF_NETLINK, SOCK_RAW|SOCK_CLOEXEC, NETLINK_ROUTE <unfinished ...>
+2381797 <... futex resumed>)            = 1
+2381795 <... futex resumed>)            = 0
+2381799 <... socket resumed>)           = 8
+2381795 futex(0xc000048950, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+2381797 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+2381830 <... socket resumed>)           = 9
+2381830 bind(9, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, 12 <unfinished ...>
+2381799 connect(8, {sa_family=AF_INET, sin_port=htons(8500), sin_addr=inet_addr("10.107.169.230")}, 16 <unfinished ...>
+2381797 <... socket resumed>)           = 11
+2381830 <... bind resumed>)             = 0
+2381797 connect(11, {sa_family=AF_INET, sin_port=htons(8500), sin_addr=inet_addr("10.107.169.230")}, 16 <unfinished ...>
+2381830 sendto(9, {{len=17, type=0x12 /* NLMSG_??? */, flags=NLM_F_REQUEST|0x300, seq=1, pid=0}, "\x00"}, 17, 0, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, 12 <unfinished ...>
+2381799 <... connect resumed>)          = -1 EINPROGRESS (Operation now in progress)
+2381797 <... connect resumed>)          = -1 EINPROGRESS (Operation now in progress)
+2381794 <... nanosleep resumed>NULL)    = 0
+2381830 <... sendto resumed>)           = 17
+2381799 epoll_ctl(4, EPOLL_CTL_ADD, 8, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=3391528672, u64=140148174397152}} <unfinished ...>
+2381797 epoll_ctl(4, EPOLL_CTL_ADD, 11, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=3391527976, u64=140148174396456}}) = 0
+2381769 <... epoll_pwait resumed>[{EPOLLIN|EPOLLOUT|EPOLLERR|EPOLLHUP|EPOLLRDHUP, {u32=3391527976, u64=140148174396456}}], 128, 262, NULL, 392245777938577) = 1
+2381830 recvfrom(9, [{{len=1336, type=0x10 /* NLMSG_??? */, flags=NLM_F_MULTI, seq=1, pid=1}, "\x00\x00\x04\x03\x01\x00\x00\x00\x49\x00\x01\x00\x00\x00\x00\x00\x07\x00\x03\x00\x6c\x6f\x00\x00\x08\x00\x0d\x00\xe8\x03\x00\x00\x05\x00\x10\x00\x00\x00\x00\x00\x05\x00\x11\x00\x00\x00\x00\x00\x08\x00\x04\x00\x00\x00\x01\x00\x08\x00\x32\x00\x00\x00\x00\x00\x08\x00\x33\x00\x00\x00\x00\x00\x08\x00\x1b\x00\x00\x00\x00\x00\x08\x00\x1e\x00\x00\x00\x00\x00\x08\x00\x1f\x00\x01\x00\x00\x00\x08\x00\x28\x00\xff\xff\x00\x00\x08\x00\x29\x00\x00\x00\x01\x00\x08\x00\x20\x00\x01\x00\x00\x00\x05\x00\x21\x00\x01\x00\x00\x00\x0c\x00\x06\x00\x6e\x6f\x71\x75\x65\x75\x65\x00\x08\x00\x23\x00\x00\x00\x00\x00\x08\x00\x2f\x00\x00\x00\x00\x00\x08\x00\x30\x00\x00\x00\x00\x00\x05\x00\x27\x00\x00\x00\x00\x00\x24\x00\x0e\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0a\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0a\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\xc4\x00\x17\x00\x18\x00\x00\x00\x00\x00\x00\x00\x18\x00\x00\x00\x00\x00\x00\x00\xb0\x04\x00\x00\x00\x00\x00\x00\xb0\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x64\x00\x07\x00\x18\x00\x00\x00\x18\x00\x00\x00\xb0\x04\x00\x00\xb0\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0c\x00\x2b\x00\x05\x00\x02\x00\x00\x00\x00\x00\x0c\x03\x1a\x00\x88\x00\x02\x00\x84\x00\x01\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10\x27\x00\x00\xe8\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\x02\x0a\x00\x08\x00\x01\x00\x00\x00\x00\x00\x14\x00\x05\x00\xff\xff\x00\x00\xe2\x7f\x56\x02\x18\x46\x00\x00\xe8\x03\x00\x00\xe4\x00\x02\x00\x00\x00\x00\x00\x40\x00\x00\x00\x00\x00\x01\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\xff\xff\xff\xff\xa0\x0f\x00\x00\xe8\x03\x00\x00\xff\xff\xff\xff\x80\x3a\x09\x00\x80\x51\x01\x00\x03\x00\x00\x00\x58\x02\x00\x00\x10\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x60\xea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x10\x27\x00\x00\xe8\x03\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\xee\x36\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\xff\xff\x00\x00\xff\xff\xff\xff\x2c\x01\x03\x00\x25\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x34\x00\x06\x00\x06\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x14\x00\x07\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x05\x00\x08\x00\x00\x00\x00\x00"}, {{len=1372, type=0x10 /* NLMSG_??? */, flags=NLM_F_MULTI, seq=1, pid=1}, "\x00\x00\x01\x00\x7b\x07\x00\x00\x43\x10\x01\x00\x00\x00\x00\x00\x09\x00\x03\x00\x65\x74\x68\x30\x00\x00\x00\x00\x08\x00\x0d\x00\xe8\x03\x00\x00\x05\x00\x10\x00\x06\x00\x00\x00\x05\x00\x11\x00\x00\x00\x00\x00\x08\x00\x04\x00\xdc\x05\x00\x00\x08\x00\x32\x00\x44\x00\x00\x00\x08\x00\x33\x00\xff\xff\x00\x00\x08\x00\x1b\x00\x00\x00\x00\x00\x08\x00\x1e\x00\x00\x00\x00\x00\x08\x00\x1f\x00\x04\x00\x00\x00\x08\x00\x28\x00\xff\xff\x00\x00\x08\x00\x29\x00\x00\x00\x01\x00\x08\x00\x20\x00\x04\x00\x00\x00\x05\x00\x21\x00\x01\x00\x00\x00\x0c\x00\x06\x00\x6e\x6f\x71\x75\x65\x75\x65\x00\x08\x00\x23\x00\x02\x00\x00\x00\x08\x00\x2f\x00\x01\x00\x00\x00\x08\x00\x30\x00\x01\x00\x00\x00\x05\x00\x27\x00\x00\x00\x00\x00\x24\x00\x0e\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0a\x00\x01\x00\x42\x35\x5e\x03\x0c\xaf\x00\x00\x0a\x00\x02\x00\xff\xff\xff\xff\xff\xff\x00\x00\xc4\x00\x17\x00\x85\x00\x00\x00\x00\x00\x00\x00\x68\x00\x00\x00\x00\x00\x00\x00\x84\x0c\x03\x00\x00\x00\x00\x00\x08\x6f\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x64\x00\x07\x00\x85\x00\x00\x00\x68\x00\x00\x00\x84\x0c\x03\x00\x08\x6f\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0c\x00\x2b\x00\x05\x00\x02\x00\x00\x00\x00\x00\x10\x00\x12\x00\x09\x00\x01\x00\x76\x65\x74\x68\x00\x00\x00\x00\x08\x00\x25\x00\x00\x00\x00\x00\x08\x00\x05\x00\x7c\x07\x00\x00\x0c\x03\x1a\x00\x88\x00\x02\x00\x84\x00\x01\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10\x27\x00\x00\xe8\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\x02\x0a\x00\x08\x00\x01\x00\x00\x00\x00\x00\x14\x00\x05\x00\xff\xff\x00\x00\x96\x80\x56\x02\xa4\xac\x00\x00\xe8\x03\x00\x00\xe4\x00\x02\x00\x00\x00\x00\x00\x40\x00\x00\x00\xdc\x05\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\xff\xff\xff\xff\xa0\x0f\x00\x00\xe8\x03\x00\x00\x00\x00\x00\x00\x80\x3a\x09\x00\x80\x51\x01\x00\x03\x00\x00\x00\x58\x02\x00\x00\x10\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x60\xea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10\x27\x00\x00\xe8\x03\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\xee\x36\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\xff\xff\x00\x00\xff\xff\xff\xff\x2c\x01\x03\x00\x25\x00\x00\x00\x00\x00\x00\x00\x13\x00\x00\x00\x00\x00\x00\x00\x88\x08\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x13\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x34\x00\x06\x00\x06\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x14\x00\x07\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x05\x00\x08\x00\x00\x00\x00\x00"}], 4096, 0, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, [112->12]) = 2708
+2381799 <... epoll_ctl resumed>)        = 0
+2381797 getsockopt(11, SOL_SOCKET, SO_ERROR,  <unfinished ...>
+2381769 epoll_pwait(4,  <unfinished ...>
+2381799 epoll_pwait(4,  <unfinished ...>
+2381830 getsockname(9,  <unfinished ...>
+2381799 <... epoll_pwait resumed>[], 128, 0, NULL, 392245) = 0
+2381797 <... getsockopt resumed>[ECONNREFUSED], [4]) = 0
+2381769 <... epoll_pwait resumed>[{EPOLLIN|EPOLLOUT|EPOLLERR|EPOLLHUP|EPOLLRDHUP, {u32=3391528672, u64=140148174397152}}], 128, 0, NULL, 392245) = 1
+2381799 epoll_pwait(4,  <unfinished ...>
+2381830 <... getsockname resumed>{sa_family=AF_NETLINK, nl_pid=1, nl_groups=00000000}, [112->12]) = 0
+2381797 epoll_ctl(4, EPOLL_CTL_DEL, 11, 0xc0002cf3a4 <unfinished ...>
+2381769 getsockopt(8, SOL_SOCKET, SO_ERROR,  <unfinished ...>
+2381799 <... epoll_pwait resumed>[], 128, 0, NULL, 392245) = 0
+2381794 epoll_pwait(4, [], 128, 0, NULL, 392245) = 0
+2381799 epoll_pwait(4,  <unfinished ...>
+2381830 getsockname(9,  <unfinished ...>
+2381797 <... epoll_ctl resumed>)        = 0
+2381794 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+2381769 <... getsockopt resumed>[ECONNREFUSED], [4]) = 0
+2381769 futex(0xc000048950, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+2381797 close(11 <unfinished ...>
+2381830 <... getsockname resumed>{sa_family=AF_NETLINK, nl_pid=1, nl_groups=00000000}, [112->12]) = 0
+2381794 <... nanosleep resumed>NULL)    = 0
+2381794 getpid( <unfinished ...>
+2381795 <... futex resumed>)            = 0
+2381769 <... futex resumed>)            = 1
+2381797 <... close resumed>)            = 0
+2381795 nanosleep({tv_sec=0, tv_nsec=3000},  <unfinished ...>
+2381830 recvfrom(9,  <unfinished ...>
+2381769 epoll_ctl(4, EPOLL_CTL_DEL, 8, 0xc0002b33a4 <unfinished ...>
+2381830 <... recvfrom resumed>{{len=20, type=NLMSG_DONE, flags=NLM_F_MULTI, seq=1, pid=1}, 0}, 4096, 0, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, [112->12]) = 20
+2381797 write(2, "2023/04/25 15:21:25 grpc/lb/consul: error retrieving instances from Consul: Get \"http://consul:8500/v1/health/service/srv-rate?passing=1\": dial tcp 10.107.169.230:8500: connect: connection refused\n", 197 <unfinished ...>
+2381795 <... nanosleep resumed>NULL)    = 0
+2381769 <... epoll_ctl resumed>)        = 0
+2381830 getsockname(9,  <unfinished ...>
+2381797 <... write resumed>)            = 197
+2381795 futex(0xc000048950, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+2381769 close(8 <unfinished ...>
+2381830 <... getsockname resumed>{sa_family=AF_NETLINK, nl_pid=1, nl_groups=00000000}, [112->12]) = 0
+2381797 futex(0xc000048950, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+2381769 <... close resumed>)            = 0
+2381794 <... getpid resumed>)           = 1
+2381794 tgkill(1, 1, SIGURG <unfinished ...>
+2381797 <... futex resumed>)            = 1
+2381795 <... futex resumed>)            = 0
+2381769 write(2, "2023/04/25 15:21:25 grpc/lb/consul: error retrieving instances from Consul: Get \"http://consul:8500/v1/health/service/srv-geo?passing=1\": dial tcp 10.107.169.230:8500: connect: connection refused\n", 196 <unfinished ...>
+2381830 close(9 <unfinished ...>
+2381795 nanosleep({tv_sec=0, tv_nsec=3000},  <unfinished ...>
+2381769 <... write resumed>)            = 196
+2381795 <... nanosleep resumed>NULL)    = 0
+2381769 futex(0xcaf470, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+2381830 <... close resumed>)            = 0
+2381797 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+2381795 futex(0xcaf470, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+2381794 <... tgkill resumed>)           = 0
+2381795 <... futex resumed>)            = 0
+2381769 <... futex resumed>)            = -1 EAGAIN (Resource temporarily unavailable)
+2381797 <... socket resumed>)           = 8
+2381797 setsockopt(8, SOL_SOCKET, SO_BROADCAST, [1], 4 <unfinished ...>
+2381795 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+2381769 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+2381795 <... socket resumed>)           = 9
+2381797 <... setsockopt resumed>)       = 0
+2381795 setsockopt(9, SOL_SOCKET, SO_BROADCAST, [1], 4 <unfinished ...>
+2381769 rt_sigreturn({mask=[]} <unfinished ...>
+2381797 connect(8, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, 16 <unfinished ...>
+2381795 <... setsockopt resumed>)       = 0
+2381795 connect(9, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, 16 <unfinished ...>
+2381769 <... rt_sigreturn resumed>)     = -1 EAGAIN (Resource temporarily unavailable)
+2381797 <... connect resumed>)          = 0
+2381795 <... connect resumed>)          = 0
+2381830 newfstatat(AT_FDCWD, ".",  <unfinished ...>
+2381797 epoll_ctl(4, EPOLL_CTL_ADD, 8, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=3391527976, u64=140148174396456}} <unfinished ...>
+2381795 epoll_ctl(4, EPOLL_CTL_ADD, 9, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=3391528672, u64=140148174397152}} <unfinished ...>
+2381769 futex(0xcaf470, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+2381794 nanosleep({tv_sec=0, tv_nsec=20000}, NULL) = 0
+2381795 <... epoll_ctl resumed>)        = 0
+2381797 <... epoll_ctl resumed>)        = 0
+2381830 <... newfstatat resumed>{st_dev=makedev(0, 0x211), st_ino=779608, st_mode=S_IFDIR|0755, st_nlink=1, st_uid=0, st_gid=0, st_blksize=4096, st_blocks=8, st_size=4096, st_atime=1682195966 /* 2023-04-22T15:39:26.063009945-0500 */, st_atime_nsec=63009945, st_mtime=1682104648 /* 2023-04-21T14:17:28-0500 */, st_mtime_nsec=0, st_ctime=1682195966 /* 2023-04-22T15:39:26.047009815-0500 */, st_ctime_nsec=47009815}, 0) = 0
+2381799 <... epoll_pwait resumed>[{EPOLLOUT, {u32=3391528672, u64=140148174397152}}, {EPOLLOUT, {u32=3391527976, u64=140148174396456}}], 128, 176, NULL, 392245777938577) = 2
+2381830 getcwd( <unfinished ...>
+2381797 getsockname(8,  <unfinished ...>
+2381795 getsockname(9,  <unfinished ...>
+2381794 getpid( <unfinished ...>
+2381799 epoll_pwait(4,  <unfinished ...>
+2381830 <... getcwd resumed>"/go/src/github.com/harlow/go-micro-services", 4096) = 44
+2381797 <... getsockname resumed>{sa_family=AF_INET, sin_port=htons(47746), sin_addr=inet_addr("10.0.2.3")}, [112->16]) = 0
+2381795 <... getsockname resumed>{sa_family=AF_INET, sin_port=htons(50180), sin_addr=inet_addr("10.0.2.3")}, [112->16]) = 0
+2381795 getpeername(9,  <unfinished ...>
+2381794 <... getpid resumed>)           = 1
+2381830 write(1, "\33[90m2023-04-25T15:21:25Z\33[0m \33[32mINF\33[0m \33[1mregistry/registry.go:91\33[0m\33[36m >\33[0m Trying to register service [ name: srv-search, id: dd79764d-4783-4071-813d-5f77b6074b76, address: 10.0.2.3:8082 ]\n", 200 <unfinished ...>
+2381799 <... epoll_pwait resumed>[], 128, 0, NULL, 392245) = 0
+2381797 getpeername(8,  <unfinished ...>
+2381795 <... getpeername resumed>{sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, [112->16]) = 0
+2381795 write(9, "?\372\1\0\0\1\0\0\0\0\0\0\6consul\7default\3svc\7cluster\5local\0\0\1\0\1", 50) = 50
+2381830 <... write resumed>)            = 200
+2381799 epoll_pwait(4,  <unfinished ...>
+2381797 <... getpeername resumed>{sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, [112->16]) = 0
+2381795 read(9, "?\372\205\0\0\1\0\1\0\0\0\0\6consul\7default\3svc\7cluster\5local\0\0\1\0\1\6consul\7default\3svc\7cluster\5local\0\0\1\0\1\0\0\0\7\0\4\nk\251\346", 512) = 98
+2381795 epoll_ctl(4, EPOLL_CTL_DEL, 9, 0xc0001de86c <unfinished ...>
+2381830 mmap(NULL, 262144, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0 <unfinished ...>
+2381797 write(8, "q\350\1\0\0\1\0\0\0\0\0\0\6consul\7default\3svc\7cluster\5local\0\0\34\0\1", 50 <unfinished ...>
+2381795 <... epoll_ctl resumed>)        = 0
+2381795 close(9)                        = 0
+2381830 <... mmap resumed>)             = 0x7f76c81a1000
+2381797 <... write resumed>)            = 50
+2381795 futex(0xcaf470, FUTEX_WAKE_PRIVATE, 1) = 1
+2381795 futex(0xc000048950, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+2381799 <... epoll_pwait resumed>[{EPOLLIN|EPOLLOUT, {u32=3391527976, u64=140148174396456}}], 128, 106, NULL, 392245777938577) = 1
+2381830 epoll_pwait(4,  <unfinished ...>
+2381799 epoll_pwait(4,  <unfinished ...>
+2381797 read(8,  <unfinished ...>
+2381794 tgkill(1, 10, SIGURG <unfinished ...>
+2381769 <... futex resumed>)            = 0
+2381799 <... epoll_pwait resumed>[], 128, 0, NULL, 392245) = 0
+2381794 <... tgkill resumed>)           = 0
+2381830 <... epoll_pwait resumed>[], 128, 0, NULL, 392245) = 0
+2381797 <... read resumed>"q\350\205\0\0\1\0\0\0\1\0\0\6consul\7default\3svc\7cluster\5local\0\0\34\0\1\7cluster\5local\0\0\6\0\1\0\0\0\7\0D\2ns\3dns\7cluster\5local\0\nhostmaster\7cluster\5local\0dG\357\333\0\0\34 \0\0\7\10\0\1Q\200\0\0\0\36", 512) = 143
+2381769 epoll_pwait(4,  <unfinished ...>
+2381830 futex(0xc000080950, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+2381799 epoll_pwait(4,  <unfinished ...>
+2381797 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+2381794 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+2381769 <... epoll_pwait resumed>[], 128, 0, NULL, 392245) = 0
+2381769 futex(0xcaf470, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+2381797 rt_sigreturn({mask=[]})         = 143
+2381797 epoll_ctl(4, EPOLL_CTL_DEL, 8, 0xc0000c086c) = 0
+2381794 <... nanosleep resumed>NULL)    = 0
+2381797 close(8)                        = 0
+2381794 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+2381797 futex(0xcaf470, FUTEX_WAKE_PRIVATE, 1) = 1
+2381769 <... futex resumed>)            = 0
+2381797 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+2381769 nanosleep({tv_sec=0, tv_nsec=3000},  <unfinished ...>
+2381797 <... socket resumed>)           = 8
+2381794 <... nanosleep resumed>NULL)    = 0
+2381769 <... nanosleep resumed>NULL)    = 0
+2381797 connect(8, {sa_family=AF_INET, sin_port=htons(8500), sin_addr=inet_addr("10.107.169.230")}, 16 <unfinished ...>
+2381769 futex(0xc000080950, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+2381830 <... futex resumed>)            = 0
+2381797 <... connect resumed>)          = -1 EINPROGRESS (Operation now in progress)
+2381794 futex(0xc000048950, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+2381769 <... futex resumed>)            = 1
+2381830 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+2381797 epoll_ctl(4, EPOLL_CTL_ADD, 8, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=3391527976, u64=140148174396456}} <unfinished ...>
+2381769 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+2381830 <... socket resumed>)           = 11
+2381799 <... epoll_pwait resumed>[{EPOLLIN|EPOLLOUT|EPOLLERR|EPOLLHUP|EPOLLRDHUP, {u32=3391527976, u64=140148174396456}}], 128, 76, NULL, 392245777938577) = 1
+2381797 <... epoll_ctl resumed>)        = 0
+2381769 <... socket resumed>)           = 9
+2381830 connect(11, {sa_family=AF_INET, sin_port=htons(8500), sin_addr=inet_addr("10.107.169.230")}, 16 <unfinished ...>
+2381797 futex(0xc000080150, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+2381769 connect(9, {sa_family=AF_INET, sin_port=htons(8500), sin_addr=inet_addr("10.107.169.230")}, 16 <unfinished ...>
+2381830 <... connect resumed>)          = -1 EINPROGRESS (Operation now in progress)
+2381799 getsockopt(8, SOL_SOCKET, SO_ERROR,  <unfinished ...>
+2381769 <... connect resumed>)          = -1 EINPROGRESS (Operation now in progress)
+2381830 epoll_ctl(4, EPOLL_CTL_ADD, 11, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=3391527744, u64=140148174396224}} <unfinished ...>
+2381799 <... getsockopt resumed>[ECONNREFUSED], [4]) = 0
+2381795 <... futex resumed>)            = 0
+2381794 <... futex resumed>)            = 1
+2381769 epoll_ctl(4, EPOLL_CTL_ADD, 9, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=3391528672, u64=140148174397152}} <unfinished ...>
+2381799 epoll_ctl(4, EPOLL_CTL_DEL, 8, 0xc0002b53a4) = 0
+2381795 epoll_pwait(4,  <unfinished ...>
+2381830 <... epoll_ctl resumed>)        = 0
+2381795 <... epoll_pwait resumed>[], 128, 0, NULL, 392245) = 0
+2381769 <... epoll_ctl resumed>)        = 0
+2381795 epoll_pwait(4,  <unfinished ...>
+2381830 nanosleep({tv_sec=0, tv_nsec=3000},  <unfinished ...>
+2381769 futex(0xc000080150, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+2381799 close(8 <unfinished ...>
+2381797 <... futex resumed>)            = 0
+2381769 <... futex resumed>)            = 1
+2381799 <... close resumed>)            = 0
+2381795 <... epoll_pwait resumed>[{EPOLLIN|EPOLLOUT|EPOLLERR|EPOLLHUP|EPOLLRDHUP, {u32=3391528672, u64=140148174397152}}, {EPOLLIN|EPOLLOUT|EPOLLERR|EPOLLHUP|EPOLLRDHUP, {u32=3391527744, u64=140148174396224}}], 128, 975, NULL, 392246777938577) = 2
+2381830 <... nanosleep resumed>NULL)    = 0
+2381799 newfstatat(AT_FDCWD, ".",  <unfinished ...>
+2381797 getsockopt(11, SOL_SOCKET, SO_ERROR,  <unfinished ...>
+2381795 futex(0xc000048950, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+2381769 getsockopt(9, SOL_SOCKET, SO_ERROR,  <unfinished ...>
+2381830 epoll_pwait(4,  <unfinished ...>
+2381797 <... getsockopt resumed>[ECONNREFUSED], [4]) = 0
+2381769 <... getsockopt resumed>[ECONNREFUSED], [4]) = 0
+2381830 <... epoll_pwait resumed>[], 128, 0, NULL, 392245) = 0
+2381797 epoll_ctl(4, EPOLL_CTL_DEL, 11, 0xc0002b33a4 <unfinished ...>
+2381769 epoll_ctl(4, EPOLL_CTL_DEL, 9, 0xc0002cf3a4 <unfinished ...>
+2381799 <... newfstatat resumed>{st_dev=makedev(0, 0x211), st_ino=779608, st_mode=S_IFDIR|0755, st_nlink=1, st_uid=0, st_gid=0, st_blksize=4096, st_blocks=8, st_size=4096, st_atime=1682195966 /* 2023-04-22T15:39:26.063009945-0500 */, st_atime_nsec=63009945, st_mtime=1682104648 /* 2023-04-21T14:17:28-0500 */, st_mtime_nsec=0, st_ctime=1682195966 /* 2023-04-22T15:39:26.047009815-0500 */, st_ctime_nsec=47009815}, 0) = 0
+2381830 epoll_pwait(4,  <unfinished ...>
+2381797 <... epoll_ctl resumed>)        = 0
+2381769 <... epoll_ctl resumed>)        = 0
+2381799 getcwd( <unfinished ...>
+2381797 close(11 <unfinished ...>
+2381769 close(9 <unfinished ...>
+2381799 <... getcwd resumed>"/go/src/github.com/harlow/go-micro-services", 4096) = 44
+2381794 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+2381797 <... close resumed>)            = 0
+2381769 <... close resumed>)            = 0
+2381799 write(1, "\33[90m2023-04-25T15:21:25Z\33[0m \33[1m\33[31mFTL\33[0m\33[0m \33[1mcmd/search/main.go:73\33[0m\33[36m >\33[0m failed register: Put \"http://consul:8500/v1/agent/service/register\": dial tcp 10.107.169.230:8500: connect: connection refused\n", 219 <unfinished ...>
+2381794 <... nanosleep resumed>NULL)    = 0
+2381797 write(2, "2023/04/25 15:21:25 grpc/lb/consul: error retrieving instances from Consul: Get \"http://consul:8500/v1/health/service/srv-geo?passing=1\": dial tcp 10.107.169.230:8500: connect: connection refused\n", 196 <unfinished ...>
+2381769 futex(0xc000048950, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+2381797 <... write resumed>)            = 196
+2381795 <... futex resumed>)            = 0
+2381769 <... futex resumed>)            = 1
+2381797 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+2381795 nanosleep({tv_sec=0, tv_nsec=3000},  <unfinished ...>
+2381769 futex(0xcaf470, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+2381795 <... nanosleep resumed>NULL)    = 0
+2381799 <... write resumed>)            = 219
+2381794 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+2381797 <... socket resumed>)           = 8
+2381799 exit_group(1)                   = ?
+2381796 <... futex resumed>)            = ?
+2381794 <... nanosleep resumed> <unfinished ...>) = ?
+2381798 <... futex resumed>)            = ?
+2381794 +++ exited with 1 +++
+2381799 +++ exited with 1 +++
+2381798 +++ exited with 1 +++
+2381796 +++ exited with 1 +++
+2381795 +++ exited with 1 +++
+2381830 <... epoll_pwait resumed> <unfinished ...>) = ?
+2381769 <... futex resumed>)            = ?
+2381797 +++ exited with 1 +++
+2381830 +++ exited with 1 +++
+2381769 +++ exited with 1 +++

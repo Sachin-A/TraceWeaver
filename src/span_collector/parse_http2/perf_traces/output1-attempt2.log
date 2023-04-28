@@ -1,0 +1,1670 @@
+336493 futex(0xc000080150, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336491 futex(0xc000048950, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336492 futex(0xc000048d50, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336489 restart_syscall(<... resuming interrupted futex ...> <unfinished ...>
+336494 futex(0xcdf1d8, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336489 <... restart_syscall resumed>)   = 0
+336489 getpid()                         = 1
+336373 futex(0xc000048950, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336489 tgkill(1, 1, SIGURG <unfinished ...>
+336373 <... futex resumed>)             = 1
+336489 <... tgkill resumed>)            = 0
+336373 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336491 <... futex resumed>)             = 0
+336489 nanosleep({tv_sec=0, tv_nsec=10000000},  <unfinished ...>
+336373 rt_sigreturn({mask=[]} <unfinished ...>
+336491 futex(0xcaf470, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336373 <... rt_sigreturn resumed>)      = 1
+336491 <... futex resumed>)             = 0
+336491 futex(0xc000048950, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336489 nanosleep({tv_sec=0, tv_nsec=10000000},  <unfinished ...>
+336373 openat(AT_FDCWD, "/etc/localtime", O_RDONLY <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336373 <... openat resumed>)            = 3
+336489 futex(0xc000048950, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336373 read(3,  <unfinished ...>
+336491 <... futex resumed>)             = 0
+336489 <... futex resumed>)             = 1
+336373 <... read resumed>"TZif2\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\1\0\0\0\1\0\0\0\0\0\0\0\0\0\0\0\1\0\0\0\4\0\0\0\0\0\0UTC\0\0\0TZif2\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\1\0\0\0\1\0\0\0\0\0\0\0\0\0\0\0\1\0\0\0\4\0\0\0\0\0\0UTC\0\0\0\nUTC0\n", 4096) = 118
+336491 futex(0xc000048950, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336489 futex(0xc000048950, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336373 read(3,  <unfinished ...>
+336489 <... futex resumed>)             = 0
+336373 <... read resumed>"", 4096)      = 0
+336491 <... futex resumed>)             = -1 EAGAIN (Resource temporarily unavailable)
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 close(3 <unfinished ...>
+336491 futex(0xc000048950, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336373 <... close resumed>)             = 0
+336489 futex(0xc000048950, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336373 write(2, "2023/04/21 18:35:09 TLS disabled\n", 33 <unfinished ...>
+336489 <... futex resumed>)             = 1
+336373 <... write resumed>)             = 33
+336491 <... futex resumed>)             = 0
+336491 futex(0xc000048950, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336489 futex(0xc000048950, FUTEX_WAKE_PRIVATE, 1) = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 write(2, "{\"level\":\"info\",\"time\":\"2023-04-21T18:35:09Z\",\"message\":\"Set global log level: info\"}\n", 86) = 86
+336491 <... futex resumed>)             = -1 EAGAIN (Resource temporarily unavailable)
+336489 <... nanosleep resumed>NULL)     = 0
+336373 newfstatat(AT_FDCWD, ".",  <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336491 futex(0xc000048950, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336373 <... newfstatat resumed>{st_dev=makedev(0, 0x233), st_ino=770604, st_mode=S_IFDIR|0755, st_nlink=1, st_uid=0, st_gid=0, st_blksize=4096, st_blocks=8, st_size=4096, st_atime=1680576758 /* 2023-04-03T21:52:38.912933824-0500 */, st_atime_nsec=912933824, st_mtime=1678313423 /* 2023-03-08T16:10:23-0600 */, st_mtime_nsec=0, st_ctime=1680576758 /* 2023-04-03T21:52:38.880933508-0500 */, st_ctime_nsec=880933508}, 0) = 0
+336489 futex(0xcb0a98, FUTEX_WAIT_PRIVATE, 0, {tv_sec=60, tv_nsec=0} <unfinished ...>
+336373 futex(0xcb0a98, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336489 <... futex resumed>)             = -1 EAGAIN (Resource temporarily unavailable)
+336373 <... futex resumed>)             = 0
+336489 sched_yield( <unfinished ...>
+336373 getcwd( <unfinished ...>
+336489 <... sched_yield resumed>)       = 0
+336373 <... getcwd resumed>"/go/src/github.com/harlow/go-micro-services", 4096) = 44
+336489 futex(0xcb0998, FUTEX_WAKE_PRIVATE, 1) = 0
+336489 getpid()                         = 1
+336489 tgkill(1, 1, SIGURG)             = 0
+336373 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 rt_sigreturn({mask=[]} <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336373 <... rt_sigreturn resumed>)      = 824635883520
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 write(1, "\33[90m2023-04-21T18:35:09Z\33[0m \33[32mINF\33[0m \33[1mcmd/search/main.go:24\33[0m\33[36m >\33[0m Reading config...\n", 102 <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336373 <... write resumed>)             = 102
+336489 futex(0xc000048950, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336373 openat(AT_FDCWD, "config.json", O_RDONLY|O_CLOEXEC <unfinished ...>
+336489 <... futex resumed>)             = 1
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... openat resumed>)            = 3
+336491 <... futex resumed>)             = 0
+336489 <... nanosleep resumed>NULL)     = 0
+336373 epoll_create1(EPOLL_CLOEXEC <unfinished ...>
+336489 getpid( <unfinished ...>
+336373 <... epoll_create1 resumed>)     = 4
+336491 futex(0xc000048950, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336489 <... getpid resumed>)            = 1
+336373 pipe2( <unfinished ...>
+336489 tgkill(1, 1, SIGURG <unfinished ...>
+336373 <... pipe2 resumed>[5, 6], O_NONBLOCK|O_CLOEXEC) = 0
+336489 <... tgkill resumed>)            = 0
+336373 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 rt_sigreturn({mask=[]})          = 0
+336489 <... nanosleep resumed>NULL)     = 0
+336489 getpid( <unfinished ...>
+336373 epoll_ctl(4, EPOLL_CTL_ADD, 5, {EPOLLIN, {u32=13495512, u64=13495512}} <unfinished ...>
+336489 <... getpid resumed>)            = 1
+336489 tgkill(1, 1, SIGURG)             = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... epoll_ctl resumed>)         = 0
+336373 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336373 rt_sigreturn({mask=[]} <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336489 getpid()                         = 1
+336489 tgkill(1, 1, SIGURG)             = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... rt_sigreturn resumed>)      = 0
+336373 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336373 rt_sigreturn({mask=[]} <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336489 getpid()                         = 1
+336489 tgkill(1, 1, SIGURG)             = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... rt_sigreturn resumed>)      = 0
+336373 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336373 rt_sigreturn({mask=[]} <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336489 getpid()                         = 1
+336489 tgkill(1, 1, SIGURG)             = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... rt_sigreturn resumed>)      = 0
+336489 <... nanosleep resumed>NULL)     = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336373 rt_sigreturn({mask=[]})          = 0
+336489 <... nanosleep resumed>NULL)     = 0
+336489 getpid()                         = 1
+336489 tgkill(1, 1, SIGURG)             = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336373 rt_sigreturn({mask=[]})          = 0
+336489 <... nanosleep resumed>NULL)     = 0
+336489 getpid()                         = 1
+336489 tgkill(1, 1, SIGURG)             = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336373 rt_sigreturn({mask=[]})          = 0
+336489 <... nanosleep resumed>NULL)     = 0
+336489 getpid()                         = 1
+336489 tgkill(1, 1, SIGURG <unfinished ...>
+336373 epoll_ctl(4, EPOLL_CTL_ADD, 3, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=2729830512, u64=140181872437360}} <unfinished ...>
+336489 <... tgkill resumed>)            = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... epoll_ctl resumed>)         = -1 EPERM (Operation not permitted)
+336373 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336373 rt_sigreturn({mask=[]} <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336489 epoll_pwait(4, [], 128, 0, NULL, 58269) = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... rt_sigreturn resumed>)      = -1 EPERM (Operation not permitted)
+336373 read(3,  <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000}, NULL) = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... read resumed>"{\n  \"consulAddress\": \"consul:8500\",\n  \"jaegerAddress\": \"jaeger:6831\",\n  \"FrontendPort\": \"5000\",\n  \"GeoPort\": \"8083\",\n  \"GeoMongoAddress\": \"mongodb-geo:27017\",\n  \"ProfilePort\": \"8081\",\n  \"ProfileMongoAddress\": \"mongodb-profile:27017\",\n  \"ProfileMemcAddress\": \"memcached-profile:11211\",\n  \"RatePort\": \"8084\",\n  \"RateMongoAddress\": \"mongodb-rate:27017\",\n  \"RateMemcAddress\": \"memcached-rate:11211\",\n  \"RecommendPort\": \"8085\",\n  \"RecommendMongoAddress\": \"mongodb-recommendation:27017\",\n  \"ReservePort\": \"8087\",\n  \"Re", 512) = 512
+336373 read(3,  <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... read resumed>"serveMongoAddress\": \"mongodb-reservation:27017\",\n  \"ReserveMemcAddress\": \"memcached-reserve:11211\",\n  \"SearchPort\": \"8082\",\n  \"UserPort\": \"8086\",\n  \"UserMongoAddress\": \"mongodb-user:27017\"\n}\n", 512) = 191
+336373 read(3, "", 321)                 = 0
+336489 <... nanosleep resumed>NULL)     = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000}, NULL) = 0
+336373 newfstatat(AT_FDCWD, ".",  <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... newfstatat resumed>{st_dev=makedev(0, 0x233), st_ino=770604, st_mode=S_IFDIR|0755, st_nlink=1, st_uid=0, st_gid=0, st_blksize=4096, st_blocks=8, st_size=4096, st_atime=1680576758 /* 2023-04-03T21:52:38.912933824-0500 */, st_atime_nsec=912933824, st_mtime=1678313423 /* 2023-03-08T16:10:23-0600 */, st_mtime_nsec=0, st_ctime=1680576758 /* 2023-04-03T21:52:38.880933508-0500 */, st_ctime_nsec=880933508}, 0) = 0
+336489 <... nanosleep resumed>NULL)     = 0
+336373 getcwd( <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... getcwd resumed>"/go/src/github.com/harlow/go-micro-services", 4096) = 44
+336373 write(1, "\33[90m2023-04-21T18:35:09Z\33[0m \33[32mINF\33[0m \33[1mcmd/search/main.go:39\33[0m\33[36m >\33[0m Read target port: 8082\n", 107 <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336373 <... write resumed>)             = 107
+336489 nanosleep({tv_sec=0, tv_nsec=20000}, NULL) = 0
+336373 newfstatat(AT_FDCWD, ".",  <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... newfstatat resumed>{st_dev=makedev(0, 0x233), st_ino=770604, st_mode=S_IFDIR|0755, st_nlink=1, st_uid=0, st_gid=0, st_blksize=4096, st_blocks=8, st_size=4096, st_atime=1680576758 /* 2023-04-03T21:52:38.912933824-0500 */, st_atime_nsec=912933824, st_mtime=1678313423 /* 2023-03-08T16:10:23-0600 */, st_mtime_nsec=0, st_ctime=1680576758 /* 2023-04-03T21:52:38.880933508-0500 */, st_ctime_nsec=880933508}, 0) = 0
+336373 getcwd( <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336373 <... getcwd resumed>"/go/src/github.com/harlow/go-micro-services", 4096) = 44
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 write(1, "\33[90m2023-04-21T18:35:09Z\33[0m \33[32mINF\33[0m \33[1mcmd/search/main.go:40\33[0m\33[36m >\33[0m Read consul address: consul:8500\n", 117 <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336373 <... write resumed>)             = 117
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 newfstatat(AT_FDCWD, ".",  <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336489 epoll_pwait(4,  <unfinished ...>
+336373 <... newfstatat resumed>{st_dev=makedev(0, 0x233), st_ino=770604, st_mode=S_IFDIR|0755, st_nlink=1, st_uid=0, st_gid=0, st_blksize=4096, st_blocks=8, st_size=4096, st_atime=1680576758 /* 2023-04-03T21:52:38.912933824-0500 */, st_atime_nsec=912933824, st_mtime=1678313423 /* 2023-03-08T16:10:23-0600 */, st_mtime_nsec=0, st_ctime=1680576758 /* 2023-04-03T21:52:38.880933508-0500 */, st_ctime_nsec=880933508}, 0) = 0
+336489 <... epoll_pwait resumed>[], 128, 0, NULL, 58269) = 0
+336373 getcwd( <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... getcwd resumed>"/go/src/github.com/harlow/go-micro-services", 4096) = 44
+336373 write(1, "\33[90m2023-04-21T18:35:09Z\33[0m \33[32mINF\33[0m \33[1mcmd/search/main.go:41\33[0m\33[36m >\33[0m Read jaeger address: jaeger:6831\n", 117 <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336373 <... write resumed>)             = 117
+336489 epoll_pwait(4, [], 128, 0, NULL, 58269) = 0
+336373 newfstatat(AT_FDCWD, ".",  <unfinished ...>
+336489 futex(0xc000048950, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336373 <... newfstatat resumed>{st_dev=makedev(0, 0x233), st_ino=770604, st_mode=S_IFDIR|0755, st_nlink=1, st_uid=0, st_gid=0, st_blksize=4096, st_blocks=8, st_size=4096, st_atime=1680576758 /* 2023-04-03T21:52:38.912933824-0500 */, st_atime_nsec=912933824, st_mtime=1678313423 /* 2023-03-08T16:10:23-0600 */, st_mtime_nsec=0, st_ctime=1680576758 /* 2023-04-03T21:52:38.880933508-0500 */, st_ctime_nsec=880933508}, 0) = 0
+336491 <... futex resumed>)             = 0
+336489 <... futex resumed>)             = 1
+336373 getcwd( <unfinished ...>
+336491 futex(0xc000048950, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... getcwd resumed>"/go/src/github.com/harlow/go-micro-services", 4096) = 44
+336373 write(1, "\33[90m2023-04-21T18:35:09Z\33[0m \33[32mINF\33[0m \33[1mcmd/search/main.go:50\33[0m\33[36m >\33[0m Initializing jaeger agent [service name: search | host: jaeger:6831]...\n", 156 <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336373 <... write resumed>)             = 156
+336489 futex(0xc000048950, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336491 <... futex resumed>)             = 0
+336489 <... futex resumed>)             = 1
+336373 newfstatat(AT_FDCWD, ".",  <unfinished ...>
+336491 futex(0xc000048950, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... newfstatat resumed>{st_dev=makedev(0, 0x233), st_ino=770604, st_mode=S_IFDIR|0755, st_nlink=1, st_uid=0, st_gid=0, st_blksize=4096, st_blocks=8, st_size=4096, st_atime=1680576758 /* 2023-04-03T21:52:38.912933824-0500 */, st_atime_nsec=912933824, st_mtime=1678313423 /* 2023-03-08T16:10:23-0600 */, st_mtime_nsec=0, st_ctime=1680576758 /* 2023-04-03T21:52:38.880933508-0500 */, st_ctime_nsec=880933508}, 0) = 0
+336373 getcwd( <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336373 <... getcwd resumed>"/go/src/github.com/harlow/go-micro-services", 4096) = 44
+336489 futex(0xc000048950, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336373 write(1, "\33[90m2023-04-21T18:35:09Z\33[0m \33[32mINF\33[0m \33[1mtracing/tracer.go:26\33[0m\33[36m >\33[0m Jaeger client: adjusted sample ratio 0.330000\n", 129 <unfinished ...>
+336489 <... futex resumed>)             = 1
+336491 <... futex resumed>)             = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... write resumed>)             = 129
+336491 futex(0xc000048950, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336489 epoll_pwait(4,  <unfinished ...>
+336373 futex(0xc000048950, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336489 <... epoll_pwait resumed>[], 128, 0, NULL, 58269) = 0
+336373 <... futex resumed>)             = 1
+336491 <... futex resumed>)             = 0
+336491 nanosleep({tv_sec=0, tv_nsec=3000},  <unfinished ...>
+336489 getpid( <unfinished ...>
+336373 openat(AT_FDCWD, "/etc/nsswitch.conf", O_RDONLY|O_CLOEXEC <unfinished ...>
+336489 <... getpid resumed>)            = 1
+336491 <... nanosleep resumed>NULL)     = 0
+336489 tgkill(1, 1, SIGURG <unfinished ...>
+336491 futex(0xc000048d50, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336489 <... tgkill resumed>)            = 0
+336373 <... openat resumed>)            = 7
+336491 <... futex resumed>)             = 1
+336491 futex(0xc000048950, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336373 rt_sigreturn({mask=[]} <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336373 <... rt_sigreturn resumed>)      = 7
+336489 epoll_pwait(4,  <unfinished ...>
+336373 epoll_ctl(4, EPOLL_CTL_ADD, 7, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=2729830512, u64=140181872437360}} <unfinished ...>
+336489 <... epoll_pwait resumed>[], 128, 0, NULL, 58269) = 0
+336373 <... epoll_ctl resumed>)         = -1 EPERM (Operation not permitted)
+336489 getpid( <unfinished ...>
+336373 read(7,  <unfinished ...>
+336489 <... getpid resumed>)            = 1
+336489 tgkill(1, 1, SIGURG <unfinished ...>
+336373 <... read resumed>"# /etc/nsswitch.conf\n#\n# Example configuration of GNU Name Service Switch functionality.\n# If you have the `glibc-doc-reference' and `info' packages installed, try:\n# `info libc \"Name Service Switch\"' for information about this file.\n\npasswd:         files\ngroup:          files\nshadow:         files\ngshadow:        files\n\nhosts:          files dns\nnetworks:       files\n\nprotocols:      db files\nservices:       db files\nethers:         db files\nrpc:            db files\n\nnetgroup:       nis\n", 1024) = 494
+336489 <... tgkill resumed>)            = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336373 rt_sigreturn({mask=[]} <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336373 <... rt_sigreturn resumed>)      = 494
+336489 epoll_pwait(4,  <unfinished ...>
+336373 read(7,  <unfinished ...>
+336489 <... epoll_pwait resumed>[], 128, 0, NULL, 58269) = 0
+336373 <... read resumed>"", 1024)      = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 close(7 <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336373 <... close resumed>)             = 0
+336489 epoll_pwait(4,  <unfinished ...>
+336373 openat(AT_FDCWD, "/etc/resolv.conf", O_RDONLY|O_CLOEXEC <unfinished ...>
+336489 <... epoll_pwait resumed>[], 128, 0, NULL, 58269) = 0
+336373 <... openat resumed>)            = 7
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 epoll_ctl(4, EPOLL_CTL_ADD, 7, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=2729830512, u64=140181872437360}}) = -1 EPERM (Operation not permitted)
+336489 <... nanosleep resumed>NULL)     = 0
+336373 fstat(7,  <unfinished ...>
+336492 <... futex resumed>)             = 0
+336492 futex(0xc000048d50, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336489 epoll_pwait(4,  <unfinished ...>
+336373 <... fstat resumed>{st_dev=makedev(0xfc, 0x5), st_ino=657777, st_mode=S_IFREG|0644, st_nlink=1, st_uid=0, st_gid=0, st_blksize=4096, st_blocks=8, st_size=103, st_atime=1682102102 /* 2023-04-21T13:35:02.792327352-0500 */, st_atime_nsec=792327352, st_mtime=1682102091 /* 2023-04-21T13:34:51.572240295-0500 */, st_mtime_nsec=572240295, st_ctime=1682102107 /* 2023-04-21T13:35:07.812366442-0500 */, st_ctime_nsec=812366442}) = 0
+336489 <... epoll_pwait resumed>[], 128, 0, NULL, 58269) = 0
+336373 read(7,  <unfinished ...>
+336489 futex(0xc000048d50, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336373 <... read resumed>"nameserver 10.96.0.10\nsearch default.svc.cluster.local svc.cluster.local cluster.local\noptions ndots:5\n", 65536) = 103
+336489 <... futex resumed>)             = 1
+336373 read(7,  <unfinished ...>
+336492 <... futex resumed>)             = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... read resumed>"", 65433)     = 0
+336373 read(7,  <unfinished ...>
+336492 futex(0xc000048d50, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336373 <... read resumed>"", 65536)     = 0
+336489 epoll_pwait(4,  <unfinished ...>
+336373 close(7 <unfinished ...>
+336489 <... epoll_pwait resumed>[], 128, 0, NULL, 58269) = 0
+336373 <... close resumed>)             = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 newfstatat(AT_FDCWD, "/etc/mdns.allow", 0xc00007a038, 0) = -1 ENOENT (No such file or directory)
+336489 <... nanosleep resumed>NULL)     = 0
+336373 newfstatat(AT_FDCWD, "/etc/hosts",  <unfinished ...>
+336489 epoll_pwait(4,  <unfinished ...>
+336373 <... newfstatat resumed>{st_dev=makedev(0xfc, 0x5), st_ino=658105, st_mode=S_IFREG|0644, st_nlink=1, st_uid=0, st_gid=0, st_blksize=4096, st_blocks=8, st_size=218, st_atime=1682102102 /* 2023-04-21T13:35:02.796327383-0500 */, st_atime_nsec=796327383, st_mtime=1682102107 /* 2023-04-21T13:35:07.052360519-0500 */, st_mtime_nsec=52360519, st_ctime=1682102107 /* 2023-04-21T13:35:07.052360519-0500 */, st_ctime_nsec=52360519}, 0) = 0
+336489 <... epoll_pwait resumed>[], 128, 0, NULL, 58269) = 0
+336489 futex(0xc000048d50, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336373 openat(AT_FDCWD, "/etc/hosts", O_RDONLY|O_CLOEXEC <unfinished ...>
+336489 <... futex resumed>)             = 1
+336373 <... openat resumed>)            = 7
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 epoll_ctl(4, EPOLL_CTL_ADD, 7, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=2729830512, u64=140181872437360}} <unfinished ...>
+336492 <... futex resumed>)             = 0
+336373 <... epoll_ctl resumed>)         = -1 EPERM (Operation not permitted)
+336492 futex(0xc000048d50, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336373 read(7,  <unfinished ...>
+336489 epoll_pwait(4,  <unfinished ...>
+336373 <... read resumed>"# Kubernetes-managed hosts file.\n127.0.0.1\tlocalhost\n::1\tlocalhost ip6-localhost ip6-loopback\nfe00::0\tip6-localnet\nfe00::0\tip6-mcastprefix\nfe00::1\tip6-allnodes\nfe00::2\tip6-allrouters\n10.0.2.197\tsearch-5d5f99cf95-86xmv\n", 65536) = 218
+336489 <... epoll_pwait resumed>[], 128, 0, NULL, 58270) = 0
+336373 read(7,  <unfinished ...>
+336489 futex(0xc000048d50, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336373 <... read resumed>"", 65318)     = 0
+336489 <... futex resumed>)             = 1
+336373 read(7,  <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... read resumed>"", 65536)     = 0
+336373 close(7 <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336373 <... close resumed>)             = 0
+336492 <... futex resumed>)             = 0
+336489 epoll_pwait(4,  <unfinished ...>
+336373 futex(0xc000048950, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336489 <... epoll_pwait resumed>[], 128, 0, NULL, 58270) = 0
+336373 <... futex resumed>)             = 1
+336491 <... futex resumed>)             = 0
+336492 nanosleep({tv_sec=0, tv_nsec=3000},  <unfinished ...>
+336491 nanosleep({tv_sec=0, tv_nsec=3000},  <unfinished ...>
+336489 getpid( <unfinished ...>
+336491 <... nanosleep resumed>NULL)     = 0
+336489 <... getpid resumed>)            = 1
+336373 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+336491 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+336489 tgkill(1, 1, SIGURG <unfinished ...>
+336373 <... socket resumed>)            = 7
+336492 <... nanosleep resumed>NULL)     = 0
+336491 <... socket resumed>)            = 8
+336489 <... tgkill resumed>)            = 0
+336373 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336491 setsockopt(8, SOL_SOCKET, SO_BROADCAST, [1], 4 <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 rt_sigreturn({mask=[]} <unfinished ...>
+336492 epoll_pwait(4,  <unfinished ...>
+336491 <... setsockopt resumed>)        = 0
+336489 <... nanosleep resumed>NULL)     = 0
+336373 <... rt_sigreturn resumed>)      = 7
+336491 connect(8, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, 16 <unfinished ...>
+336489 getpid( <unfinished ...>
+336373 setsockopt(7, SOL_SOCKET, SO_BROADCAST, [1], 4 <unfinished ...>
+336491 <... connect resumed>)           = 0
+336489 <... getpid resumed>)            = 1
+336373 <... setsockopt resumed>)        = 0
+336491 epoll_ctl(4, EPOLL_CTL_ADD, 8, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=2729830512, u64=140181872437360}} <unfinished ...>
+336489 tgkill(1, 1, SIGURG <unfinished ...>
+336373 connect(7, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, 16 <unfinished ...>
+336491 <... epoll_ctl resumed>)         = 0
+336489 <... tgkill resumed>)            = 0
+336373 <... connect resumed>)           = 0
+336492 <... epoll_pwait resumed>[{EPOLLOUT, {u32=2729830512, u64=140181872437360}}], 128, 4964, NULL, 58275065622037) = 1
+336491 getsockname(8,  <unfinished ...>
+336489 getpid( <unfinished ...>
+336373 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336491 <... getsockname resumed>{sa_family=AF_INET, sin_port=htons(58288), sin_addr=inet_addr("10.0.2.197")}, [112->16]) = 0
+336489 <... getpid resumed>)            = 1
+336373 rt_sigreturn({mask=[]} <unfinished ...>
+336491 getpeername(8,  <unfinished ...>
+336489 tgkill(1, 9, SIGURG <unfinished ...>
+336373 <... rt_sigreturn resumed>)      = 0
+336492 epoll_pwait(4,  <unfinished ...>
+336491 <... getpeername resumed>{sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, [112->16]) = 0
+336489 <... tgkill resumed>)            = 0
+336373 epoll_ctl(4, EPOLL_CTL_ADD, 7, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=2729830280, u64=140181872437128}} <unfinished ...>
+336491 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... epoll_ctl resumed>)         = 0
+336492 <... epoll_pwait resumed>[{EPOLLOUT, {u32=2729830280, u64=140181872437128}}], 128, 4850, NULL, 58275065622037) = 1
+336491 rt_sigreturn({mask=[]} <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336373 getsockname(7,  <unfinished ...>
+336492 epoll_pwait(4,  <unfinished ...>
+336491 <... rt_sigreturn resumed>)      = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... getsockname resumed>{sa_family=AF_INET, sin_port=htons(51417), sin_addr=inet_addr("10.0.2.197")}, [112->16]) = 0
+336491 write(8, "\242\34\1\0\0\1\0\0\0\0\0\0\6jaeger\7default\3svc\7cluster\5local\0\0\34\0\1", 50 <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336373 getpeername(7,  <unfinished ...>
+336491 <... write resumed>)             = 50
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... getpeername resumed>{sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, [112->16]) = 0
+336492 <... epoll_pwait resumed>[{EPOLLIN|EPOLLOUT, {u32=2729830512, u64=140181872437360}}], 128, 4807, NULL, 58275065622037) = 1
+336491 read(8,  <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336373 write(6, "\0", 1 <unfinished ...>
+336492 epoll_pwait(4,  <unfinished ...>
+336491 <... read resumed>"\242\34\205\0\0\1\0\0\0\1\0\0\6jaeger\7default\3svc\7cluster\5local\0\0\34\0\1\7cluster\5local\0\0\6\0\1\0\0\0\34\0D\2ns\3dns\7cluster\5local\0\nhostmaster\7cluster\5local\0dB\327Z\0\0\34 \0\0\7\10\0\1Q\200\0\0\0\36", 512) = 143
+336489 getpid( <unfinished ...>
+336373 <... write resumed>)             = 1
+336491 epoll_ctl(4, EPOLL_CTL_DEL, 8, 0xc00024e86c <unfinished ...>
+336489 <... getpid resumed>)            = 1
+336373 write(7, "4\331\1\0\0\1\0\0\0\0\0\0\6jaeger\7default\3svc\7cluster\5local\0\0\1\0\1", 50 <unfinished ...>
+336492 <... epoll_pwait resumed>[{EPOLLIN, {u32=13495512, u64=13495512}}], 128, 4787, NULL, 58275065621233) = 1
+336491 <... epoll_ctl resumed>)         = 0
+336489 tgkill(1, 1, SIGURG <unfinished ...>
+336373 <... write resumed>)             = 50
+336492 read(5,  <unfinished ...>
+336491 close(8 <unfinished ...>
+336489 <... tgkill resumed>)            = 0
+336373 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336492 <... read resumed>"\0", 16)      = 1
+336491 <... close resumed>)             = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 rt_sigreturn({mask=[]} <unfinished ...>
+336492 epoll_pwait(4,  <unfinished ...>
+336491 futex(0xc000080150, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336373 <... rt_sigreturn resumed>)      = 50
+336492 <... epoll_pwait resumed>[{EPOLLIN|EPOLLOUT, {u32=2729830280, u64=140181872437128}}], 128, 4737, NULL, 58275065621233) = 1
+336493 <... futex resumed>)             = 0
+336492 nanosleep({tv_sec=0, tv_nsec=3000},  <unfinished ...>
+336491 <... futex resumed>)             = 1
+336489 getpid( <unfinished ...>
+336373 read(7,  <unfinished ...>
+336493 epoll_pwait(4,  <unfinished ...>
+336491 mmap(NULL, 262144, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0 <unfinished ...>
+336489 <... getpid resumed>)            = 1
+336373 <... read resumed>"4\331\205\0\0\1\0\1\0\0\0\0\6jaeger\7default\3svc\7cluster\5local\0\0\1\0\1\6jaeger\7default\3svc\7cluster\5local\0\0\1\0\1\0\0\0\3\0\4\nh\n8", 512) = 98
+336492 <... nanosleep resumed>NULL)     = 0
+336492 futex(0xc000048d50, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336489 tgkill(1, 9, SIGURG <unfinished ...>
+336491 <... mmap resumed>)              = 0x7f7ea1b08000
+336373 epoll_ctl(4, EPOLL_CTL_DEL, 7, 0xc0001e286c <unfinished ...>
+336491 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336489 <... tgkill resumed>)            = 0
+336373 <... epoll_ctl resumed>)         = 0
+336491 rt_sigreturn({mask=[]} <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 close(7 <unfinished ...>
+336491 <... rt_sigreturn resumed>)      = 140181855305728
+336489 <... nanosleep resumed>NULL)     = 0
+336373 <... close resumed>)             = 0
+336491 futex(0xc000048950, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 futex(0xc000048950, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336491 <... futex resumed>)             = -1 EAGAIN (Resource temporarily unavailable)
+336489 <... nanosleep resumed>NULL)     = 0
+336373 <... futex resumed>)             = 0
+336491 nanosleep({tv_sec=0, tv_nsec=3000},  <unfinished ...>
+336489 getpid( <unfinished ...>
+336373 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+336489 <... getpid resumed>)            = 1
+336491 <... nanosleep resumed>NULL)     = 0
+336489 tgkill(1, 1, SIGURG <unfinished ...>
+336373 <... socket resumed>)            = 7
+336491 futex(0xc000048d50, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336489 <... tgkill resumed>)            = 0
+336373 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336491 <... futex resumed>)             = 1
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 rt_sigreturn({mask=[]} <unfinished ...>
+336491 futex(0xc000048950, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336373 <... rt_sigreturn resumed>)      = 7
+336492 <... futex resumed>)             = 0
+336489 getpid( <unfinished ...>
+336373 setsockopt(7, SOL_SOCKET, SO_BROADCAST, [1], 4 <unfinished ...>
+336489 <... getpid resumed>)            = 1
+336373 <... setsockopt resumed>)        = 0
+336492 futex(0xc000048d50, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336489 tgkill(1, 1, SIGURG <unfinished ...>
+336373 connect(7, {sa_family=AF_INET, sin_port=htons(6831), sin_addr=inet_addr("10.104.10.56")}, 16 <unfinished ...>
+336489 <... tgkill resumed>)            = 0
+336373 <... connect resumed>)           = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336373 rt_sigreturn({mask=[]} <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... rt_sigreturn resumed>)      = 0
+336373 epoll_ctl(4, EPOLL_CTL_ADD, 7, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=2729830280, u64=140181872437128}} <unfinished ...>
+336493 <... epoll_pwait resumed>[{EPOLLOUT, {u32=2729830280, u64=140181872437128}}], 128, 4708, NULL, 58275065621233) = 1
+336489 <... nanosleep resumed>NULL)     = 0
+336373 <... epoll_ctl resumed>)         = 0
+336493 futex(0xc000080150, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336489 getpid( <unfinished ...>
+336373 getsockname(7,  <unfinished ...>
+336489 <... getpid resumed>)            = 1
+336373 <... getsockname resumed>{sa_family=AF_INET, sin_port=htons(37790), sin_addr=inet_addr("10.0.2.197")}, [112->16]) = 0
+336489 tgkill(1, 1, SIGURG <unfinished ...>
+336373 getpeername(7,  <unfinished ...>
+336489 <... tgkill resumed>)            = 0
+336373 <... getpeername resumed>{sa_family=AF_INET, sin_port=htons(6831), sin_addr=inet_addr("10.104.10.56")}, [112->16]) = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336489 <... nanosleep resumed>NULL)     = 0
+336373 rt_sigreturn({mask=[]} <unfinished ...>
+336489 epoll_pwait(4,  <unfinished ...>
+336373 <... rt_sigreturn resumed>)      = 0
+336489 <... epoll_pwait resumed>[], 128, 0, NULL, 58270) = 0
+336373 setsockopt(7, SOL_SOCKET, SO_SNDBUF, [65000], 4 <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... setsockopt resumed>)        = 0
+336489 <... nanosleep resumed>NULL)     = 0
+336373 futex(0xc000080150, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336493 <... futex resumed>)             = 0
+336489 epoll_pwait(4,  <unfinished ...>
+336373 <... futex resumed>)             = 1
+336493 nanosleep({tv_sec=0, tv_nsec=3000},  <unfinished ...>
+336489 <... epoll_pwait resumed>[{EPOLLOUT, {u32=2729830280, u64=140181872437128}}], 128, 0, NULL, 58270) = 1
+336373 mmap(NULL, 262144, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0 <unfinished ...>
+336489 getpid( <unfinished ...>
+336373 <... mmap resumed>)              = 0x7f7ea1ac8000
+336493 <... nanosleep resumed>NULL)     = 0
+336489 <... getpid resumed>)            = 1
+336493 epoll_pwait(4,  <unfinished ...>
+336373 uname( <unfinished ...>
+336489 tgkill(1, 1, SIGURG <unfinished ...>
+336373 <... uname resumed>{sysname="Linux", nodename="search-5d5f99cf95-86xmv", release="5.15.0-69-generic", version="#76~20.04.1-Ubuntu SMP Mon Mar 20 15:54:19 UTC 2023", machine="x86_64", domainname="(none)"}) = 0
+336489 <... tgkill resumed>)            = 0
+336373 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 rt_sigreturn({mask=[]} <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336373 <... rt_sigreturn resumed>)      = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 socket(AF_NETLINK, SOCK_RAW|SOCK_CLOEXEC, NETLINK_ROUTE) = 8
+336489 <... nanosleep resumed>NULL)     = 0
+336373 bind(8, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, 12 <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... bind resumed>)              = 0
+336373 sendto(8, {{len=17, type=0x12 /* NLMSG_??? */, flags=NLM_F_REQUEST|0x300, seq=1, pid=0}, "\x00"}, 17, 0, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, 12 <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... sendto resumed>)            = 17
+336373 recvfrom(8,  <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336373 <... recvfrom resumed>[{{len=1336, type=0x10 /* NLMSG_??? */, flags=NLM_F_MULTI, seq=1, pid=1}, "\x00\x00\x04\x03\x01\x00\x00\x00\x49\x00\x01\x00\x00\x00\x00\x00\x07\x00\x03\x00\x6c\x6f\x00\x00\x08\x00\x0d\x00\xe8\x03\x00\x00\x05\x00\x10\x00\x00\x00\x00\x00\x05\x00\x11\x00\x00\x00\x00\x00\x08\x00\x04\x00\x00\x00\x01\x00\x08\x00\x32\x00\x00\x00\x00\x00\x08\x00\x33\x00\x00\x00\x00\x00\x08\x00\x1b\x00\x00\x00\x00\x00\x08\x00\x1e\x00\x00\x00\x00\x00\x08\x00\x1f\x00\x01\x00\x00\x00\x08\x00\x28\x00\xff\xff\x00\x00\x08\x00\x29\x00\x00\x00\x01\x00\x08\x00\x20\x00\x01\x00\x00\x00\x05\x00\x21\x00\x01\x00\x00\x00\x0c\x00\x06\x00\x6e\x6f\x71\x75\x65\x75\x65\x00\x08\x00\x23\x00\x00\x00\x00\x00\x08\x00\x2f\x00\x00\x00\x00\x00\x08\x00\x30\x00\x00\x00\x00\x00\x05\x00\x27\x00\x00\x00\x00\x00\x24\x00\x0e\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0a\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0a\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\xc4\x00\x17\x00\x0c\x00\x00\x00\x00\x00\x00\x00\x0c\x00\x00\x00\x00\x00\x00\x00\x58\x02\x00\x00\x00\x00\x00\x00\x58\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x64\x00\x07\x00\x0c\x00\x00\x00\x0c\x00\x00\x00\x58\x02\x00\x00\x58\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0c\x00\x2b\x00\x05\x00\x02\x00\x00\x00\x00\x00\x0c\x03\x1a\x00\x88\x00\x02\x00\x84\x00\x01\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10\x27\x00\x00\xe8\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\x02\x0a\x00\x08\x00\x01\x00\x00\x00\x00\x00\x14\x00\x05\x00\xff\xff\x00\x00\x22\xe2\x58\x00\xb0\x50\x00\x00\xe8\x03\x00\x00\xe4\x00\x02\x00\x00\x00\x00\x00\x40\x00\x00\x00\x00\x00\x01\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\xff\xff\xff\xff\xa0\x0f\x00\x00\xe8\x03\x00\x00\xff\xff\xff\xff\x80\x3a\x09\x00\x80\x51\x01\x00\x03\x00\x00\x00\x58\x02\x00\x00\x10\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x60\xea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x10\x27\x00\x00\xe8\x03\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\xee\x36\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\xff\xff\x00\x00\xff\xff\xff\xff\x2c\x01\x03\x00\x25\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x34\x00\x06\x00\x06\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x14\x00\x07\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x05\x00\x08\x00\x00\x00\x00\x00"}, {{len=1372, type=0x10 /* NLMSG_??? */, flags=NLM_F_MULTI, seq=1, pid=1}, "\x00\x00\x01\x00\xf5\x01\x00\x00\x43\x10\x01\x00\x00\x00\x00\x00\x09\x00\x03\x00\x65\x74\x68\x30\x00\x00\x00\x00\x08\x00\x0d\x00\xe8\x03\x00\x00\x05\x00\x10\x00\x06\x00\x00\x00\x05\x00\x11\x00\x00\x00\x00\x00\x08\x00\x04\x00\xdc\x05\x00\x00\x08\x00\x32\x00\x44\x00\x00\x00\x08\x00\x33\x00\xff\xff\x00\x00\x08\x00\x1b\x00\x00\x00\x00\x00\x08\x00\x1e\x00\x00\x00\x00\x00\x08\x00\x1f\x00\x04\x00\x00\x00\x08\x00\x28\x00\xff\xff\x00\x00\x08\x00\x29\x00\x00\x00\x01\x00\x08\x00\x20\x00\x04\x00\x00\x00\x05\x00\x21\x00\x01\x00\x00\x00\x0c\x00\x06\x00\x6e\x6f\x71\x75\x65\x75\x65\x00\x08\x00\x23\x00\x02\x00\x00\x00\x08\x00\x2f\x00\x01\x00\x00\x00\x08\x00\x30\x00\x01\x00\x00\x00\x05\x00\x27\x00\x00\x00\x00\x00\x24\x00\x0e\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0a\x00\x01\x00\xbe\x22\x72\xaf\x6a\x0c\x00\x00\x0a\x00\x02\x00\xff\xff\xff\xff\xff\xff\x00\x00\xc4\x00\x17\x00\x84\x00\x00\x00\x00\x00\x00\x00\x6f\x00\x00\x00\x00\x00\x00\x00\x3e\xdd\x04\x00\x00\x00\x00\x00\x38\x70\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x64\x00\x07\x00\x84\x00\x00\x00\x6f\x00\x00\x00\x3e\xdd\x04\x00\x38\x70\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0c\x00\x2b\x00\x05\x00\x02\x00\x00\x00\x00\x00\x10\x00\x12\x00\x09\x00\x01\x00\x76\x65\x74\x68\x00\x00\x00\x00\x08\x00\x25\x00\x00\x00\x00\x00\x08\x00\x05\x00\xf6\x01\x00\x00\x0c\x03\x1a\x00\x88\x00\x02\x00\x84\x00\x01\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10\x27\x00\x00\xe8\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\x02\x0a\x00\x08\x00\x01\x00\x00\x00\x00\x00\x14\x00\x05\x00\xff\xff\x00\x00\x13\xe3\x58\x00\xbc\x6d\x00\x00\xe8\x03\x00\x00\xe4\x00\x02\x00\x00\x00\x00\x00\x40\x00\x00\x00\xdc\x05\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\xff\xff\xff\xff\xa0\x0f\x00\x00\xe8\x03\x00\x00\x00\x00\x00\x00\x80\x3a\x09\x00\x80\x51\x01\x00\x03\x00\x00\x00\x58\x02\x00\x00\x10\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x60\xea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10\x27\x00\x00\xe8\x03\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\xee\x36\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\xff\xff\x00\x00\xff\xff\xff\xff\x2c\x01\x03\x00\x25\x00\x00\x00\x00\x00\x00\x00\x15\x00\x00\x00\x00\x00\x00\x00\x1d\x09\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x15\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x34\x00\x06\x00\x06\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x14\x00\x07\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x05\x00\x08\x00\x00\x00\x00\x00"}], 4096, 0, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, [112->12]) = 2708
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 getsockname(8,  <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336373 <... getsockname resumed>{sa_family=AF_NETLINK, nl_pid=1, nl_groups=00000000}, [112->12]) = 0
+336489 getpid( <unfinished ...>
+336373 getsockname(8,  <unfinished ...>
+336489 <... getpid resumed>)            = 1
+336373 <... getsockname resumed>{sa_family=AF_NETLINK, nl_pid=1, nl_groups=00000000}, [112->12]) = 0
+336489 tgkill(1, 1, SIGURG <unfinished ...>
+336373 recvfrom(8,  <unfinished ...>
+336489 <... tgkill resumed>)            = 0
+336373 <... recvfrom resumed>{{len=20, type=NLMSG_DONE, flags=NLM_F_MULTI, seq=1, pid=1}, 0}, 4096, 0, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, [112->12]) = 20
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336373 rt_sigreturn({mask=[]} <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... rt_sigreturn resumed>)      = 20
+336489 <... nanosleep resumed>NULL)     = 0
+336373 getsockname(8,  <unfinished ...>
+336489 getpid( <unfinished ...>
+336373 <... getsockname resumed>{sa_family=AF_NETLINK, nl_pid=1, nl_groups=00000000}, [112->12]) = 0
+336489 <... getpid resumed>)            = 1
+336373 close(8 <unfinished ...>
+336489 tgkill(1, 1, SIGURG <unfinished ...>
+336373 <... close resumed>)             = 0
+336489 <... tgkill resumed>)            = 0
+336373 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 rt_sigreturn({mask=[]} <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336373 <... rt_sigreturn resumed>)      = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 socket(AF_NETLINK, SOCK_RAW|SOCK_CLOEXEC, NETLINK_ROUTE) = 8
+336489 <... nanosleep resumed>NULL)     = 0
+336373 bind(8, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, 12 <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... bind resumed>)              = 0
+336373 sendto(8, {{len=17, type=0x16 /* NLMSG_??? */, flags=NLM_F_REQUEST|0x300, seq=1, pid=0}, "\x00"}, 17, 0, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, 12 <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... sendto resumed>)            = 17
+336373 recvfrom(8,  <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336373 <... recvfrom resumed>[{{len=76, type=0x14 /* NLMSG_??? */, flags=NLM_F_MULTI, seq=1, pid=1}, "\x02\x08\x80\xfe\x01\x00\x00\x00\x08\x00\x01\x00\x7f\x00\x00\x01\x08\x00\x02\x00\x7f\x00\x00\x01\x07\x00\x03\x00\x6c\x6f\x00\x00\x08\x00\x08\x00\x80\x00\x00\x00\x14\x00\x06\x00\xff\xff\xff\xff\xff\xff\xff\xff\x6d\xe1\x58\x00\x6d\xe1\x58\x00"}, {{len=80, type=0x14 /* NLMSG_??? */, flags=NLM_F_MULTI, seq=1, pid=1}, "\x02\x20\x80\x00\xf5\x01\x00\x00\x08\x00\x01\x00\x0a\x00\x02\xc5\x08\x00\x02\x00\x0a\x00\x02\xc5\x09\x00\x03\x00\x65\x74\x68\x30\x00\x00\x00\x00\x08\x00\x08\x00\x80\x00\x00\x00\x14\x00\x06\x00\xff\xff\xff\xff\xff\xff\xff\xff\x26\xe3\x58\x00\x26\xe3\x58\x00"}], 4096, 0, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, [112->12]) = 156
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 getsockname(8,  <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336373 <... getsockname resumed>{sa_family=AF_NETLINK, nl_pid=1, nl_groups=00000000}, [112->12]) = 0
+336489 getpid( <unfinished ...>
+336373 getsockname(8,  <unfinished ...>
+336489 <... getpid resumed>)            = 1
+336373 <... getsockname resumed>{sa_family=AF_NETLINK, nl_pid=1, nl_groups=00000000}, [112->12]) = 0
+336489 tgkill(1, 1, SIGURG <unfinished ...>
+336373 recvfrom(8,  <unfinished ...>
+336489 <... tgkill resumed>)            = 0
+336373 <... recvfrom resumed>{{len=20, type=NLMSG_DONE, flags=NLM_F_MULTI, seq=1, pid=1}, 0}, 4096, 0, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, [112->12]) = 20
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336489 <... nanosleep resumed>NULL)     = 0
+336373 rt_sigreturn({mask=[]} <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... rt_sigreturn resumed>)      = 20
+336489 <... nanosleep resumed>NULL)     = 0
+336373 getsockname(8,  <unfinished ...>
+336489 getpid( <unfinished ...>
+336373 <... getsockname resumed>{sa_family=AF_NETLINK, nl_pid=1, nl_groups=00000000}, [112->12]) = 0
+336489 <... getpid resumed>)            = 1
+336373 close(8 <unfinished ...>
+336489 tgkill(1, 1, SIGURG <unfinished ...>
+336373 <... close resumed>)             = 0
+336373 socket(AF_NETLINK, SOCK_RAW|SOCK_CLOEXEC, NETLINK_ROUTE) = 8
+336489 <... tgkill resumed>)            = 0
+336373 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 rt_sigreturn({mask=[]})          = 8
+336373 bind(8, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, 12) = 0
+336489 <... nanosleep resumed>NULL)     = 0
+336373 sendto(8, {{len=17, type=0x16 /* NLMSG_??? */, flags=NLM_F_REQUEST|0x300, seq=1, pid=0}, "\x00"}, 17, 0, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, 12 <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... sendto resumed>)            = 17
+336373 recvfrom(8, [{{len=76, type=0x14 /* NLMSG_??? */, flags=NLM_F_MULTI, seq=1, pid=1}, "\x02\x08\x80\xfe\x01\x00\x00\x00\x08\x00\x01\x00\x7f\x00\x00\x01\x08\x00\x02\x00\x7f\x00\x00\x01\x07\x00\x03\x00\x6c\x6f\x00\x00\x08\x00\x08\x00\x80\x00\x00\x00\x14\x00\x06\x00\xff\xff\xff\xff\xff\xff\xff\xff\x6d\xe1\x58\x00\x6d\xe1\x58\x00"}, {{len=80, type=0x14 /* NLMSG_??? */, flags=NLM_F_MULTI, seq=1, pid=1}, "\x02\x20\x80\x00\xf5\x01\x00\x00\x08\x00\x01\x00\x0a\x00\x02\xc5\x08\x00\x02\x00\x0a\x00\x02\xc5\x09\x00\x03\x00\x65\x74\x68\x30\x00\x00\x00\x00\x08\x00\x08\x00\x80\x00\x00\x00\x14\x00\x06\x00\xff\xff\xff\xff\xff\xff\xff\xff\x26\xe3\x58\x00\x26\xe3\x58\x00"}], 4096, 0, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, [112->12]) = 156
+336489 <... nanosleep resumed>NULL)     = 0
+336373 getsockname(8, {sa_family=AF_NETLINK, nl_pid=1, nl_groups=00000000}, [112->12]) = 0
+336373 getsockname(8, {sa_family=AF_NETLINK, nl_pid=1, nl_groups=00000000}, [112->12]) = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 recvfrom(8, {{len=20, type=NLMSG_DONE, flags=NLM_F_MULTI, seq=1, pid=1}, 0}, 4096, 0, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, [112->12]) = 20
+336489 <... nanosleep resumed>NULL)     = 0
+336373 getsockname(8,  <unfinished ...>
+336489 getpid( <unfinished ...>
+336373 <... getsockname resumed>{sa_family=AF_NETLINK, nl_pid=1, nl_groups=00000000}, [112->12]) = 0
+336373 close(8 <unfinished ...>
+336489 <... getpid resumed>)            = 1
+336373 <... close resumed>)             = 0
+336489 tgkill(1, 1, SIGURG <unfinished ...>
+336373 newfstatat(AT_FDCWD, ".",  <unfinished ...>
+336489 <... tgkill resumed>)            = 0
+336373 <... newfstatat resumed>{st_dev=makedev(0, 0x233), st_ino=770604, st_mode=S_IFDIR|0755, st_nlink=1, st_uid=0, st_gid=0, st_blksize=4096, st_blocks=8, st_size=4096, st_atime=1680576758 /* 2023-04-03T21:52:38.912933824-0500 */, st_atime_nsec=912933824, st_mtime=1678313423 /* 2023-03-08T16:10:23-0600 */, st_mtime_nsec=0, st_ctime=1680576758 /* 2023-04-03T21:52:38.880933508-0500 */, st_ctime_nsec=880933508}, 0) = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000}, NULL) = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000}, NULL) = 0
+336373 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 rt_sigreturn({mask=[]})          = 0
+336489 <... nanosleep resumed>NULL)     = 0
+336489 futex(0xcb0a98, FUTEX_WAIT_PRIVATE, 0, {tv_sec=0, tv_nsec=481158455} <unfinished ...>
+336373 futex(0xcb0a98, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336489 <... futex resumed>)             = -1 EAGAIN (Resource temporarily unavailable)
+336373 <... futex resumed>)             = 0
+336489 sched_yield( <unfinished ...>
+336373 getcwd("/go/src/github.com/harlow/go-micro-services", 4096) = 44
+336373 write(1, "\33[90m2023-04-21T18:35:10Z\33[0m \33[32mINF\33[0m \33[1mcmd/search/main.go:55\33[0m\33[36m >\33[0m Jaeger agent initialized\n", 109) = 109
+336373 newfstatat(AT_FDCWD, ".",  <unfinished ...>
+336489 <... sched_yield resumed>)       = 0
+336373 <... newfstatat resumed>{st_dev=makedev(0, 0x233), st_ino=770604, st_mode=S_IFDIR|0755, st_nlink=1, st_uid=0, st_gid=0, st_blksize=4096, st_blocks=8, st_size=4096, st_atime=1680576758 /* 2023-04-03T21:52:38.912933824-0500 */, st_atime_nsec=912933824, st_mtime=1678313423 /* 2023-03-08T16:10:23-0600 */, st_mtime_nsec=0, st_ctime=1680576758 /* 2023-04-03T21:52:38.880933508-0500 */, st_ctime_nsec=880933508}, 0) = 0
+336489 futex(0xcb0998, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336373 getcwd( <unfinished ...>
+336489 <... futex resumed>)             = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... getcwd resumed>"/go/src/github.com/harlow/go-micro-services", 4096) = 44
+336489 <... nanosleep resumed>NULL)     = 0
+336489 futex(0xcb0a98, FUTEX_WAIT_PRIVATE, 0, {tv_sec=0, tv_nsec=444194198} <unfinished ...>
+336373 futex(0xcb0a98, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336489 <... futex resumed>)             = -1 EAGAIN (Resource temporarily unavailable)
+336489 sched_yield( <unfinished ...>
+336373 <... futex resumed>)             = 0
+336373 write(1, "\33[90m2023-04-21T18:35:10Z\33[0m \33[32mINF\33[0m \33[1mcmd/search/main.go:57\33[0m\33[36m >\33[0m Initializing consul agent [host: consul:8500]...\n", 133) = 133
+336373 newfstatat(AT_FDCWD, ".",  <unfinished ...>
+336489 <... sched_yield resumed>)       = 0
+336489 futex(0xcb0998, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336373 <... newfstatat resumed>{st_dev=makedev(0, 0x233), st_ino=770604, st_mode=S_IFDIR|0755, st_nlink=1, st_uid=0, st_gid=0, st_blksize=4096, st_blocks=8, st_size=4096, st_atime=1680576758 /* 2023-04-03T21:52:38.912933824-0500 */, st_atime_nsec=912933824, st_mtime=1678313423 /* 2023-03-08T16:10:23-0600 */, st_mtime_nsec=0, st_ctime=1680576758 /* 2023-04-03T21:52:38.880933508-0500 */, st_ctime_nsec=880933508}, 0) = 0
+336489 <... futex resumed>)             = 0
+336373 getcwd( <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... getcwd resumed>"/go/src/github.com/harlow/go-micro-services", 4096) = 44
+336489 <... nanosleep resumed>NULL)     = 0
+336373 write(1, "\33[90m2023-04-21T18:35:10Z\33[0m \33[32mINF\33[0m \33[1mcmd/search/main.go:62\33[0m\33[36m >\33[0m Consul agent initialized\n", 109 <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... write resumed>)             = 109
+336489 <... nanosleep resumed>NULL)     = 0
+336373 newfstatat(AT_FDCWD, ".",  <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... newfstatat resumed>{st_dev=makedev(0, 0x233), st_ino=770604, st_mode=S_IFDIR|0755, st_nlink=1, st_uid=0, st_gid=0, st_blksize=4096, st_blocks=8, st_size=4096, st_atime=1680576758 /* 2023-04-03T21:52:38.912933824-0500 */, st_atime_nsec=912933824, st_mtime=1678313423 /* 2023-03-08T16:10:23-0600 */, st_mtime_nsec=0, st_ctime=1680576758 /* 2023-04-03T21:52:38.880933508-0500 */, st_ctime_nsec=880933508}, 0) = 0
+336489 <... nanosleep resumed>NULL)     = 0
+336489 futex(0xcb0a98, FUTEX_WAIT_PRIVATE, 0, {tv_sec=0, tv_nsec=390224345} <unfinished ...>
+336373 futex(0xcb0a98, FUTEX_WAKE_PRIVATE, 1) = 1
+336373 getcwd("/go/src/github.com/harlow/go-micro-services", 4096) = 44
+336489 <... futex resumed>)             = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 write(1, "\33[90m2023-04-21T18:35:10Z\33[0m \33[32mINF\33[0m \33[1mcmd/search/main.go:72\33[0m\33[36m >\33[0m Starting server...\n", 103) = 103
+336373 getrandom("\xfc\x64\x1f\x28\xf8\xe0\xc3\xe5\x53\x0c\x73\x58\x28\xa4\xab\x15", 16, 0) = 16
+336489 <... nanosleep resumed>NULL)     = 0
+336489 getpid()                         = 1
+336489 tgkill(1, 1, SIGURG)             = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000}, NULL) = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000}, NULL) = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000}, NULL) = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000}, NULL) = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000}, NULL) = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336373 rt_sigreturn({mask=[]} <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336489 getpid()                         = 1
+336489 tgkill(1, 1, SIGURG)             = 0
+336373 <... rt_sigreturn resumed>)      = 0
+336373 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 rt_sigreturn({mask=[]})          = 0
+336489 <... nanosleep resumed>NULL)     = 0
+336373 futex(0xc000048d50, FUTEX_WAKE_PRIVATE, 1) = 1
+336492 <... futex resumed>)             = 0
+336489 getpid( <unfinished ...>
+336373 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+336492 futex(0xc000048950, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336489 <... getpid resumed>)            = 1
+336373 <... socket resumed>)            = 8
+336373 setsockopt(8, SOL_SOCKET, SO_BROADCAST, [1], 4 <unfinished ...>
+336492 <... futex resumed>)             = 1
+336491 <... futex resumed>)             = 0
+336489 tgkill(1, 1, SIGURG <unfinished ...>
+336373 <... setsockopt resumed>)        = 0
+336492 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+336491 futex(0xc000048950, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336489 <... tgkill resumed>)            = 0
+336373 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336373 rt_sigreturn({mask=[]} <unfinished ...>
+336492 <... socket resumed>)            = 9
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... rt_sigreturn resumed>)      = 0
+336373 connect(8, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, 16) = 0
+336492 setsockopt(9, SOL_SOCKET, SO_BROADCAST, [1], 4 <unfinished ...>
+336373 epoll_ctl(4, EPOLL_CTL_ADD, 8, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=2729830512, u64=140181872437360}} <unfinished ...>
+336492 <... setsockopt resumed>)        = 0
+336489 <... nanosleep resumed>NULL)     = 0
+336492 connect(9, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, 16 <unfinished ...>
+336489 getpid( <unfinished ...>
+336493 <... epoll_pwait resumed>[{EPOLLOUT, {u32=2729830512, u64=140181872437360}}], 128, 999, NULL, 58270) = 1
+336373 <... epoll_ctl resumed>)         = 0
+336492 <... connect resumed>)           = 0
+336489 <... getpid resumed>)            = 1
+336493 epoll_pwait(4,  <unfinished ...>
+336492 epoll_ctl(4, EPOLL_CTL_ADD, 9, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=2729830048, u64=140181872436896}} <unfinished ...>
+336489 tgkill(1, 1, SIGURG <unfinished ...>
+336373 getsockname(8, {sa_family=AF_INET, sin_port=htons(42543), sin_addr=inet_addr("10.0.2.197")}, [112->16]) = 0
+336373 getpeername(8,  <unfinished ...>
+336492 <... epoll_ctl resumed>)         = 0
+336489 <... tgkill resumed>)            = 0
+336492 getsockname(9,  <unfinished ...>
+336489 getpid( <unfinished ...>
+336492 <... getsockname resumed>{sa_family=AF_INET, sin_port=htons(48695), sin_addr=inet_addr("10.0.2.197")}, [112->16]) = 0
+336489 <... getpid resumed>)            = 1
+336492 getpeername(9,  <unfinished ...>
+336489 tgkill(1, 10, SIGURG <unfinished ...>
+336492 <... getpeername resumed>{sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, [112->16]) = 0
+336489 <... tgkill resumed>)            = 0
+336493 <... epoll_pwait resumed>[{EPOLLOUT, {u32=2729830048, u64=140181872436896}}], 128, 122, NULL, 58271596091533) = 1
+336373 <... getpeername resumed>{sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, [112->16]) = 0
+336492 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336492 rt_sigreturn({mask=[]})          = 0
+336489 <... nanosleep resumed>NULL)     = 0
+336492 write(9, "\303Z\1\0\0\1\0\0\0\0\0\0\6consul\7default\3svc\7cluster\5local\0\0\1\0\1", 50 <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336492 <... write resumed>)             = 50
+336492 read(9,  <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336492 <... read resumed>0xc00012c000, 512) = -1 EAGAIN (Resource temporarily unavailable)
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336492 futex(0xc000048d50, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336493 epoll_pwait(4,  <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336489 <... nanosleep resumed>NULL)     = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000}, NULL) = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000}, NULL) = 0
+336493 <... epoll_pwait resumed>[{EPOLLIN|EPOLLOUT, {u32=2729830048, u64=140181872436896}}], 128, 0, NULL, 58271) = 1
+336373 rt_sigreturn({mask=[]} <unfinished ...>
+336493 futex(0xc000048d50, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336373 <... rt_sigreturn resumed>)      = 0
+336493 <... futex resumed>)             = 1
+336373 write(8, "\223\275\1\0\0\1\0\0\0\0\0\0\6consul\7default\3svc\7cluster\5local\0\0\34\0\1", 50 <unfinished ...>
+336493 read(9,  <unfinished ...>
+336373 <... write resumed>)             = 50
+336493 <... read resumed>"\303Z\205\0\0\1\0\1\0\0\0\0\6consul\7default\3svc\7cluster\5local\0\0\1\0\1\6consul\7default\3svc\7cluster\5local\0\0\1\0\1\0\0\0\2\0\4\ngvW", 512) = 98
+336373 read(8,  <unfinished ...>
+336493 epoll_ctl(4, EPOLL_CTL_DEL, 9, 0xc00012286c <unfinished ...>
+336373 <... read resumed>"\223\275\205\0\0\1\0\0\0\1\0\0\6consul\7default\3svc\7cluster\5local\0\0\34\0\1\7cluster\5local\0\0\6\0\1\0\0\0\2\0D\2ns\3dns\7cluster\5local\0\nhostmaster\7cluster\5local\0dB\327?\0\0\34 \0\0\7\10\0\1Q\200\0\0\0\36", 512) = 143
+336493 <... epoll_ctl resumed>)         = 0
+336373 epoll_ctl(4, EPOLL_CTL_DEL, 8, 0xc00024a86c <unfinished ...>
+336493 close(9 <unfinished ...>
+336373 <... epoll_ctl resumed>)         = 0
+336493 <... close resumed>)             = 0
+336492 <... futex resumed>)             = 0
+336489 epoll_pwait(4,  <unfinished ...>
+336373 close(8 <unfinished ...>
+336493 epoll_pwait(4, [], 128, 0, NULL, 2) = 0
+336373 <... close resumed>)             = 0
+336493 epoll_pwait(4,  <unfinished ...>
+336373 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP) = 8
+336373 connect(8, {sa_family=AF_INET, sin_port=htons(8500), sin_addr=inet_addr("10.103.118.87")}, 16 <unfinished ...>
+336492 futex(0xc000048d50, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336489 <... epoll_pwait resumed>[], 128, 0, NULL, 58271) = 0
+336373 <... connect resumed>)           = -1 EINPROGRESS (Operation now in progress)
+336489 getpid( <unfinished ...>
+336373 epoll_ctl(4, EPOLL_CTL_ADD, 8, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=2729830512, u64=140181872437360}} <unfinished ...>
+336493 <... epoll_pwait resumed>[{EPOLLIN|EPOLLOUT|EPOLLERR|EPOLLHUP|EPOLLRDHUP, {u32=2729830512, u64=140181872437360}}], 128, 57, NULL, 58271596091533) = 1
+336373 <... epoll_ctl resumed>)         = 0
+336493 epoll_pwait(4,  <unfinished ...>
+336489 <... getpid resumed>)            = 1
+336373 getsockopt(8, SOL_SOCKET, SO_ERROR,  <unfinished ...>
+336493 <... epoll_pwait resumed>[], 128, 0, NULL, 58271) = 0
+336489 tgkill(1, 1, SIGURG <unfinished ...>
+336373 <... getsockopt resumed>[ECONNREFUSED], [4]) = 0
+336493 futex(0xc000048d50, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336489 <... tgkill resumed>)            = 0
+336373 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336493 <... futex resumed>)             = 1
+336373 rt_sigreturn({mask=[]} <unfinished ...>
+336493 epoll_pwait(4,  <unfinished ...>
+336373 <... rt_sigreturn resumed>)      = 0
+336493 <... epoll_pwait resumed>[], 128, 0, NULL, 2) = 0
+336373 epoll_ctl(4, EPOLL_CTL_DEL, 8, 0xc0000bf3a4 <unfinished ...>
+336493 epoll_pwait(4,  <unfinished ...>
+336373 <... epoll_ctl resumed>)         = 0
+336492 <... futex resumed>)             = 0
+336492 futex(0xc000048d50, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 close(8)                         = 0
+336373 futex(0xc000048d50, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336489 getpid()                         = 1
+336489 tgkill(1, 1, SIGURG)             = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... futex resumed>)             = 1
+336492 <... futex resumed>)             = 0
+336489 <... nanosleep resumed>NULL)     = 0
+336373 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336492 nanosleep({tv_sec=0, tv_nsec=3000},  <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 rt_sigreturn({mask=[]})          = 1
+336492 <... nanosleep resumed>NULL)     = 0
+336489 <... nanosleep resumed>NULL)     = 0
+336373 write(2, "2023/04/21 18:35:11 grpc/lb/consul: error retrieving instances from Consul: Get \"http://consul:8500/v1/health/service/srv-geo?passing=1\": dial tcp 10.103.118.87:8500: connect: connection refused\n", 195 <unfinished ...>
+336492 futex(0xc000048d50, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... write resumed>)             = 195
+336489 <... nanosleep resumed>NULL)     = 0
+336373 futex(0xc000048d50, FUTEX_WAKE_PRIVATE, 1) = 1
+336492 <... futex resumed>)             = 0
+336489 getpid( <unfinished ...>
+336373 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+336492 futex(0xc000048950, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336489 <... getpid resumed>)            = 1
+336373 <... socket resumed>)            = 8
+336492 <... futex resumed>)             = 1
+336491 <... futex resumed>)             = 0
+336489 tgkill(1, 1, SIGURG <unfinished ...>
+336373 setsockopt(8, SOL_SOCKET, SO_BROADCAST, [1], 4 <unfinished ...>
+336491 rt_sigprocmask(SIG_SETMASK, ~[RTMIN RT_1],  <unfinished ...>
+336373 <... setsockopt resumed>)        = 0
+336489 <... tgkill resumed>)            = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000}, NULL) = 0
+336489 getpid()                         = 1
+336491 <... rt_sigprocmask resumed>[], 8) = 0
+336373 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336491 mmap(NULL, 8392704, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_STACK, -1, 0 <unfinished ...>
+336373 rt_sigreturn({mask=[]} <unfinished ...>
+336491 <... mmap resumed>)              = 0x7f7ea12c7000
+336373 <... rt_sigreturn resumed>)      = 0
+336491 mprotect(0x7f7ea12c8000, 8388608, PROT_READ|PROT_WRITE <unfinished ...>
+336373 connect(8, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, 16 <unfinished ...>
+336491 <... mprotect resumed>)          = 0
+336373 <... connect resumed>)           = 0
+336491 clone(child_stack=0x7f7ea1ac6fb0, flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID <unfinished ...>
+336373 epoll_ctl(4, EPOLL_CTL_ADD, 8, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=2729830512, u64=140181872437360}} <unfinished ...>
+336493 <... epoll_pwait resumed>[{EPOLLOUT, {u32=2729830512, u64=140181872437360}}], 128, 930, NULL, 58272596091533) = 1
+336491 <... clone resumed>, parent_tid=[13], tls=0x7f7ea1ac7700, child_tidptr=0x7f7ea1ac79d0) = 13
+336373 <... epoll_ctl resumed>)         = 0
+336493 futex(0xc000080150, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336491 rt_sigprocmask(SIG_SETMASK, [],  <unfinished ...>
+336373 getsockname(8,  <unfinished ...>
+336491 <... rt_sigprocmask resumed>NULL, 8) = 0
+336373 <... getsockname resumed>{sa_family=AF_INET, sin_port=htons(41061), sin_addr=inet_addr("10.0.2.197")}, [112->16]) = 0
+336491 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+336373 getpeername(8,  <unfinished ...>
+336491 <... socket resumed>)            = 9
+336373 <... getpeername resumed>{sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, [112->16]) = 0
+336491 setsockopt(9, SOL_SOCKET, SO_BROADCAST, [1], 4 <unfinished ...>
+336373 write(8, "r\306\1\0\0\1\0\0\0\0\0\0\6consul\7default\3svc\7cluster\5local\0\0\34\0\1", 50 <unfinished ...>
+336491 <... setsockopt resumed>)        = 0
+336373 <... write resumed>)             = 50
+336492 mmap(NULL, 262144, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0 <unfinished ...>
+336489 tgkill(1, 10, SIGURG <unfinished ...>
+336660 set_robust_list(0x7f7ea1ac79e0, 24) = 0
+336660 mmap(NULL, 134217728, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_NORESERVE, -1, 0) = 0x7f7e84000000
+336660 munmap(0x7f7e88000000, 67108864 <unfinished ...>
+336492 <... mmap resumed>)              = 0x7f7ea1287000
+336489 <... tgkill resumed>)            = 0
+336492 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336491 connect(9, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, 16 <unfinished ...>
+336373 read(8,  <unfinished ...>
+336660 <... munmap resumed>)            = 0
+336491 <... connect resumed>)           = 0
+336373 <... read resumed>"r\306\205\0\0\1\0\0\0\1\0\0\6consul\7default\3svc\7cluster\5local\0\0\34\0\1\7cluster\5local\0\0\6\0\1\0\0\0\1\0D\2ns\3dns\7cluster\5local\0\nhostmaster\7cluster\5local\0dB\327?\0\0\34 \0\0\7\10\0\1Q\200\0\0\0\36", 512) = 143
+336660 mprotect(0x7f7e84000000, 135168, PROT_READ|PROT_WRITE <unfinished ...>
+336491 epoll_ctl(4, EPOLL_CTL_ADD, 9, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=2729830048, u64=140181872436896}} <unfinished ...>
+336373 epoll_ctl(4, EPOLL_CTL_DEL, 8, 0xc00024a86c <unfinished ...>
+336660 <... mprotect resumed>)          = 0
+336491 <... epoll_ctl resumed>)         = 0
+336373 <... epoll_ctl resumed>)         = 0
+336660 sigaltstack(NULL, {ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=0}) = 0
+336492 rt_sigreturn({mask=[]} <unfinished ...>
+336491 getsockname(9,  <unfinished ...>
+336373 close(8 <unfinished ...>
+336491 <... getsockname resumed>{sa_family=AF_INET, sin_port=htons(50834), sin_addr=inet_addr("10.0.2.197")}, [112->16]) = 0
+336373 <... close resumed>)             = 0
+336660 sigaltstack({ss_sp=0xc000254000, ss_flags=0, ss_size=32768}, NULL) = 0
+336491 getpeername(9, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, [112->16]) = 0
+336373 epoll_pwait(4,  <unfinished ...>
+336491 write(9, "r5\1\0\0\1\0\0\0\0\0\0\6consul\7default\3svc\7cluster\5local\0\0\1\0\1", 50 <unfinished ...>
+336373 <... epoll_pwait resumed>[{EPOLLOUT, {u32=2729830048, u64=140181872436896}}], 128, 0, NULL, 58271) = 1
+336492 <... rt_sigreturn resumed>)      = 140181846388736
+336489 <... nanosleep resumed>NULL)     = 0
+336491 <... write resumed>)             = 50
+336373 epoll_pwait(4,  <unfinished ...>
+336660 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+336492 futex(0xc000048d50, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336491 read(9,  <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... epoll_pwait resumed>[{EPOLLIN|EPOLLOUT, {u32=2729830048, u64=140181872436896}}], 128, 738, NULL, 58272596091533) = 1
+336491 <... read resumed>"r5\205\0\0\1\0\1\0\0\0\0\6consul\7default\3svc\7cluster\5local\0\0\1\0\1\6consul\7default\3svc\7cluster\5local\0\0\1\0\1\0\0\0\1\0\4\ngvW", 512) = 98
+336373 epoll_pwait(4,  <unfinished ...>
+336660 gettid( <unfinished ...>
+336491 epoll_ctl(4, EPOLL_CTL_DEL, 9, 0xc0001e286c <unfinished ...>
+336373 <... epoll_pwait resumed>[], 128, 0, NULL, 58271) = 0
+336491 <... epoll_ctl resumed>)         = 0
+336373 epoll_pwait(4,  <unfinished ...>
+336660 <... gettid resumed>)            = 13
+336660 futex(0xc000252150, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336491 close(9)                         = 0
+336491 futex(0xc000252150, FUTEX_WAKE_PRIVATE, 1) = 1
+336660 <... futex resumed>)             = 0
+336491 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP) = 8
+336660 futex(0xc000048d50, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336491 connect(8, {sa_family=AF_INET, sin_port=htons(8500), sin_addr=inet_addr("10.103.118.87")}, 16 <unfinished ...>
+336660 <... futex resumed>)             = 1
+336492 <... futex resumed>)             = 0
+336491 <... connect resumed>)           = -1 EINPROGRESS (Operation now in progress)
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336492 futex(0xc000048d50, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336660 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+336491 epoll_ctl(4, EPOLL_CTL_ADD, 8, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=2729830048, u64=140181872436896}} <unfinished ...>
+336660 <... socket resumed>)            = 9
+336491 <... epoll_ctl resumed>)         = 0
+336489 <... nanosleep resumed>NULL)     = 0
+336491 futex(0xc000048d50, FUTEX_WAKE_PRIVATE, 1) = 1
+336491 futex(0xc000048950, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336373 <... epoll_pwait resumed>[{EPOLLIN|EPOLLOUT|EPOLLERR|EPOLLHUP|EPOLLRDHUP, {u32=2729830048, u64=140181872436896}}], 128, 712, NULL, 58272596091533) = 1
+336660 connect(9, {sa_family=AF_INET, sin_port=htons(8500), sin_addr=inet_addr("10.103.118.87")}, 16) = -1 EINPROGRESS (Operation now in progress)
+336373 getsockopt(8, SOL_SOCKET, SO_ERROR,  <unfinished ...>
+336660 epoll_ctl(4, EPOLL_CTL_ADD, 9, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=2729830512, u64=140181872437360}}) = 0
+336373 <... getsockopt resumed>[ECONNREFUSED], [4]) = 0
+336660 epoll_pwait(4,  <unfinished ...>
+336373 epoll_ctl(4, EPOLL_CTL_DEL, 8, 0xc0001093a4 <unfinished ...>
+336492 <... futex resumed>)             = 0
+336489 epoll_pwait(4,  <unfinished ...>
+336373 <... epoll_ctl resumed>)         = 0
+336660 <... epoll_pwait resumed>[{EPOLLIN|EPOLLOUT|EPOLLERR|EPOLLHUP|EPOLLRDHUP, {u32=2729830512, u64=140181872437360}}], 128, 0, NULL, 58271) = 1
+336373 close(8)                         = 0
+336660 getsockopt(9, SOL_SOCKET, SO_ERROR, [ECONNREFUSED], [4]) = 0
+336373 write(2, "2023/04/21 18:35:11 grpc/lb/consul: error retrieving instances from Consul: Get \"http://consul:8500/v1/health/service/srv-rate?passing=1\": dial tcp 10.103.118.87:8500: connect: connection refused\n", 196 <unfinished ...>
+336660 epoll_ctl(4, EPOLL_CTL_DEL, 9, 0xc0000c13a4 <unfinished ...>
+336492 epoll_pwait(4,  <unfinished ...>
+336489 <... epoll_pwait resumed>[], 128, 0, NULL, 58271) = 0
+336373 <... write resumed>)             = 196
+336373 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_TCP) = 8
+336373 close(8)                         = 0
+336373 socket(AF_INET6, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_TCP) = 8
+336660 <... epoll_ctl resumed>)         = 0
+336373 setsockopt(8, SOL_IPV6, IPV6_V6ONLY, [1], 4) = 0
+336373 bind(8, {sa_family=AF_INET6, sin6_port=htons(0), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::1", &sin6_addr), sin6_scope_id=0}, 28 <unfinished ...>
+336660 close(9 <unfinished ...>
+336492 <... epoll_pwait resumed>[], 128, 0, NULL, 0) = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... bind resumed>)              = -1 EADDRNOTAVAIL (Cannot assign requested address)
+336373 socket(AF_INET6, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_TCP) = 10
+336373 setsockopt(10, SOL_IPV6, IPV6_V6ONLY, [0], 4 <unfinished ...>
+336660 <... close resumed>)             = 0
+336373 <... setsockopt resumed>)        = 0
+336660 write(2, "2023/04/21 18:35:11 grpc/lb/consul: error retrieving instances from Consul: Get \"http://consul:8500/v1/health/service/srv-geo?passing=1\": dial tcp 10.103.118.87:8500: connect: connection refused\n", 195 <unfinished ...>
+336373 bind(10, {sa_family=AF_INET6, sin6_port=htons(0), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::ffff:127.0.0.1", &sin6_addr), sin6_scope_id=0}, 28) = 0
+336492 futex(0xc000048950, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336373 close(10 <unfinished ...>
+336492 <... futex resumed>)             = 1
+336489 <... nanosleep resumed>NULL)     = 0
+336373 <... close resumed>)             = 0
+336492 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+336489 epoll_pwait(4,  <unfinished ...>
+336660 <... write resumed>)             = 195
+336492 <... socket resumed>)            = 9
+336489 <... epoll_pwait resumed>[], 128, 0, NULL, 58272) = 0
+336373 close(8 <unfinished ...>
+336492 setsockopt(9, SOL_SOCKET, SO_BROADCAST, [1], 4 <unfinished ...>
+336489 futex(0xc000080150, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336660 epoll_pwait(4,  <unfinished ...>
+336493 <... futex resumed>)             = 0
+336492 <... setsockopt resumed>)        = 0
+336489 <... futex resumed>)             = 1
+336373 <... close resumed>)             = 0
+336493 epoll_pwait(4,  <unfinished ...>
+336491 <... futex resumed>)             = 0
+336373 futex(0xcaf470, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336493 <... epoll_pwait resumed>[], 128, 0, NULL, 2) = 0
+336492 connect(9, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, 16 <unfinished ...>
+336491 socket(AF_INET6, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336660 <... epoll_pwait resumed>[], 128, 0, NULL, 58272) = 0
+336493 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+336492 <... connect resumed>)           = 0
+336491 <... socket resumed>)            = 8
+336489 <... nanosleep resumed>NULL)     = 0
+336492 epoll_ctl(4, EPOLL_CTL_ADD, 9, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=2729830512, u64=140181872437360}} <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336493 <... socket resumed>)            = 10
+336492 <... epoll_ctl resumed>)         = 0
+336489 <... nanosleep resumed>NULL)     = 0
+336492 getsockname(9,  <unfinished ...>
+336489 epoll_pwait(4,  <unfinished ...>
+336660 epoll_pwait(4,  <unfinished ...>
+336492 <... getsockname resumed>{sa_family=AF_INET, sin_port=htons(60985), sin_addr=inet_addr("10.0.2.197")}, [112->16]) = 0
+336489 <... epoll_pwait resumed>[{EPOLLOUT, {u32=2729830512, u64=140181872437360}}], 128, 0, NULL, 58272) = 1
+336493 setsockopt(10, SOL_SOCKET, SO_BROADCAST, [1], 4 <unfinished ...>
+336492 getpeername(9,  <unfinished ...>
+336491 setsockopt(8, SOL_IPV6, IPV6_V6ONLY, [0], 4 <unfinished ...>
+336489 getpid()                         = 1
+336493 <... setsockopt resumed>)        = 0
+336492 <... getpeername resumed>{sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, [112->16]) = 0
+336493 connect(10, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, 16 <unfinished ...>
+336492 write(9, "\314J\1\0\0\1\0\0\0\0\0\0\6consul\7default\3svc\7cluster\5local\0\0\34\0\1", 50 <unfinished ...>
+336489 tgkill(1, 10, SIGURG <unfinished ...>
+336660 <... epoll_pwait resumed>[{EPOLLOUT, {u32=2729830512, u64=140181872437360}}], 128, 552, NULL, 58272596091533) = 1
+336493 <... connect resumed>)           = 0
+336492 <... write resumed>)             = 50
+336489 <... tgkill resumed>)            = 0
+336492 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336491 <... setsockopt resumed>)        = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336660 epoll_pwait(4,  <unfinished ...>
+336492 rt_sigreturn({mask=[]} <unfinished ...>
+336491 openat(AT_FDCWD, "/proc/sys/net/core/somaxconn", O_RDONLY|O_CLOEXEC <unfinished ...>
+336493 epoll_ctl(4, EPOLL_CTL_ADD, 10, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=2729830048, u64=140181872436896}} <unfinished ...>
+336492 <... rt_sigreturn resumed>)      = 50
+336491 <... openat resumed>)            = 11
+336489 <... nanosleep resumed>NULL)     = 0
+336492 read(9,  <unfinished ...>
+336489 getpid( <unfinished ...>
+336493 <... epoll_ctl resumed>)         = 0
+336492 <... read resumed>"\314J\205\0\0\1\0\0\0\1\0\0\6consul\7default\3svc\7cluster\5local\0\0\34\0\1\7cluster\5local\0\0\6\0\1\0\0\0\1\0D\2ns\3dns\7cluster\5local\0\nhostmaster\7cluster\5local\0dB\327?\0\0\34 \0\0\7\10\0\1Q\200\0\0\0\36", 512) = 143
+336489 <... getpid resumed>)            = 1
+336660 <... epoll_pwait resumed>[{EPOLLOUT, {u32=2729830512, u64=140181872437360}}, {EPOLLOUT, {u32=2729830048, u64=140181872436896}}], 128, 0, NULL, 58272) = 2
+336660 epoll_pwait(4,  <unfinished ...>
+336493 getsockname(10,  <unfinished ...>
+336492 epoll_ctl(4, EPOLL_CTL_DEL, 9, 0xc00011e86c <unfinished ...>
+336489 tgkill(1, 11, SIGURG <unfinished ...>
+336492 <... epoll_ctl resumed>)         = 0
+336489 <... tgkill resumed>)            = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336492 close(9 <unfinished ...>
+336493 <... getsockname resumed>{sa_family=AF_INET, sin_port=htons(36320), sin_addr=inet_addr("10.0.2.197")}, [112->16]) = 0
+336492 <... close resumed>)             = 0
+336489 <... nanosleep resumed>NULL)     = 0
+336492 futex(0xcaf470, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336491 epoll_ctl(4, EPOLL_CTL_ADD, 11, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=2729830512, u64=140181872437360}} <unfinished ...>
+336489 getpid( <unfinished ...>
+336493 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336492 <... futex resumed>)             = 1
+336491 <... epoll_ctl resumed>)         = 0
+336489 <... getpid resumed>)            = 1
+336660 <... epoll_pwait resumed>[{EPOLLIN|EPOLLOUT, {u32=2729830512, u64=140181872437360}}], 128, 522, NULL, 58272596091533) = 1
+336493 rt_sigreturn({mask=[]} <unfinished ...>
+336492 futex(0xc000048d50, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336491 fcntl(11, F_GETFL <unfinished ...>
+336489 tgkill(1, 9, SIGURG <unfinished ...>
+336373 <... futex resumed>)             = 0
+336493 <... rt_sigreturn resumed>)      = 0
+336489 <... tgkill resumed>)            = 0
+336373 futex(0xcaf470, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336493 getpeername(10,  <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336491 <... fcntl resumed>)             = 0x8000 (flags O_RDONLY|O_LARGEFILE)
+336660 epoll_pwait(4,  <unfinished ...>
+336493 <... getpeername resumed>{sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, [112->16]) = 0
+336491 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336489 <... nanosleep resumed>NULL)     = 0
+336660 <... epoll_pwait resumed>[], 128, 0, NULL, 58272) = 0
+336493 write(10, "\227\223\1\0\0\1\0\0\0\0\0\0\6consul\7default\3svc\7cluster\5local\0\0\1\0\1", 50 <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000}, NULL) = 0
+336660 epoll_pwait(4,  <unfinished ...>
+336493 <... write resumed>)             = 50
+336660 <... epoll_pwait resumed>[{EPOLLIN|EPOLLOUT, {u32=2729830048, u64=140181872436896}}], 128, 485, NULL, 58272596091533) = 1
+336493 read(10,  <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336491 rt_sigreturn({mask=[]} <unfinished ...>
+336660 epoll_pwait(4,  <unfinished ...>
+336493 <... read resumed>"\227\223\205\0\0\1\0\1\0\0\0\0\6consul\7default\3svc\7cluster\5local\0\0\1\0\1\6consul\7default\3svc\7cluster\5local\0\0\1\0\1\0\0\0\1\0\4\ngvW", 512) = 98
+336491 <... rt_sigreturn resumed>)      = 32768
+336489 <... nanosleep resumed>NULL)     = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336660 <... epoll_pwait resumed>[], 128, 0, NULL, 58272) = 0
+336493 epoll_ctl(4, EPOLL_CTL_DEL, 10, 0xc0001e286c <unfinished ...>
+336660 epoll_pwait(4,  <unfinished ...>
+336493 <... epoll_ctl resumed>)         = 0
+336489 <... nanosleep resumed>NULL)     = 0
+336493 close(10 <unfinished ...>
+336491 fcntl(11, F_SETFL, O_RDONLY|O_NONBLOCK|O_LARGEFILE <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336491 <... fcntl resumed>)             = 0
+336491 read(11,  <unfinished ...>
+336493 <... close resumed>)             = 0
+336491 <... read resumed>"4096\n", 65536) = 5
+336493 futex(0xcaf470, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336491 read(11,  <unfinished ...>
+336493 <... futex resumed>)             = 1
+336489 <... nanosleep resumed>NULL)     = 0
+336373 <... futex resumed>)             = 0
+336489 getpid( <unfinished ...>
+336491 <... read resumed>"", 65531)     = 0
+336493 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+336491 epoll_ctl(4, EPOLL_CTL_DEL, 11, 0xc0001e7444 <unfinished ...>
+336489 <... getpid resumed>)            = 1
+336373 futex(0xc000048d50, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336493 <... socket resumed>)            = 9
+336492 <... futex resumed>)             = 0
+336491 <... epoll_ctl resumed>)         = 0
+336489 tgkill(1, 11, SIGURG <unfinished ...>
+336373 <... futex resumed>)             = 1
+336493 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336489 <... tgkill resumed>)            = 0
+336492 futex(0xc000048d50, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336373 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+336493 rt_sigreturn({mask=[]} <unfinished ...>
+336491 close(11 <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... socket resumed>)            = 10
+336493 <... rt_sigreturn resumed>)      = 9
+336373 connect(10, {sa_family=AF_INET, sin_port=htons(8500), sin_addr=inet_addr("10.103.118.87")}, 16 <unfinished ...>
+336491 <... close resumed>)             = 0
+336489 <... nanosleep resumed>NULL)     = 0
+336491 setsockopt(8, SOL_SOCKET, SO_REUSEADDR, [1], 4 <unfinished ...>
+336489 getpid( <unfinished ...>
+336491 <... setsockopt resumed>)        = 0
+336493 connect(9, {sa_family=AF_INET, sin_port=htons(8500), sin_addr=inet_addr("10.103.118.87")}, 16 <unfinished ...>
+336491 bind(8, {sa_family=AF_INET6, sin6_port=htons(8082), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::", &sin6_addr), sin6_scope_id=0}, 28 <unfinished ...>
+336489 <... getpid resumed>)            = 1
+336373 <... connect resumed>)           = -1 EINPROGRESS (Operation now in progress)
+336493 <... connect resumed>)           = -1 EINPROGRESS (Operation now in progress)
+336489 tgkill(1, 11, SIGURG <unfinished ...>
+336373 epoll_ctl(4, EPOLL_CTL_ADD, 10, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=2729830512, u64=140181872437360}} <unfinished ...>
+336489 <... tgkill resumed>)            = 0
+336660 <... epoll_pwait resumed>[{EPOLLIN|EPOLLOUT|EPOLLERR|EPOLLHUP|EPOLLRDHUP, {u32=2729830512, u64=140181872437360}}], 128, 476, NULL, 58272596091533) = 1
+336493 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336489 getpid( <unfinished ...>
+336373 <... epoll_ctl resumed>)         = 0
+336493 rt_sigreturn({mask=[]} <unfinished ...>
+336373 futex(0xc000048d50, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336493 <... rt_sigreturn resumed>)      = -1 EINPROGRESS (Operation now in progress)
+336373 <... futex resumed>)             = 1
+336493 epoll_ctl(4, EPOLL_CTL_ADD, 9, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=2729830048, u64=140181872436896}}) = 0
+336373 futex(0xcaf470, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336493 futex(0xc000080150, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336660 getsockopt(10, SOL_SOCKET, SO_ERROR,  <unfinished ...>
+336492 <... futex resumed>)             = 0
+336489 <... getpid resumed>)            = 1
+336660 <... getsockopt resumed>[ECONNREFUSED], [4]) = 0
+336489 tgkill(1, 1, SIGURG <unfinished ...>
+336492 epoll_pwait(4, [{EPOLLIN|EPOLLOUT|EPOLLERR|EPOLLHUP|EPOLLRDHUP, {u32=2729830048, u64=140181872436896}}], 128, 0, NULL, 58272) = 1
+336489 <... tgkill resumed>)            = 0
+336373 <... futex resumed>)             = ? ERESTARTSYS (To be restarted if SA_RESTART is set)
+336660 epoll_ctl(4, EPOLL_CTL_DEL, 10, 0xc00023f3a4 <unfinished ...>
+336492 futex(0xc000080150, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336660 <... epoll_ctl resumed>)         = 0
+336493 <... futex resumed>)             = 0
+336492 <... futex resumed>)             = 1
+336660 close(10 <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336373 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336493 epoll_pwait(4, [], 128, 0, NULL, 1) = 0
+336373 rt_sigreturn({mask=[]} <unfinished ...>
+336493 epoll_pwait(4,  <unfinished ...>
+336373 <... rt_sigreturn resumed>)      = 202
+336373 futex(0xcaf470, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336492 getsockopt(9, SOL_SOCKET, SO_ERROR,  <unfinished ...>
+336491 <... bind resumed>)              = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336491 listen(8, 4096)                  = 0
+336492 <... getsockopt resumed>[ECONNREFUSED], [4]) = 0
+336491 epoll_ctl(4, EPOLL_CTL_ADD, 8, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=2729830512, u64=140181872437360}} <unfinished ...>
+336660 <... close resumed>)             = 0
+336660 futex(0xcaf470, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336491 <... epoll_ctl resumed>)         = 0
+336660 <... futex resumed>)             = 1
+336489 <... nanosleep resumed>NULL)     = 0
+336489 getpid( <unfinished ...>
+336492 epoll_ctl(4, EPOLL_CTL_DEL, 9, 0xc0000c13a4 <unfinished ...>
+336491 getsockname(8, {sa_family=AF_INET6, sin6_port=htons(8082), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::", &sin6_addr), sin6_scope_id=0}, [112->28]) = 0
+336491 socket(AF_NETLINK, SOCK_RAW|SOCK_CLOEXEC, NETLINK_ROUTE) = 10
+336660 write(2, "2023/04/21 18:35:11 grpc/lb/consul: error retrieving instances from Consul: Get \"http://consul:8500/v1/health/service/srv-rate?passing=1\": dial tcp 10.103.118.87:8500: connect: connection refused\n", 196 <unfinished ...>
+336491 bind(10, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, 12 <unfinished ...>
+336373 <... futex resumed>)             = 0
+336660 <... write resumed>)             = 196
+336491 <... bind resumed>)              = 0
+336660 futex(0xcaf470, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336492 <... epoll_ctl resumed>)         = 0
+336489 <... getpid resumed>)            = 1
+336373 futex(0xcaf470, FUTEX_WAIT_PRIVATE, 0, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+336660 <... futex resumed>)             = 0
+336492 close(9 <unfinished ...>
+336491 sendto(10, {{len=17, type=0x16 /* NLMSG_??? */, flags=NLM_F_REQUEST|0x300, seq=1, pid=0}, "\x00"}, 17, 0, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, 12 <unfinished ...>
+336489 tgkill(1, 9, SIGURG <unfinished ...>
+336373 nanosleep({tv_sec=0, tv_nsec=3000},  <unfinished ...>
+336492 <... close resumed>)             = 0
+336660 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+336492 write(2, "2023/04/21 18:35:11 grpc/lb/consul: error retrieving instances from Consul: Get \"http://consul:8500/v1/health/service/srv-geo?passing=1\": dial tcp 10.103.118.87:8500: connect: connection refused\n", 195 <unfinished ...>
+336491 <... sendto resumed>)            = 17
+336489 <... tgkill resumed>)            = 0
+336373 <... nanosleep resumed>NULL)     = 0
+336660 <... socket resumed>)            = 9
+336660 setsockopt(9, SOL_SOCKET, SO_BROADCAST, [1], 4 <unfinished ...>
+336373 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+336660 <... setsockopt resumed>)        = 0
+336491 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336491 rt_sigreturn({mask=[]} <unfinished ...>
+336660 connect(9, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, 16 <unfinished ...>
+336492 <... write resumed>)             = 195
+336491 <... rt_sigreturn resumed>)      = 17
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... socket resumed>)            = 11
+336660 <... connect resumed>)           = 0
+336660 epoll_ctl(4, EPOLL_CTL_ADD, 9, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=2729830048, u64=140181872436896}}) = 0
+336493 <... epoll_pwait resumed>[{EPOLLOUT, {u32=2729830048, u64=140181872436896}}], 128, 412, NULL, 58272596091533) = 1
+336492 futex(0xc000048d50, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336373 setsockopt(11, SOL_SOCKET, SO_BROADCAST, [1], 4 <unfinished ...>
+336493 epoll_pwait(4,  <unfinished ...>
+336489 getpid( <unfinished ...>
+336373 <... setsockopt resumed>)        = 0
+336660 getsockname(9,  <unfinished ...>
+336489 <... getpid resumed>)            = 1
+336493 <... epoll_pwait resumed>[], 128, 0, NULL, 58272) = 0
+336373 connect(11, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, 16 <unfinished ...>
+336660 <... getsockname resumed>{sa_family=AF_INET, sin_port=htons(58631), sin_addr=inet_addr("10.0.2.197")}, [112->16]) = 0
+336489 tgkill(1, 13, SIGURG <unfinished ...>
+336493 epoll_pwait(4,  <unfinished ...>
+336373 <... connect resumed>)           = 0
+336660 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336489 <... tgkill resumed>)            = 0
+336373 epoll_ctl(4, EPOLL_CTL_ADD, 11, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=2729829816, u64=140181872436664}} <unfinished ...>
+336660 rt_sigreturn({mask=[]} <unfinished ...>
+336493 <... epoll_pwait resumed>[{EPOLLOUT, {u32=2729829816, u64=140181872436664}}], 128, 374, NULL, 58272596091533) = 1
+336491 recvfrom(10,  <unfinished ...>
+336489 getpid( <unfinished ...>
+336373 <... epoll_ctl resumed>)         = 0
+336491 <... recvfrom resumed>[{{len=76, type=0x14 /* NLMSG_??? */, flags=NLM_F_MULTI, seq=1, pid=1}, "\x02\x08\x80\xfe\x01\x00\x00\x00\x08\x00\x01\x00\x7f\x00\x00\x01\x08\x00\x02\x00\x7f\x00\x00\x01\x07\x00\x03\x00\x6c\x6f\x00\x00\x08\x00\x08\x00\x80\x00\x00\x00\x14\x00\x06\x00\xff\xff\xff\xff\xff\xff\xff\xff\x6d\xe1\x58\x00\x6d\xe1\x58\x00"}, {{len=80, type=0x14 /* NLMSG_??? */, flags=NLM_F_MULTI, seq=1, pid=1}, "\x02\x20\x80\x00\xf5\x01\x00\x00\x08\x00\x01\x00\x0a\x00\x02\xc5\x08\x00\x02\x00\x0a\x00\x02\xc5\x09\x00\x03\x00\x65\x74\x68\x30\x00\x00\x00\x00\x08\x00\x08\x00\x80\x00\x00\x00\x14\x00\x06\x00\xff\xff\xff\xff\xff\xff\xff\xff\x26\xe3\x58\x00\x26\xe3\x58\x00"}], 4096, 0, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, [112->12]) = 156
+336493 epoll_pwait(4,  <unfinished ...>
+336373 getsockname(11,  <unfinished ...>
+336493 <... epoll_pwait resumed>[], 128, 0, NULL, 58272) = 0
+336660 <... rt_sigreturn resumed>)      = 0
+336489 <... getpid resumed>)            = 1
+336373 <... getsockname resumed>{sa_family=AF_INET, sin_port=htons(57298), sin_addr=inet_addr("10.0.2.197")}, [112->16]) = 0
+336660 getpeername(9,  <unfinished ...>
+336489 tgkill(1, 1, SIGURG <unfinished ...>
+336493 epoll_pwait(4,  <unfinished ...>
+336491 getsockname(10,  <unfinished ...>
+336373 getpeername(11,  <unfinished ...>
+336491 <... getsockname resumed>{sa_family=AF_NETLINK, nl_pid=1, nl_groups=00000000}, [112->12]) = 0
+336489 <... tgkill resumed>)            = 0
+336491 getsockname(10,  <unfinished ...>
+336373 <... getpeername resumed>{sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, [112->16]) = 0
+336491 <... getsockname resumed>{sa_family=AF_NETLINK, nl_pid=1, nl_groups=00000000}, [112->12]) = 0
+336660 <... getpeername resumed>{sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, [112->16]) = 0
+336491 recvfrom(10,  <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336373 rt_sigreturn({mask=[]})          = 0
+336373 write(11, "n\254\1\0\0\1\0\0\0\0\0\0\6consul\7default\3svc\7cluster\5local\0\0\1\0\1", 50 <unfinished ...>
+336493 <... epoll_pwait resumed>[{EPOLLOUT, {u32=2729829816, u64=140181872436664}}], 128, 363, NULL, 58272596091533) = 1
+336373 <... write resumed>)             = 50
+336660 write(9, "\213\220\1\0\0\1\0\0\0\0\0\0\6consul\7default\3svc\7cluster\5local\0\0\34\0\1", 50) = 50
+336493 epoll_pwait(4,  <unfinished ...>
+336373 read(11,  <unfinished ...>
+336493 <... epoll_pwait resumed>[{EPOLLIN|EPOLLOUT, {u32=2729829816, u64=140181872436664}}, {EPOLLIN|EPOLLOUT, {u32=2729830048, u64=140181872436896}}], 128, 0, NULL, 58272) = 2
+336491 <... recvfrom resumed>{{len=20, type=NLMSG_DONE, flags=NLM_F_MULTI, seq=1, pid=1}, 0}, 4096, 0, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, [112->12]) = 20
+336373 <... read resumed>"n\254\205\0\0\1\0\1\0\0\0\0\6consul\7default\3svc\7cluster\5local\0\0\1\0\1\6consul\7default\3svc\7cluster\5local\0\0\1\0\1\0\0\0\1\0\4\ngvW", 512) = 98
+336493 epoll_pwait(4,  <unfinished ...>
+336660 read(9,  <unfinished ...>
+336373 epoll_ctl(4, EPOLL_CTL_DEL, 11, 0xc0001e286c <unfinished ...>
+336491 getsockname(10,  <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336373 <... epoll_ctl resumed>)         = 0
+336489 getpid( <unfinished ...>
+336491 <... getsockname resumed>{sa_family=AF_NETLINK, nl_pid=1, nl_groups=00000000}, [112->12]) = 0
+336660 <... read resumed>"\213\220\205\0\0\1\0\0\0\1\0\0\6consul\7default\3svc\7cluster\5local\0\0\34\0\1\7cluster\5local\0\0\6\0\1\0\0\0\1\0D\2ns\3dns\7cluster\5local\0\nhostmaster\7cluster\5local\0dB\327?\0\0\34 \0\0\7\10\0\1Q\200\0\0\0\36", 512) = 143
+336491 close(10 <unfinished ...>
+336489 <... getpid resumed>)            = 1
+336373 close(11)                        = 0
+336373 futex(0xc000048d50, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336660 epoll_ctl(4, EPOLL_CTL_DEL, 9, 0xc00024e86c <unfinished ...>
+336492 <... futex resumed>)             = 0
+336491 <... close resumed>)             = 0
+336489 tgkill(1, 9, SIGURG <unfinished ...>
+336373 <... futex resumed>)             = 1
+336373 futex(0xcaf470, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336660 <... epoll_ctl resumed>)         = 0
+336492 futex(0xc000048d50, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336491 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336489 <... tgkill resumed>)            = 0
+336491 rt_sigreturn({mask=[]} <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336660 close(9 <unfinished ...>
+336491 <... rt_sigreturn resumed>)      = 0
+336491 socket(AF_NETLINK, SOCK_RAW|SOCK_CLOEXEC, NETLINK_ROUTE <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336491 <... socket resumed>)            = 10
+336491 bind(10, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, 12) = 0
+336489 <... nanosleep resumed>NULL)     = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336491 sendto(10, {{len=17, type=0x12 /* NLMSG_??? */, flags=NLM_F_REQUEST|0x300, seq=1, pid=0}, "\x00"}, 17, 0, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, 12 <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336491 <... sendto resumed>)            = 17
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336491 recvfrom(10,  <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336491 <... recvfrom resumed>[{{len=1336, type=0x10 /* NLMSG_??? */, flags=NLM_F_MULTI, seq=1, pid=1}, "\x00\x00\x04\x03\x01\x00\x00\x00\x49\x00\x01\x00\x00\x00\x00\x00\x07\x00\x03\x00\x6c\x6f\x00\x00\x08\x00\x0d\x00\xe8\x03\x00\x00\x05\x00\x10\x00\x00\x00\x00\x00\x05\x00\x11\x00\x00\x00\x00\x00\x08\x00\x04\x00\x00\x00\x01\x00\x08\x00\x32\x00\x00\x00\x00\x00\x08\x00\x33\x00\x00\x00\x00\x00\x08\x00\x1b\x00\x00\x00\x00\x00\x08\x00\x1e\x00\x00\x00\x00\x00\x08\x00\x1f\x00\x01\x00\x00\x00\x08\x00\x28\x00\xff\xff\x00\x00\x08\x00\x29\x00\x00\x00\x01\x00\x08\x00\x20\x00\x01\x00\x00\x00\x05\x00\x21\x00\x01\x00\x00\x00\x0c\x00\x06\x00\x6e\x6f\x71\x75\x65\x75\x65\x00\x08\x00\x23\x00\x00\x00\x00\x00\x08\x00\x2f\x00\x00\x00\x00\x00\x08\x00\x30\x00\x00\x00\x00\x00\x05\x00\x27\x00\x00\x00\x00\x00\x24\x00\x0e\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0a\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0a\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\xc4\x00\x17\x00\x16\x00\x00\x00\x00\x00\x00\x00\x16\x00\x00\x00\x00\x00\x00\x00\x4c\x04\x00\x00\x00\x00\x00\x00\x4c\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x64\x00\x07\x00\x16\x00\x00\x00\x16\x00\x00\x00\x4c\x04\x00\x00\x4c\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0c\x00\x2b\x00\x05\x00\x02\x00\x00\x00\x00\x00\x0c\x03\x1a\x00\x88\x00\x02\x00\x84\x00\x01\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10\x27\x00\x00\xe8\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\x02\x0a\x00\x08\x00\x01\x00\x00\x00\x00\x00\x14\x00\x05\x00\xff\xff\x00\x00\x22\xe2\x58\x00\xb0\x50\x00\x00\xe8\x03\x00\x00\xe4\x00\x02\x00\x00\x00\x00\x00\x40\x00\x00\x00\x00\x00\x01\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\xff\xff\xff\xff\xa0\x0f\x00\x00\xe8\x03\x00\x00\xff\xff\xff\xff\x80\x3a\x09\x00\x80\x51\x01\x00\x03\x00\x00\x00\x58\x02\x00\x00\x10\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x60\xea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x10\x27\x00\x00\xe8\x03\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\xee\x36\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\xff\xff\x00\x00\xff\xff\xff\xff\x2c\x01\x03\x00\x25\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x34\x00\x06\x00\x06\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x14\x00\x07\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x05\x00\x08\x00\x00\x00\x00\x00"}, {{len=1372, type=0x10 /* NLMSG_??? */, flags=NLM_F_MULTI, seq=1, pid=1}, "\x00\x00\x01\x00\xf5\x01\x00\x00\x43\x10\x01\x00\x00\x00\x00\x00\x09\x00\x03\x00\x65\x74\x68\x30\x00\x00\x00\x00\x08\x00\x0d\x00\xe8\x03\x00\x00\x05\x00\x10\x00\x06\x00\x00\x00\x05\x00\x11\x00\x00\x00\x00\x00\x08\x00\x04\x00\xdc\x05\x00\x00\x08\x00\x32\x00\x44\x00\x00\x00\x08\x00\x33\x00\xff\xff\x00\x00\x08\x00\x1b\x00\x00\x00\x00\x00\x08\x00\x1e\x00\x00\x00\x00\x00\x08\x00\x1f\x00\x04\x00\x00\x00\x08\x00\x28\x00\xff\xff\x00\x00\x08\x00\x29\x00\x00\x00\x01\x00\x08\x00\x20\x00\x04\x00\x00\x00\x05\x00\x21\x00\x01\x00\x00\x00\x0c\x00\x06\x00\x6e\x6f\x71\x75\x65\x75\x65\x00\x08\x00\x23\x00\x02\x00\x00\x00\x08\x00\x2f\x00\x01\x00\x00\x00\x08\x00\x30\x00\x01\x00\x00\x00\x05\x00\x27\x00\x00\x00\x00\x00\x24\x00\x0e\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0a\x00\x01\x00\xbe\x22\x72\xaf\x6a\x0c\x00\x00\x0a\x00\x02\x00\xff\xff\xff\xff\xff\xff\x00\x00\xc4\x00\x17\x00\x96\x00\x00\x00\x00\x00\x00\x00\x7c\x00\x00\x00\x00\x00\x00\x00\xbf\xce\x05\x00\x00\x00\x00\x00\x4a\x74\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x64\x00\x07\x00\x96\x00\x00\x00\x7c\x00\x00\x00\xbf\xce\x05\x00\x4a\x74\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0c\x00\x2b\x00\x05\x00\x02\x00\x00\x00\x00\x00\x10\x00\x12\x00\x09\x00\x01\x00\x76\x65\x74\x68\x00\x00\x00\x00\x08\x00\x25\x00\x00\x00\x00\x00\x08\x00\x05\x00\xf6\x01\x00\x00\x0c\x03\x1a\x00\x88\x00\x02\x00\x84\x00\x01\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10\x27\x00\x00\xe8\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\x02\x0a\x00\x08\x00\x01\x00\x00\x00\x00\x00\x14\x00\x05\x00\xff\xff\x00\x00\x13\xe3\x58\x00\xbc\x6d\x00\x00\xe8\x03\x00\x00\xe4\x00\x02\x00\x00\x00\x00\x00\x40\x00\x00\x00\xdc\x05\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\xff\xff\xff\xff\xa0\x0f\x00\x00\xe8\x03\x00\x00\x00\x00\x00\x00\x80\x3a\x09\x00\x80\x51\x01\x00\x03\x00\x00\x00\x58\x02\x00\x00\x10\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x60\xea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10\x27\x00\x00\xe8\x03\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\xee\x36\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\xff\xff\x00\x00\xff\xff\xff\xff\x2c\x01\x03\x00\x25\x00\x00\x00\x00\x00\x00\x00\x15\x00\x00\x00\x00\x00\x00\x00\x1d\x09\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x15\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x34\x00\x06\x00\x06\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x14\x00\x07\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x05\x00\x08\x00\x00\x00\x00\x00"}], 4096, 0, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, [112->12]) = 2708
+336491 getsockname(10,  <unfinished ...>
+336660 <... close resumed>)             = 0
+336660 futex(0xc000048d50, FUTEX_WAKE_PRIVATE, 1) = 1
+336660 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP) = 9
+336660 connect(9, {sa_family=AF_INET, sin_port=htons(8500), sin_addr=inet_addr("10.103.118.87")}, 16) = -1 EINPROGRESS (Operation now in progress)
+336660 epoll_ctl(4, EPOLL_CTL_ADD, 9, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=2729830048, u64=140181872436896}}) = 0
+336493 <... epoll_pwait resumed>[{EPOLLIN|EPOLLOUT|EPOLLERR|EPOLLHUP|EPOLLRDHUP, {u32=2729830048, u64=140181872436896}}], 128, 350, NULL, 58272596091533) = 1
+336660 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+336493 getsockopt(9, SOL_SOCKET, SO_ERROR,  <unfinished ...>
+336660 <... socket resumed>)            = 11
+336493 <... getsockopt resumed>[ECONNREFUSED], [4]) = 0
+336492 <... futex resumed>)             = 0
+336491 <... getsockname resumed>{sa_family=AF_NETLINK, nl_pid=1, nl_groups=00000000}, [112->12]) = 0
+336489 <... nanosleep resumed>NULL)     = 0
+336660 connect(11, {sa_family=AF_INET, sin_port=htons(8500), sin_addr=inet_addr("10.103.118.87")}, 16 <unfinished ...>
+336493 epoll_ctl(4, EPOLL_CTL_DEL, 9, 0xc0000c13a4 <unfinished ...>
+336660 <... connect resumed>)           = -1 EINPROGRESS (Operation now in progress)
+336493 <... epoll_ctl resumed>)         = 0
+336492 epoll_pwait(4,  <unfinished ...>
+336491 getsockname(10,  <unfinished ...>
+336489 getpid( <unfinished ...>
+336660 epoll_ctl(4, EPOLL_CTL_ADD, 11, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=2729829816, u64=140181872436664}} <unfinished ...>
+336493 close(9 <unfinished ...>
+336492 <... epoll_pwait resumed>[], 128, 0, NULL, 58272) = 0
+336660 <... epoll_ctl resumed>)         = 0
+336492 epoll_pwait(4,  <unfinished ...>
+336660 futex(0xcaf470, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336492 <... epoll_pwait resumed>[{EPOLLIN|EPOLLOUT|EPOLLERR|EPOLLHUP|EPOLLRDHUP, {u32=2729829816, u64=140181872436664}}], 128, 302, NULL, 58272596091533) = 1
+336493 <... close resumed>)             = 0
+336660 <... futex resumed>)             = 1
+336492 futex(0xc000048d50, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336660 getsockopt(11, SOL_SOCKET, SO_ERROR, [ECONNREFUSED], [4]) = 0
+336660 epoll_ctl(4, EPOLL_CTL_DEL, 11, 0xc00023f3a4) = 0
+336489 <... getpid resumed>)            = 1
+336491 <... getsockname resumed>{sa_family=AF_NETLINK, nl_pid=1, nl_groups=00000000}, [112->12]) = 0
+336660 close(11 <unfinished ...>
+336493 write(2, "2023/04/21 18:35:11 grpc/lb/consul: error retrieving instances from Consul: Get \"http://consul:8500/v1/health/service/srv-geo?passing=1\": dial tcp 10.103.118.87:8500: connect: connection refused\n", 195 <unfinished ...>
+336491 recvfrom(10,  <unfinished ...>
+336489 tgkill(1, 9, SIGURG <unfinished ...>
+336373 <... futex resumed>)             = 0
+336489 <... tgkill resumed>)            = 0
+336493 <... write resumed>)             = 195
+336491 <... recvfrom resumed>{{len=20, type=NLMSG_DONE, flags=NLM_F_MULTI, seq=1, pid=1}, 0}, 4096, 0, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, [112->12]) = 20
+336373 epoll_pwait(4,  <unfinished ...>
+336493 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+336373 <... epoll_pwait resumed>[], 128, 0, NULL, 1) = 0
+336493 <... socket resumed>)            = 9
+336493 setsockopt(9, SOL_SOCKET, SO_BROADCAST, [1], 4 <unfinished ...>
+336373 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+336493 <... setsockopt resumed>)        = 0
+336373 <... socket resumed>)            = 12
+336493 connect(9, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, 16 <unfinished ...>
+336373 setsockopt(12, SOL_SOCKET, SO_BROADCAST, [1], 4 <unfinished ...>
+336493 <... connect resumed>)           = 0
+336373 <... setsockopt resumed>)        = 0
+336493 epoll_ctl(4, EPOLL_CTL_ADD, 9, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=2729829816, u64=140181872436664}} <unfinished ...>
+336491 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 connect(12, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, 16 <unfinished ...>
+336493 <... epoll_ctl resumed>)         = 0
+336373 <... connect resumed>)           = 0
+336493 getsockname(9,  <unfinished ...>
+336373 epoll_ctl(4, EPOLL_CTL_ADD, 12, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=2729830048, u64=140181872436896}} <unfinished ...>
+336493 <... getsockname resumed>{sa_family=AF_INET, sin_port=htons(38121), sin_addr=inet_addr("10.0.2.197")}, [112->16]) = 0
+336491 rt_sigreturn({mask=[]} <unfinished ...>
+336373 <... epoll_ctl resumed>)         = 0
+336493 getpeername(9,  <unfinished ...>
+336373 getsockname(12,  <unfinished ...>
+336493 <... getpeername resumed>{sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, [112->16]) = 0
+336373 <... getsockname resumed>{sa_family=AF_INET, sin_port=htons(56180), sin_addr=inet_addr("10.0.2.197")}, [112->16]) = 0
+336493 write(9, "\305\237\1\0\0\1\0\0\0\0\0\0\6consul\7default\3svc\7cluster\5local\0\0\34\0\1", 50 <unfinished ...>
+336373 getpeername(12,  <unfinished ...>
+336493 <... write resumed>)             = 50
+336373 <... getpeername resumed>{sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, [112->16]) = 0
+336491 <... rt_sigreturn resumed>)      = 20
+336489 <... nanosleep resumed>NULL)     = 0
+336489 epoll_pwait(4,  <unfinished ...>
+336491 getsockname(10, {sa_family=AF_NETLINK, nl_pid=1, nl_groups=00000000}, [112->12]) = 0
+336489 <... epoll_pwait resumed>[{EPOLLIN|EPOLLOUT, {u32=2729829816, u64=140181872436664}}, {EPOLLOUT, {u32=2729830048, u64=140181872436896}}], 128, 0, NULL, 58272) = 2
+336493 read(9,  <unfinished ...>
+336373 write(12, "\314]\1\0\0\1\0\0\0\0\0\0\6consul\7default\3svc\7cluster\5local\0\0\1\0\1", 50 <unfinished ...>
+336493 <... read resumed>"\305\237\205\0\0\1\0\0\0\1\0\0\6consul\7default\3svc\7cluster\5local\0\0\34\0\1\7cluster\5local\0\0\6\0\1\0\0\0\1\0D\2ns\3dns\7cluster\5local\0\nhostmaster\7cluster\5local\0dB\327?\0\0\34 \0\0\7\10\0\1Q\200\0\0\0\36", 512) = 143
+336373 <... write resumed>)             = 50
+336493 epoll_ctl(4, EPOLL_CTL_DEL, 9, 0xc0001e286c <unfinished ...>
+336373 read(12,  <unfinished ...>
+336493 <... epoll_ctl resumed>)         = 0
+336373 <... read resumed>0xc00021e600, 512) = -1 EAGAIN (Resource temporarily unavailable)
+336493 close(9 <unfinished ...>
+336373 epoll_pwait(4,  <unfinished ...>
+336493 <... close resumed>)             = 0
+336373 <... epoll_pwait resumed>[{EPOLLIN|EPOLLOUT, {u32=2729830048, u64=140181872436896}}], 128, 0, NULL, 58272) = 1
+336493 epoll_pwait(4,  <unfinished ...>
+336373 read(12,  <unfinished ...>
+336493 <... epoll_pwait resumed>[], 128, 0, NULL, 58272) = 0
+336373 <... read resumed>"\314]\205\0\0\1\0\1\0\0\0\0\6consul\7default\3svc\7cluster\5local\0\0\1\0\1\6consul\7default\3svc\7cluster\5local\0\0\1\0\1\0\0\0\1\0\4\ngvW", 512) = 98
+336493 epoll_pwait(4,  <unfinished ...>
+336373 epoll_ctl(4, EPOLL_CTL_DEL, 12, 0xc00011e86c) = 0
+336373 close(12)                        = 0
+336373 futex(0xc000048d50, FUTEX_WAKE_PRIVATE, 1) = 1
+336492 <... futex resumed>)             = 0
+336492 nanosleep({tv_sec=0, tv_nsec=3000},  <unfinished ...>
+336491 close(10 <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+336492 <... nanosleep resumed>NULL)     = 0
+336491 <... close resumed>)             = 0
+336489 <... nanosleep resumed>NULL)     = 0
+336492 futex(0xc000048d50, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336373 <... socket resumed>)            = 9
+336373 connect(9, {sa_family=AF_INET, sin_port=htons(8500), sin_addr=inet_addr("10.103.118.87")}, 16 <unfinished ...>
+336491 newfstatat(AT_FDCWD, ".",  <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336373 <... connect resumed>)           = -1 EINPROGRESS (Operation now in progress)
+336491 <... newfstatat resumed>{st_dev=makedev(0, 0x233), st_ino=770604, st_mode=S_IFDIR|0755, st_nlink=1, st_uid=0, st_gid=0, st_blksize=4096, st_blocks=8, st_size=4096, st_atime=1680576758 /* 2023-04-03T21:52:38.912933824-0500 */, st_atime_nsec=912933824, st_mtime=1678313423 /* 2023-03-08T16:10:23-0600 */, st_mtime_nsec=0, st_ctime=1680576758 /* 2023-04-03T21:52:38.880933508-0500 */, st_ctime_nsec=880933508}, 0) = 0
+336373 epoll_ctl(4, EPOLL_CTL_ADD, 9, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=2729830048, u64=140181872436896}} <unfinished ...>
+336493 <... epoll_pwait resumed>[{EPOLLIN|EPOLLOUT|EPOLLERR|EPOLLHUP|EPOLLRDHUP, {u32=2729830048, u64=140181872436896}}], 128, 276, NULL, 58272596091533) = 1
+336373 <... epoll_ctl resumed>)         = 0
+336493 epoll_pwait(4,  <unfinished ...>
+336373 getsockopt(9, SOL_SOCKET, SO_ERROR,  <unfinished ...>
+336491 getcwd( <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336493 <... epoll_pwait resumed>[], 128, 0, NULL, 58272) = 0
+336373 <... getsockopt resumed>[ECONNREFUSED], [4]) = 0
+336493 futex(0xc000048d50, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336373 epoll_pwait(4,  <unfinished ...>
+336493 <... futex resumed>)             = 1
+336492 <... futex resumed>)             = 0
+336373 <... epoll_pwait resumed>[], 128, 0, NULL, 58272) = 0
+336492 epoll_pwait(4, [], 128, 0, NULL, 58272) = 0
+336493 epoll_ctl(4, EPOLL_CTL_DEL, 9, 0xc0000c13a4 <unfinished ...>
+336373 epoll_pwait(4,  <unfinished ...>
+336492 futex(0xc000048d50, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336493 <... epoll_ctl resumed>)         = 0
+336493 close(9 <unfinished ...>
+336491 <... getcwd resumed>"/go/src/github.com/harlow/go-micro-services", 4096) = 44
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336493 <... close resumed>)             = 0
+336493 futex(0xc000048d50, FUTEX_WAKE_PRIVATE, 1) = 1
+336492 <... futex resumed>)             = 0
+336492 nanosleep({tv_sec=0, tv_nsec=3000},  <unfinished ...>
+336660 <... close resumed>)             = 0
+336492 <... nanosleep resumed>NULL)     = 0
+336660 futex(0xc000048d50, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336492 futex(0xc000048d50, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336660 <... futex resumed>)             = 0
+336492 <... futex resumed>)             = -1 EAGAIN (Resource temporarily unavailable)
+336492 futex(0xc000048d50, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336660 write(2, "2023/04/21 18:35:11 grpc/lb/consul: error retrieving instances from Consul: Get \"http://consul:8500/v1/health/service/srv-rate?passing=1\": dial tcp 10.103.118.87:8500: connect: connection refused\n", 196 <unfinished ...>
+336493 futex(0xc000080150, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336491 write(1, "\33[90m2023-04-21T18:35:11Z\33[0m \33[32mINF\33[0m \33[1mregistry/registry.go:91\33[0m\33[36m >\33[0m Trying to register service [ name: srv-search, id: fc641f28-f8e0-43e5-930c-735828a4ab15, address: 10.0.2.197:8082 ]\n", 202 <unfinished ...>
+336660 <... write resumed>)             = 196
+336660 futex(0xc000080150, FUTEX_WAKE_PRIVATE, 1) = 0
+336491 <... write resumed>)             = 202
+336489 <... nanosleep resumed>NULL)     = 0
+336489 getpid()                         = 1
+336660 write(2, "2023/04/21 18:35:11 grpc/lb/consul: error retrieving instances from Consul: Get \"http://consul:8500/v1/health/service/srv-geo?passing=1\": dial tcp 10.103.118.87:8500: connect: connection refused\n", 195) = 195
+336489 tgkill(1, 13, SIGURG <unfinished ...>
+336660 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+336493 <... futex resumed>)             = -1 EAGAIN (Resource temporarily unavailable)
+336491 socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+336489 <... tgkill resumed>)            = 0
+336493 futex(0xc000080150, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336491 <... socket resumed>)            = 9
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336491 setsockopt(9, SOL_SOCKET, SO_BROADCAST, [1], 4) = 0
+336489 <... nanosleep resumed>NULL)     = 0
+336660 <... socket resumed>)            = 10
+336491 connect(9, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, 16 <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336660 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336660 rt_sigreturn({mask=[]})          = 10
+336660 setsockopt(10, SOL_SOCKET, SO_BROADCAST, [1], 4) = 0
+336660 connect(10, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, 16) = 0
+336660 epoll_ctl(4, EPOLL_CTL_ADD, 10, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=2729830048, u64=140181872436896}}) = 0
+336660 getsockname(10, {sa_family=AF_INET, sin_port=htons(53338), sin_addr=inet_addr("10.0.2.197")}, [112->16]) = 0
+336660 getpeername(10, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, [112->16]) = 0
+336373 <... epoll_pwait resumed>[{EPOLLOUT, {u32=2729830048, u64=140181872436896}}], 128, 259, NULL, 58272596091533) = 1
+336660 write(10, "-W\1\0\0\1\0\0\0\0\0\0\6consul\7default\3svc\7cluster\5local\0\0\34\0\1", 50 <unfinished ...>
+336373 epoll_pwait(4, [], 128, 0, NULL, 58272) = 0
+336373 epoll_pwait(4,  <unfinished ...>
+336660 <... write resumed>)             = 50
+336660 read(10,  <unfinished ...>
+336373 <... epoll_pwait resumed>[{EPOLLOUT, {u32=2729830048, u64=140181872436896}}], 128, 228, NULL, 58272596091533) = 1
+336660 <... read resumed>0xc00021ec00, 512) = -1 EAGAIN (Resource temporarily unavailable)
+336660 futex(0xc000252150, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336373 epoll_pwait(4, [], 128, 0, NULL, 58272) = 0
+336373 epoll_pwait(4, [{EPOLLIN|EPOLLOUT, {u32=2729830048, u64=140181872436896}}], 128, 223, NULL, 58272596091533) = 1
+336373 read(10, "-W\205\0\0\1\0\0\0\1\0\0\6consul\7default\3svc\7cluster\5local\0\0\34\0\1\7cluster\5local\0\0\6\0\1\0\0\0\1\0D\2ns\3dns\7cluster\5local\0\nhostmaster\7cluster\5local\0dB\327?\0\0\34 \0\0\7\10\0\1Q\200\0\0\0\36", 512) = 143
+336373 epoll_ctl(4, EPOLL_CTL_DEL, 10, 0xc00011e86c) = 0
+336373 close(10)                        = 0
+336373 futex(0xc000252150, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336491 <... connect resumed>)           = 0
+336491 epoll_ctl(4, EPOLL_CTL_ADD, 9, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=2729830048, u64=140181872436896}} <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336373 <... futex resumed>)             = 1
+336660 <... futex resumed>)             = 0
+336660 epoll_pwait(4,  <unfinished ...>
+336373 epoll_pwait(4,  <unfinished ...>
+336660 <... epoll_pwait resumed>[], 128, 0, NULL, 58272) = 0
+336660 epoll_pwait(4,  <unfinished ...>
+336373 <... epoll_pwait resumed>[], 128, 0, NULL, 58272) = 0
+336373 futex(0xcaf470, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336491 <... epoll_ctl resumed>)         = 0
+336489 getpid( <unfinished ...>
+336660 <... epoll_pwait resumed>[{EPOLLOUT, {u32=2729830048, u64=140181872436896}}], 128, 214, NULL, 58272596091533) = 1
+336660 epoll_pwait(4,  <unfinished ...>
+336491 getsockname(9,  <unfinished ...>
+336489 <... getpid resumed>)            = 1
+336660 <... epoll_pwait resumed>[], 128, 0, NULL, 58272) = 0
+336660 epoll_pwait(4,  <unfinished ...>
+336489 tgkill(1, 9, SIGURG <unfinished ...>
+336491 <... getsockname resumed>{sa_family=AF_INET, sin_port=htons(40978), sin_addr=inet_addr("10.0.2.197")}, [112->16]) = 0
+336491 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336489 <... tgkill resumed>)            = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336491 rt_sigreturn({mask=[]})          = 0
+336489 <... nanosleep resumed>NULL)     = 0
+336491 getpeername(9, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("10.96.0.10")}, [112->16]) = 0
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336491 write(9, "\230\364\1\0\0\1\0\0\0\0\0\0\6consul\7default\3svc\7cluster\5local\0\0\1\0\1", 50 <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336491 <... write resumed>)             = 50
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336491 read(9,  <unfinished ...>
+336660 <... epoll_pwait resumed>[{EPOLLOUT, {u32=2729830048, u64=140181872436896}}], 128, 206, NULL, 58272596091533) = 1
+336660 epoll_pwait(4, [], 128, 0, NULL, 58272) = 0
+336660 epoll_pwait(4, [{EPOLLIN|EPOLLOUT, {u32=2729830048, u64=140181872436896}}], 128, 182, NULL, 58272596091533) = 1
+336660 epoll_pwait(4, [], 128, 0, NULL, 58272) = 0
+336660 epoll_pwait(4,  <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336491 <... read resumed>"\230\364\205\0\0\1\0\1\0\0\0\0\6consul\7default\3svc\7cluster\5local\0\0\1\0\1\6consul\7default\3svc\7cluster\5local\0\0\1\0\1\0\0\0\1\0\4\ngvW", 512) = 98
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336491 epoll_ctl(4, EPOLL_CTL_DEL, 9, 0xc0001e286c) = 0
+336489 <... nanosleep resumed>NULL)     = 0
+336491 close(9 <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336491 <... close resumed>)             = 0
+336489 <... nanosleep resumed>NULL)     = 0
+336491 futex(0xcaf470, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336489 getpid( <unfinished ...>
+336491 <... futex resumed>)             = 1
+336373 <... futex resumed>)             = 0
+336373 nanosleep({tv_sec=0, tv_nsec=3000},  <unfinished ...>
+336489 <... getpid resumed>)            = 1
+336373 <... nanosleep resumed>NULL)     = 0
+336491 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+336373 futex(0xc000080150, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336493 <... futex resumed>)             = 0
+336373 <... futex resumed>)             = 1
+336493 futex(0xc000048d50, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336373 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+336493 <... futex resumed>)             = 1
+336373 <... socket resumed>)            = 9
+336493 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, IPPROTO_IP <unfinished ...>
+336373 connect(9, {sa_family=AF_INET, sin_port=htons(8500), sin_addr=inet_addr("10.103.118.87")}, 16 <unfinished ...>
+336493 <... socket resumed>)            = 10
+336492 <... futex resumed>)             = 0
+336492 futex(0xc000048d50, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336493 connect(10, {sa_family=AF_INET, sin_port=htons(8500), sin_addr=inet_addr("10.103.118.87")}, 16 <unfinished ...>
+336373 <... connect resumed>)           = -1 EINPROGRESS (Operation now in progress)
+336493 <... connect resumed>)           = -1 EINPROGRESS (Operation now in progress)
+336373 epoll_ctl(4, EPOLL_CTL_ADD, 9, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=2729830048, u64=140181872436896}} <unfinished ...>
+336493 epoll_ctl(4, EPOLL_CTL_ADD, 10, {EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, {u32=2729829816, u64=140181872436664}}) = 0
+336373 <... epoll_ctl resumed>)         = 0
+336660 <... epoll_pwait resumed>[{EPOLLIN|EPOLLOUT|EPOLLERR|EPOLLHUP|EPOLLRDHUP, {u32=2729829816, u64=140181872436664}}, {EPOLLIN|EPOLLOUT|EPOLLERR|EPOLLHUP|EPOLLRDHUP, {u32=2729830048, u64=140181872436896}}], 128, 180, NULL, 58272596091533) = 2
+336660 epoll_pwait(4, [], 128, 0, NULL, 58272) = 0
+336489 tgkill(1, 9, SIGURG <unfinished ...>
+336491 <... socket resumed>)            = 11
+336660 epoll_pwait(4,  <unfinished ...>
+336493 futex(0xc000048d50, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336373 getsockopt(9, SOL_SOCKET, SO_ERROR,  <unfinished ...>
+336493 <... futex resumed>)             = 1
+336373 <... getsockopt resumed>[ECONNREFUSED], [4]) = 0
+336493 getsockopt(10, SOL_SOCKET, SO_ERROR,  <unfinished ...>
+336373 epoll_ctl(4, EPOLL_CTL_DEL, 9, 0xc00023f3a4 <unfinished ...>
+336492 <... futex resumed>)             = 0
+336492 futex(0xc000048d50, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336493 <... getsockopt resumed>[ECONNREFUSED], [4]) = 0
+336493 futex(0xc000048d50, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336373 <... epoll_ctl resumed>)         = 0
+336493 <... futex resumed>)             = 1
+336373 close(9 <unfinished ...>
+336491 --- SIGURG {si_signo=SIGURG, si_code=SI_TKILL, si_pid=1, si_uid=0} ---
+336489 <... tgkill resumed>)            = 0
+336492 <... futex resumed>)             = 0
+336492 nanosleep({tv_sec=0, tv_nsec=3000},  <unfinished ...>
+336493 epoll_ctl(4, EPOLL_CTL_DEL, 10, 0xc0002393a4 <unfinished ...>
+336492 <... nanosleep resumed>NULL)     = 0
+336492 futex(0xc000048d50, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336493 <... epoll_ctl resumed>)         = 0
+336373 <... close resumed>)             = 0
+336493 close(10 <unfinished ...>
+336373 futex(0xc000048d50, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+336493 <... close resumed>)             = 0
+336373 <... futex resumed>)             = 1
+336493 newfstatat(AT_FDCWD, ".",  <unfinished ...>
+336373 write(2, "2023/04/21 18:35:12 grpc/lb/consul: error retrieving instances from Consul: Get \"http://consul:8500/v1/health/service/srv-geo?passing=1\": dial tcp 10.103.118.87:8500: connect: connection refused\n", 195 <unfinished ...>
+336492 <... futex resumed>)             = 0
+336492 futex(0xc000048d50, FUTEX_WAIT_PRIVATE, 0, NULL <unfinished ...>
+336491 rt_sigreturn({mask=[]} <unfinished ...>
+336489 nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+336491 <... rt_sigreturn resumed>)      = 11
+336493 <... newfstatat resumed>{st_dev=makedev(0, 0x233), st_ino=770604, st_mode=S_IFDIR|0755, st_nlink=1, st_uid=0, st_gid=0, st_blksize=4096, st_blocks=8, st_size=4096, st_atime=1680576758 /* 2023-04-03T21:52:38.912933824-0500 */, st_atime_nsec=912933824, st_mtime=1678313423 /* 2023-03-08T16:10:23-0600 */, st_mtime_nsec=0, st_ctime=1680576758 /* 2023-04-03T21:52:38.880933508-0500 */, st_ctime_nsec=880933508}, 0) = 0
+336493 getcwd("/go/src/github.com/harlow/go-micro-services", 4096) = 44
+336493 write(1, "\33[90m2023-04-21T18:35:12Z\33[0m \33[1m\33[31mFTL\33[0m\33[0m \33[1mcmd/search/main.go:73\33[0m\33[36m >\33[0m failed register: Put \"http://consul:8500/v1/agent/service/register\": dial tcp 10.103.118.87:8500: connect: connection refused\n", 218 <unfinished ...>
+336491 connect(11, {sa_family=AF_INET, sin_port=htons(8500), sin_addr=inet_addr("10.103.118.87")}, 16 <unfinished ...>
+336489 <... nanosleep resumed>NULL)     = 0
+336493 <... write resumed>)             = 218
+336493 exit_group(1)                    = ?
+336491 <... connect resumed>)           = -1 (errno 18446744073709551385)
+336373 <... write resumed>)             = ?
+336660 <... epoll_pwait resumed> <unfinished ...>) = ?
+336494 <... futex resumed>)             = ?
+336492 <... futex resumed>)             = ?
+336660 +++ exited with 1 +++
+336493 +++ exited with 1 +++
+336489 +++ exited with 1 +++
+336491 +++ exited with 1 +++
+336494 +++ exited with 1 +++
+336492 +++ exited with 1 +++
+336373 +++ exited with 1 +++
