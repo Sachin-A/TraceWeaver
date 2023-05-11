@@ -14,7 +14,18 @@ class Timing2(Timing):
         super().__init__(all_spans, all_processes)
         self.all_spans = all_spans
         self.all_processes = all_processes
+        self.process = ''
         self.services_times = {}
+        self.parallel = False
+        self.instrumented_hops = []
+        self.true_assignments = None
+        self.per_span_candidates = {}
+
+    def AddToCandidatesList(self, stack):
+        if (stack[0].trace_id, stack[0].sid) not in self.per_span_candidates:
+            self.per_span_candidates[(stack[0].trace_id, stack[0].sid)] = 0
+
+        self.per_span_candidates[(stack[0].trace_id, stack[0].sid)] += 1
 
     def FindTopKAssignments(self, in_span, out_eps, out_span_partitions, K):
         global top_assignments
@@ -27,36 +38,99 @@ class Timing2(Timing):
                 print("DFSTraverse", i, out_eps, stack)
             last_span = stack[-1]
             if i == len(out_span_partitions) + 1:
-                score = self.ScoreAssignment(stack)
+                self.AddToCandidatesList(stack)
+                if self.parallel:
+                    score = self.ScoreAssignmentParallel(stack)
+                    # if in_span.GetId() == ("6f6def166e4f4221", "6f6def166e4f4221"):
+                    #     print(stack)
+                    #     print(score)
+                    #     input()
+                else:
+                    score = self.ScoreAssignmentSequential(stack)
                 # min heap
                 heapq.heappush(top_assignments, (score, stack))
                 if len(top_assignments) > K:
                     heapq.heappop(top_assignments)
+            elif i in self.instrumented_hops:
+                ep = out_eps[i - 1]
+                span_id = self.true_assignments[ep][in_span.GetId()]
+                for s in out_span_partitions[ep]:
+                    if s.GetId() == span_id:
+                        DfsTraverse(stack + [s])
+                        break
             else:
                 ep = out_eps[i - 1]
                 for s in out_span_partitions[ep]:
-                    # first ep
-                    if (
-                        i == 1
-                        and in_span.start_mus < s.start_mus
-                        and s.start_mus + s.duration_mus
-                        < in_span.start_mus + in_span.duration_mus
-                    ):
-                        DfsTraverse(stack + [s])
-                    # all other eps
-                    elif (
-                        i <= len(out_eps)
-                        and last_span.start_mus + last_span.duration_mus < s.start_mus
-                        and s.start_mus + s.duration_mus
-                        < in_span.start_mus + in_span.duration_mus
-                    ):
-                        DfsTraverse(stack + [s])
+                    # parallel eps
+                    if self.parallel:
+                        # if (
+                        #     in_span.start_mus < s.start_mus
+                        #     and s.start_mus + s.duration_mus
+                        #     < in_span.start_mus + in_span.duration_mus
+                        # ):
+                        #     DfsTraverse(stack + [s])
+                        # first ep
+                        if (
+                            i == 1
+                            and in_span.start_mus <= s.start_mus
+                            and s.start_mus + s.duration_mus
+                            <= in_span.start_mus + in_span.duration_mus
+                        ):
+                            DfsTraverse(stack + [s])
+                        # all other eps
+                        elif (
+                            i <= len(out_eps)
+                            and last_span.start_mus <= s.start_mus
+                            and s.start_mus + s.duration_mus
+                            <= in_span.start_mus + in_span.duration_mus
+                        ):
+                            DfsTraverse(stack + [s])
+                    # Sequential eps
+                    else:
+                        # first ep
+                        if (
+                            i == 1
+                            and in_span.start_mus <= s.start_mus
+                            and s.start_mus + s.duration_mus
+                            <= in_span.start_mus + in_span.duration_mus
+                        ):
+                            DfsTraverse(stack + [s])
+                        # all other eps
+                        elif (
+                            i <= len(out_eps)
+                            and last_span.start_mus + last_span.duration_mus <= s.start_mus
+                            and s.start_mus + s.duration_mus
+                            <= in_span.start_mus + in_span.duration_mus
+                        ):
+                            DfsTraverse(stack + [s])
         DfsTraverse([in_span])
         top_assignments.sort(reverse=True)
+        # print(top_assignments)
+        # input()
         return top_assignments
 
-    def FindAssignments(self, process, in_span_partitions, out_span_partitions):
+    def GetSpanIDNotation(self, out_eps, assignment, type1):
+        span_id_notation = []
+
+        if type1:
+            for i in range(1, len(assignment)):
+                span_id_notation.append(assignment[i].GetId())
+        else:
+            for out_ep in out_eps:
+                span_id_notation.append(assignment[out_ep].GetId())
+        return span_id_notation
+
+    def FindAssignments(self, process, in_span_partitions, out_span_partitions, parallel, instrumented_hops, true_assignments):
         assert len(in_span_partitions) == 1
+        self.process = process
+        self.parallel = parallel
+        self.instrumented_hops = instrumented_hops
+        self.true_assignments = true_assignments
+        self.per_span_candidates = {}
+        for ep in out_span_partitions.keys():
+            for key in true_assignments[ep].keys():
+                self.per_span_candidates[key] = 0
+        span_to_top_assignments = {}
         ep, in_spans = list(in_span_partitions.items())[0]
         out_eps = self.GetOutEpsInOrder(out_span_partitions)
         out_span_partitions_copy = copy.deepcopy(out_span_partitions)
@@ -66,6 +140,7 @@ class Timing2(Timing):
         topK = 5
         cnt = 0
         cnt_unassigned = 0
+        not_best_count = 0
         all_assignments = {}
         top_assignments = []
         batch_in_spans = []
@@ -79,9 +154,9 @@ class Timing2(Timing):
                     min(len(in_spans), cnt + batch_size),
                 )
                 print("Finished %d spans, unassigned spans: %d" % (cnt, cnt_unassigned))
-            top_assignments.append(
-                self.FindTopKAssignments(in_span, out_eps, out_span_partitions_copy, topK)
-            )
+            top_k = self.FindTopKAssignments(in_span, out_eps, out_span_partitions_copy, topK)
+            span_to_top_assignments[in_span] = top_k
+            top_assignments.append(top_k)
             batch_in_spans.append(in_span)
             cnt += 1
 
@@ -94,6 +169,13 @@ class Timing2(Timing):
                         assert len(out_eps) == len(assignments[ind]) - 1
                         for ii in range(len(out_eps)):
                             assignment[out_eps[ii]] = assignments[ind][ii + 1]
+                    if len(span_to_top_assignments[batch_in_spans[ind]]) < 1 or not assignment:
+                        not_best_count += 1
+                    else:
+                        best = self.GetSpanIDNotation(out_eps, span_to_top_assignments[batch_in_spans[ind]][0][1], type1 = True)
+                        chosen = self.GetSpanIDNotation(out_eps, assignment, type1 = False)
+                        if best != chosen:
+                            not_best_count += 1
                     self.AddAssignment(
                         batch_in_spans[ind],
                         assignment,
@@ -105,7 +187,7 @@ class Timing2(Timing):
                     cnt_unassigned += int(len(assignment) == 0)
                 top_assignments = []
                 batch_in_spans = []
-        return all_assignments
+        return all_assignments, not_best_count, len(in_spans), self.per_span_candidates
 
     # Create max independent set(MIS) based on top_assignments for each incoming span
     # Each assignment consists of an ordered list of spans, starting with the incoming span and the subsequent spans are outgoing spans in order of dependence
@@ -116,7 +198,10 @@ class Timing2(Timing):
     def GetAssignmentsMIS(self, top_assignments):
         mis_assignments = [[]] * len(top_assignments)
         G = self.BuildMISInstance(top_assignments)
-        mis = self.GetMIS(G)
+        if len(G.nodes) > 0:
+            mis = self.GetMIS(G)
+        else:
+            return mis_assignments
         #mis = self.GetWeightedMIS(G, "weight")
         #print("MIS- num assigned: %d/%d" % (len(mis), len(top_assignments)))
         for in_span_ind, a_ind in mis:
