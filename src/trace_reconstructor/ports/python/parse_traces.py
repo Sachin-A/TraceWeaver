@@ -716,6 +716,19 @@ def GetGroundTruth(in_span_partitions, out_span_partitions):
                     break
     return true_assignments
 
+def AccuracyForSpan(pred_assignments, true_assignments, in_span_id):
+    correct = True
+    for ep in true_assignments.keys():
+        if isinstance(pred_assignments[ep][in_span_id], list):
+            if len(pred_assignments[ep][in_span_id]) > 1:
+                correct = False
+            else:
+                pred_assignments[ep][in_span_id] = pred_assignments[ep][in_span_id][0]
+        correct = correct and (
+            pred_assignments[ep][in_span_id]
+            == true_assignments[ep][in_span_id]
+        )
+    return int(correct)
 
 def AccuracyForService(pred_assignments, true_assignments, in_span_partitions):
     assert len(in_span_partitions) == 1
