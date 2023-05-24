@@ -744,6 +744,26 @@ def AccuracyForService(pred_assignments, true_assignments, in_span_partitions):
         cnt += int(correct)
     return float(cnt) / len(in_spans)
 
+def AccuracyEndToEnd(
+    pred_assignments_by_process, true_assignments_by_process, in_spans_by_process
+):
+    processes = true_assignments_by_process.keys()
+    trace_acc = {}
+    for process in processes:
+        for in_span in in_spans_by_process[process]:
+            if in_span.trace_id not in trace_acc:
+                trace_acc[in_span.trace_id] = True
+            true_assignments = true_assignments_by_process[process]
+            pred_assignments = pred_assignments_by_process[process]
+            for ep in true_assignments.keys():
+                if (
+                    true_assignments[ep][in_span.GetId()]
+                    != pred_assignments[ep][in_span.GetId()]
+                ):
+                    trace_acc[in_span.trace_id] = False
+    correct = sum(trace_acc[tid] for tid in trace_acc)
+    return trace_acc, float(correct) / len(trace_acc)
+
 def PrintLatency12(trace_acc):
     all_traces = []
     min_time = 1.0e40
