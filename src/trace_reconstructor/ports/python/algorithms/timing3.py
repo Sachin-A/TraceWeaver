@@ -148,6 +148,107 @@ class Timing7(Timing):
         for key in self.distribution_values_true.keys():
             self.services_times[key] = np.mean(self.distribution_values_true[key]), np.std(self.distribution_values_true[key])
 
+    # def BuildDistributions2(self, process, in_span_partitions, out_span_partitions, in_eps, out_eps):
+    #     for ep in in_span_partitions.keys():
+    #         in_span_partitions[ep].sort(key = lambda x: float(x.start_mus))
+    #     for ep in out_span_partitions.keys():
+    #         out_span_partitions[ep].sort(key = lambda x: float(x.start_mus))
+
+    #     in_span_ep, in_spans = list(in_span_partitions.items())[0]
+    #     all_assignments = { ep: {} for ep in out_span_partitions.keys() }
+
+    #     for ind in range(len(in_spans)):
+    #         for ep, out_spans in out_span_partitions.items():
+    #             all_assignments[ep][(in_spans[ind].trace_id, in_spans[ind].sid)] = ['NA', 'NA']
+
+    #     out_eps = self.GetOutEpsInOrder(out_span_partitions)
+
+    #     for ep in out_eps:
+    #         out_spans = out_span_partitions[ep]
+    #         j = 0
+    #         for i in range(len(in_spans)):
+    #             while float(out_spans[j].start_mus) < float(in_spans[i].start_mus):
+    #                 j += 1
+    #             if float(out_spans[j].start_mus) >= float(in_spans[i].start_mus) and ((i == (len(in_spans) - 1)) or (float(out_spans[j].start_mus) < float(in_spans[i + 1].start_mus))):
+    #                 all_assignments[ep][(in_spans[i].trace_id, in_spans[i].sid)] = [out_spans[j].trace_id, out_spans[j].sid]
+    #                 if (in_span_ep, ep) not in self.distribution_values2:
+    #                     self.distribution_values2[(in_span_ep, ep)] = []
+    #                 self.distribution_values2[(in_span_ep, ep)].append(out_spans[j].start_mus - in_spans[i].start_mus)
+    #                 if
+    #                 j += 1
+
+    #     for key in self.distribution_values2.keys():
+    #         self.services_times[key] = np.mean(self.distribution_values2[key]), np.std(self.distribution_values2[key])
+
+    #     return all_assignments
+
+    def BuildDistributions(self, process, in_span_partitions, out_span_partitions, in_eps, out_eps):
+
+        spans = []
+        for in_ep in in_eps:
+            for span in in_span_partitions[in_ep]:
+                span.ep = span.GetParentProcess()
+            spans.extend(in_span_partitions[in_ep])
+        for out_ep in out_eps:
+            for span in out_span_partitions[out_ep]:
+                span.ep = span.GetChildProcess()
+            spans.extend(out_span_partitions[out_ep])
+        spans.sort(key=lambda x: x.start_mus)
+        self.large_delay = max([span.duration_mus for in_ep in in_eps for span in in_span_partitions[in_ep]])
+        out_ep_order = {k: v for v, k in enumerate(out_eps)}
+
+        for i, span in enumerate(spans):
+            if span.span_kind == "client":
+                # print(i, span)
+                sent_mus = span.start_mus
+                duration_mus = span.duration_mus
+                parent_span = None
+                parent_type = None
+                for j, preceding_span in reversed(list(enumerate(spans[:i]))):
+                    if (sent_mus + duration_mus) - preceding_span.start_mus > self.large_delay:
+                        break
+                    if preceding_span.span_kind == "server":
+                        parent_span = preceding_span
+                        parent_type = "server"
+                        break
+                    if ((preceding_span.span_kind == "client") and
+                        (preceding_span.start_mus + preceding_span.duration_mus < span.start_mus) and
+                        (out_ep_order[preceding_span.ep] < out_ep_order[span.ep])):
+                        parent_span = preceding_span
+                        parent_type = "client"
+                        break
+                if parent_span is not None:
+                    if (parent_span.ep, span.ep) not in self.distribution_values:
+                        self.distribution_values[(parent_span.ep, span.ep)] = []
+                    if parent_type == "server":
+                        self.distribution_values[(parent_span.ep, span.ep)].append(sent_mus - parent_span.start_mus)
+                    elif parent_type == "client":
+                        self.distribution_values[(parent_span.ep, span.ep)].append(sent_mus - (parent_span.start_mus + parent_span.duration_mus))
+
+            elif span.span_kind == "server":
+                sent_mus = span.start_mus
+                duration_mus = span.duration_mus
+                parent_span = None
+                for j, preceding_span in reversed(list(enumerate(spans[:i]))):
+                    if (sent_mus + duration_mus) - preceding_span.start_mus > self.large_delay:
+                        break
+                    if ((preceding_span.span_kind == "client") and
+                        (preceding_span.start_mus + preceding_span.duration_mus < span.start_mus + span.duration_mus)):
+                        parent_span = preceding_span
+                        parent_type = "client"
+                        break
+                if parent_span is not None:
+                    if (parent_span.ep, span.ep) not in self.distribution_values:
+                        self.distribution_values[(parent_span.ep, span.ep)] = []
+                    if parent_type == "client":
+                        self.distribution_values[(parent_span.ep, span.ep)].append((sent_mus + duration_mus) - (parent_span.start_mus + parent_span.duration_mus))
+                if (span.ep, span.ep) not in self.distribution_values:
+                    self.distribution_values[(span.ep, span.ep)] = []
+                self.distribution_values[(span.ep, span.ep)].append(duration_mus)
+
+        for key in self.distribution_values.keys():
+            self.services_times[key] = np.mean(self.distribution_values[key]), np.std(self.distribution_values[key])
+
     def GenerateRandomID(self):
         x = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
         return x
@@ -559,9 +660,15 @@ def FindTopKAssignments(self, in_span, out_eps, out_span_partitions, K):
         # print(self.span_windows)
         # print([(i[1] - i[0] + 1) for i in self.span_windows])
 
+        if self.true_dist:
+            self.BuildTrueDistributions(in_span_partitions, out_span_partitions, in_eps, out_eps, true_assignments)
+        else:
+            self.BuildDistributions(process, in_span_partitions, out_span_partitions, in_eps, out_eps)
+            # self.BuildDistributions2(process, in_span_partitions, out_span_partitions, in_eps, out_eps)
+
         for in_span in in_spans:
             if cnt % batch_size == 0:
-                self.ComputeEpPairDistParams(in_span_partitions, out_span_partitions, out_eps, cnt, min(len(in_spans), cnt + batch_size))
+                # self.ComputeEpPairDistParams(in_span_partitions, out_span_partitions, out_eps, cnt, min(len(in_spans), cnt + batch_size))
                 # self.ComputeEpPairDistParams3(in_span_partitions, out_span_partitions, out_eps, cnt, min(len(in_spans), cnt + batch_size), invocation_graph)
                 print("Finished %d spans, unassigned spans: %d" % (cnt, cnt_unassigned))
 
