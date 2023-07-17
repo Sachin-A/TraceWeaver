@@ -103,8 +103,23 @@ class Timing7(Timing):
         self.per_span_candidates = {}
         self.time_windows = []
         self.span_windows = []
+        self.skip_count_per_window = {}
+        self.available_skips_per_window = {}
+        self.true_skips = False
         self.true_dist = False
         self.overall_skip_budget = {}
+
+    def ContainsSkip2(self, assignment):
+        for (ep, i) in assignment:
+            if i.trace_id == "None":
+                return True
+        return False
+
+    def ContainsSkip(self, assignment):
+        for i in assignment:
+            if i.trace_id == "None":
+                return True
+        return False
 
     def BuildTrueDistributions(self, in_span_partitions, out_span_partitions, in_eps, out_eps, true_assignments):
         for in_ep in in_eps:
@@ -259,86 +274,170 @@ class Timing7(Timing):
 
         self.per_span_candidates[(stack[0].trace_id, stack[0].sid)] += 1
 
-def FindTopKAssignments(self, in_span, out_eps, out_span_partitions, K):
+    def FindTopKAssignments(self, in_eps, in_span, out_eps, out_span_partitions, K):
+        # f = open("dump.txt", "a")
+
         global top_assignments
         top_assignments = []
 
-        def DfsTraverse(stack):
+        normalized = False
+        for ep in out_eps:
+            if self.overall_skip_budget[ep] > 0:
+                normalized = True
+                break
+
+        if self.true_skips == False:
+            for ep in out_eps:
+                out_span_partitions[ep].append(None)
+
+        def DfsTraverse(stack, depth, l_non_skip_depth, l_start, l_duration):
+            # print(depth, l_non_skip_depth)
             global top_assignments
             i = len(stack)
             if VERBOSE:
                 print("DFSTraverse", i, out_eps, stack)
             last_span = stack[-1]
             if i == len(out_span_partitions) + 1:
+                # print("X")
                 self.AddToCandidatesList(stack)
-                if self.parallel:
-                    score = self.ScoreAssignmentParallel(stack)
-                    # if in_span.GetId() == ("6f6def166e4f4221", "6f6def166e4f4221"):
-                    #     print(stack)
-                    #     print(score)
-                    #     input()
+                if self.ContainsSkip(stack):
+                    score = self.ScoreAssignmentWithSkip(stack, normalized)
+                elif self.parallel:
+                    score = self.ScoreAssignmentParallel(stack, normalized)
                 else:
-                    score = self.ScoreAssignmentSequential(stack)
+                    score = self.ScoreAssignmentSequential(stack, normalized)
                 # min heap
+                # if self.true_skips == True:
+                #     print(stack)
+                #     print(score)
+                #     input()
                 heapq.heappush(top_assignments, (score, stack))
                 if len(top_assignments) > K:
                     heapq.heappop(top_assignments)
-            elif i in self.instrumented_hops:
-                ep = out_eps[i - 1]
-                span_id = self.true_assignments[ep][in_span.GetId()]
-                for s in out_span_partitions[ep]:
-                    if s.GetId() == span_id:
-                        DfsTraverse(stack + [s])
-                        break
+            # elif i in self.instrumented_hops:
+            #     ep = out_eps[i - 1]
+            #     span_id = self.true_assignments[ep][in_span.GetId()]
+            #     for s in out_span_partitions[ep]:
+            #         if s.GetId() == span_id:
+            #             DfsTraverse(stack + [s])
+            #             break
             else:
+                # print("J")
                 ep = out_eps[i - 1]
-                for s in out_span_partitions[ep]:
-                    # parallel eps
-                    if self.parallel:
-                        # if (
-                        #     in_span.start_mus < s.start_mus
-                        #     and s.start_mus + s.duration_mus
-                        #     < in_span.start_mus + in_span.duration_mus
-                        # ):
-                        #     DfsTraverse(stack + [s])
-                        # first ep
-                        if (
-                            i == 1
-                            and in_span.start_mus <= s.start_mus
-                            and s.start_mus + s.duration_mus
-                            <= in_span.start_mus + in_span.duration_mus
-                        ):
-                            DfsTraverse(stack + [s])
-                        # all other eps
-                        elif (
-                            i <= len(out_eps)
-                            and last_span.start_mus <= s.start_mus
-                            and s.start_mus + s.duration_mus
-                            <= in_span.start_mus + in_span.duration_mus
-                        ):
-                            DfsTraverse(stack + [s])
-                    # Sequential eps
-                    else:
-                        # first ep
-                        if (
-                            i == 1
-                            and in_span.start_mus <= s.start_mus
-                            and s.start_mus + s.duration_mus
-                            <= in_span.start_mus + in_span.duration_mus
-                        ):
-                            DfsTraverse(stack + [s])
-                        # all other eps
-                        elif (
-                            i <= len(out_eps)
-                            and last_span.start_mus + last_span.duration_mus <= s.start_mus
-                            and s.start_mus + s.duration_mus
-                            <= in_span.start_mus + in_span.duration_mus
-                        ):
-                            DfsTraverse(stack + [s])
-        DfsTraverse([in_span])
+                # print(in_span.GetId()[0], self.true_skips)
+                # if in_span.GetId()[0] == "1d88e7719f1b3be7" and self.true_skips == True:
+                    # print("A")
+                    # input()
+                if self.true_skips == True and self.true_assignments[ep][in_span.GetId()][0] == "Skip":
+                    new_span_id = self.GenerateRandomID()
+                    skip_span = Span(
+                        "None",
+                        new_span_id,
+                        "None",
+                        "None",
+                        "None",
+                        "None",
+                        "None",
+                        "None",
+                    )
+                    # if in_span.GetId()[0] == "1d88e7719f1b3be7" and self.true_skips == True:
+                        # print("B")
+                        # input()
+                    DfsTraverse(stack + [skip_span], depth + 1, l_non_skip_depth, last_span.start_mus, last_span.duration_mus)
+                else:
+                    for x, s in enumerate(out_span_partitions[ep]):
+                        # print("Span num:", x)
+                        if self.true_skips == False and s == None:
+                            # if in_span.GetId()[0] == "1d88e7719f1b3be7" and self.true_skips == True:
+                                # print("C")
+                                # input()
+                            skip_span = self.FetchSkipFromWindow(ep, in_span.start_mus)
+                            # print("None:", len(stack))
+                            if skip_span != None:
+                                DfsTraverse(stack + [skip_span], depth + 1, l_non_skip_depth, last_span.start_mus, last_span.duration_mus)
+                        else:
+                            # if in_span.GetId()[0] == "1d88e7719f1b3be7" and self.true_skips == True:
+                                # print([x.sid for x in out_span_partitions[ep][:7]])
+                                # print("D")
+                                # input()
+                            # parallel eps
+                            if self.parallel:
+                                if (
+                                    in_span.start_mus <= s.start_mus
+                                    and s.start_mus + s.duration_mus
+                                    <= in_span.start_mus + in_span.duration_mus
+                                ):
+                                    # print("Parallel:", len(stack))
+                                    DfsTraverse(stack + [s], depth + 1, l_non_skip_depth + 1, None, None)
+
+                            # Sequential eps
+                            else:
+                                # if in_span.GetId()[0] == "1d88e7719f1b3be7" and self.true_skips == True:
+                                    # print("E")
+                                    # print(last_span)
+                                    # print(s)
+                                    # print(l_non_skip_depth)
+                                    # print(in_span.start_mus, s.start_mus, in_span.start_mus < s.start_mus)
+                                    # print(s.start_mus + s.duration_mus, in_span.start_mus + in_span.duration_mus, s.start_mus + s.duration_mus < in_span.start_mus + in_span.duration_mus)
+                                    # input()
+                                if last_span.trace_id == "None":
+                                    if (
+                                        l_non_skip_depth == 1
+                                        and in_span.start_mus <= s.start_mus
+                                        and s.start_mus + s.duration_mus
+                                        <= in_span.start_mus + in_span.duration_mus
+                                    ):
+                                        # print("E1")
+                                        # print("Seq1-prevnone:", len(stack))
+                                        # if self.process == "search":
+                                        # f.write(str(in_span) + ", " + str(s) + "\n")
+                                        DfsTraverse(stack + [s], depth + 1, l_non_skip_depth + 1, None, None)
+                                    # all other eps
+                                    elif (
+                                        l_non_skip_depth <= len(out_eps)
+                                        and l_start + l_duration <= s.start_mus
+                                        and s.start_mus + s.duration_mus
+                                        <= in_span.start_mus + in_span.duration_mus
+                                    ):
+                                        # print("E2")
+                                        # print("Seq2-prevnone:", len(stack))
+                                        # if self.process == "search":
+                                        # f.write(str(last_span) + ", " + str(s) + "\n")
+                                        DfsTraverse(stack + [s], depth + 1, l_non_skip_depth + 1, None, None)
+                                else:
+                                    # first ep
+                                    if (
+                                        i == 1
+                                        and in_span.start_mus <= s.start_mus
+                                        and s.start_mus + s.duration_mus
+                                        <= in_span.start_mus + in_span.duration_mus
+                                    ):
+                                        # print("E3")
+                                        # print("Seq1:", len(stack))
+                                        # if self.process == "search":
+                                        # f.write(str(in_span) + ", " + str(s) + "\n")
+                                        DfsTraverse(stack + [s], depth + 1, l_non_skip_depth + 1, None, None)
+                                    # all other eps
+                                    elif (
+                                        i <= len(out_eps)
+                                        and last_span.start_mus + last_span.duration_mus <= s.start_mus
+                                        and s.start_mus + s.duration_mus
+                                        <= in_span.start_mus + in_span.duration_mus
+                                    ):
+                                        # print("E4")
+                                        # print("Seq2:", len(stack))
+                                        # if self.process == "search":
+                                        # f.write(str(last_span) + ", " + str(s) + "\n")
+                                        DfsTraverse(stack + [s], depth + 1, l_non_skip_depth + 1, None, None)
+
+        DfsTraverse([in_span], 1, 1, None, None)
         top_assignments.sort(reverse=True)
-        # print(top_assignments)
-        # input()
+        if self.true_skips == False:
+            for ep in out_eps:
+                out_span_partitions[ep].pop()
+
+        # f.close()
+
         return top_assignments
 
     def GetSpanIDNotation(self, out_eps, assignment, type1):
@@ -518,73 +617,44 @@ def FindTopKAssignments(self, in_span, out_eps, out_span_partitions, K):
             t2 = [s.start_mus + s.duration_mus for s in t2[s2: e2]]
             ComputeDistParams(ep1, ep2, t1, t2)
 
-    def ComputeEpPairDistParams3(
+    def FetchSkipFromWindow(
         self,
-        in_span_partitions,
-        out_span_partitions,
-        out_eps,
-        in_span_start,
-        in_span_end,
-        invocation_graph
+        ep,
+        start_mus
     ):
 
-        def ComputeDistParams(ep1, ep2, t1, t2):
-            t1 = t1[in_span_start:in_span_end]
-            t2 = t2[in_span_start:in_span_end]
-            assert len(t1) == len(t2)
-            mean = (sum(t2) - sum(t1)) / len(t1)
-            if len(t1) == 0:
-                print("len(t1)")
-                input()
-            batch_means = []
-            nbatches = 10
-            batch_size = math.ceil(float(len(t1)) / nbatches)
-            if nbatches == 0:
-                print("nbatches")
-                input()
-            for i in range(nbatches):
-                start = i * batch_size
-                end = min(len(t1), (i + 1) * batch_size)
-                if end - start > 0:
-                    batch_means.append(
-                        (sum(t2[start:end]) - sum(t1[start:end])) / (end - start)
-                    )
-            std = math.sqrt(batch_size) * scipy.stats.tstd(batch_means)
-            if VERBOSE:
-                print(
-                    "Computing ep pair (%s, %s), distribution params: %f, %f"
-                    % (ep1, ep2, mean, std)
-                )
-            self.services_times[(ep1, ep2)] = mean, std
+        def FindWindow(key, windows):
+            return windows.index(max(i for i in windows if i <= key))
 
-        in_ep = list(in_span_partitions.keys())[0]
+        # def FindWindow(start_mus, windows):
+        #     index = None
+        #     start = 0
+        #     end = len(windows)
+        #     while start <= end:
+        #         mid = (start + end) // 2
+        #         if mid >= len(windows):  # out of bounds
+        #             break
+        #         if windows[mid] <= start_mus:
+        #             index = mid
+        #             start = mid + 1
+        #         else:
+        #             end = mid - 1
+        #     return index
 
-        for out_ep in out_span_partitions.keys():
+        self.time_windows.sort(key = lambda x: x[0])
+        index = FindWindow(start_mus, [x[0] for x in self.time_windows])
+        if index == None:
+            assert False
+        window = self.time_windows[index][:2]
 
-            if len(invocation_graph.in_edges(out_ep)) == 0:
-                t1 = sorted([s.start_mus for s in in_span_partitions[in_ep]])
-                t2 = sorted([s.start_mus for s in out_span_partitions[out_ep]])
-                ComputeDistParams(in_ep, out_ep, t1, t2)
+        if len(self.available_skips_per_window[ep][window]) <= 0:
+            return None
 
-            before_eps = invocation_graph.in_edges(out_ep)
+        minval = min(self.available_skips_per_window[ep][window], key = lambda x: x[1])
+        pos = self.available_skips_per_window[ep][window].index(minval)
+        self.available_skips_per_window[ep][window][pos][1] += 1
 
-            for (before_ep, self_ep) in before_eps:
-
-                if not self.AlsoNonPrimaryAncestor(before_ep, self_ep, invocation_graph):
-
-                    if before_ep == in_ep:
-                        t1 = sorted([s.start_mus for s in in_span_partitions[before_ep]])
-                        t2 = sorted([s.start_mus for s in out_span_partitions[self_ep]])
-                        ComputeDistParams(before_ep, self_ep, t1, t2)
-
-                    else:
-                        t1 = sorted([s.start_mus + s.duration_mus for s in out_span_partitions[before_ep]])
-                        t2 = sorted([s.start_mus for s in out_span_partitions[self_ep]])
-                        ComputeDistParams(before_ep, self_ep, t1, t2)
-
-            t1 = sorted([s.start_mus + s.duration_mus for s in out_span_partitions[out_ep]])
-            t2 = sorted([s.start_mus + s.duration_mus for s in in_span_partitions[in_ep]])
-            ComputeDistParams(out_ep, in_ep, t1, t2)
+        return self.available_skips_per_window[ep][window][pos][0]
 
     def DetectBoundaries(
         self,
@@ -594,6 +664,107 @@ def FindTopKAssignments(self, in_span, out_eps, out_span_partitions, K):
         out_eps
     ):
         pass
+
+    def TallySkipSpans(
+        self,
+        in_span_partitions,
+        out_span_partitions,
+        in_eps,
+        out_eps,
+        batch_size_mis
+    ):
+
+        def TackleMismatch(ep):
+
+            skip_budget = self.overall_skip_budget[ep]
+
+            self.skip_count_per_window[ep] = {}
+            self.available_skips_per_window[ep] = {}
+            window_counts = {}
+            window_diffs = {}
+
+            for (window_start, window_end, expected_count) in self.time_windows:
+
+                if (window_start, window_end) not in self.skip_count_per_window[ep]:
+                    self.skip_count_per_window[ep][(window_start, window_end)] = 0
+
+                count = 0
+                # TODO: calculate mean_span_time per window
+                mean_span_time = np.mean([i.duration_mus for i in out_span_partitions[ep]])
+                for span in out_span_partitions[ep]:
+                    if span.start_mus > window_start and span.start_mus <= window_end:
+                        count += 1
+                window_diffs[(window_start, window_end)] = max(expected_count - count, 0)
+                window_counts[(window_start, window_end)] = count
+
+            skip_budget_copy = skip_budget
+            # while skip_budget > 0:
+            #     no_change = True
+            #     for (window_start, window_end, expected_count) in self.time_windows:
+            #         if window_diffs[(window_start, window_end)] > self.skip_count_per_window[ep][(window_start, window_end)]:
+            #             self.skip_count_per_window[ep][(window_start, window_end)] += 1
+            #             skip_budget -= 1
+            #             no_change = False
+            #         if skip_budget == 0:
+            #             break
+            #     if no_change:
+            #         break
+
+            # x = copy.deepcopy([v for k, v in self.skip_count_per_window[ep].items()])
+            # y = copy.deepcopy([v for k, v in self.skip_count_per_window[ep].items()])
+
+            # if skip_budget_copy > 0:
+            #     print(x)
+            #     print(y)
+            #     print(x == y)
+            #     input()
+
+            for (window_start, window_end, _) in self.time_windows:
+
+                if (window_start, window_end) not in self.available_skips_per_window[ep]:
+                    self.available_skips_per_window[ep][(window_start, window_end)] = []
+
+                for i in range(int(self.skip_count_per_window[ep][(window_start, window_end)])):
+
+                    new_span_id = self.GenerateRandomID()
+                    skip_span = Span(
+                            "None",
+                            new_span_id,
+                            "None",
+                            "None",
+                            "None",
+                            "None",
+                            "None",
+                            "None",
+                        )
+                    self.available_skips_per_window[ep][(window_start, window_end)].append([skip_span, 0])
+
+        self.skip_count_per_window = {}
+
+        for ep in in_eps:
+            in_span_partitions[ep].sort(key = lambda x: float(x.start_mus))
+        for ep in out_eps:
+            out_span_partitions[ep].sort(key = lambda x: float(x.start_mus))
+            self.overall_skip_budget[ep] = len(in_span_partitions[in_eps[0]]) - len(out_span_partitions[ep])
+
+        window_start = in_span_partitions[in_eps[0]][0].start_mus
+        final_span = sorted(in_span_partitions[in_eps[0]], key = lambda x: float(x.start_mus) + float(x.duration_mus))[-1]
+        final_window_end = final_span.start_mus + final_span.duration_mus
+
+        len_spans = len(in_span_partitions[in_eps[0]])
+        for i in range(0, len_spans):
+            if (i != 0 and i != len_spans - 1 and i % batch_size_mis == 0):
+                # print(i, batch_size_mis)
+                window_end = in_span_partitions[in_eps[0]][i].start_mus + in_span_partitions[in_eps[0]][i].duration_mus
+                self.time_windows.append((window_start, window_end, batch_size_mis))
+                window_start = window_end
+            elif i == len_spans - 1:
+                # window_end = in_span_partitions[in_eps[0]][i].start_mus + in_span_partitions[in_eps[0]][i].duration_mus
+                window_end = final_window_end
+                self.time_windows.append((window_start, window_end, batch_size_mis))
+
+        for ep in out_eps:
+            TackleMismatch(ep)
 
     def CreateWindows(self, in_span_partitions, in_eps, max_size, threshold):
 
@@ -624,13 +795,14 @@ def FindTopKAssignments(self, in_span, out_eps, out_span_partitions, K):
 
         return windows
 
-    def FindAssignments(self, process, in_span_partitions, out_span_partitions, parallel, instrumented_hops, true_assignments, invocation_graph, true_dist = False):
+    def FindAssignments(self, process, in_span_partitions, out_span_partitions, parallel, instrumented_hops, true_assignments, true_skips = False, true_dist = False):
         assert len(in_span_partitions) == 1
         self.process = process
         self.parallel = parallel
         self.instrumented_hops = instrumented_hops
         self.true_assignments = true_assignments
         self.per_span_candidates = {}
+        self.true_skips = true_skips
         self.true_dist = true_dist
         for ep in out_span_partitions.keys():
             for key in true_assignments[ep].keys():
@@ -660,6 +832,22 @@ def FindTopKAssignments(self, in_span, out_eps, out_span_partitions, K):
         # print(self.span_windows)
         # print([(i[1] - i[0] + 1) for i in self.span_windows])
 
+        count = 0
+        for span in in_span_partitions[in_eps[0]]:
+            for ep in out_eps:
+                if self.true_assignments[ep][span.GetId()][0] == "Skip":
+                    count += 1
+        print("True skips: ", count, "\n")
+
+        self.TallySkipSpans(in_span_partitions, out_span_partitions, in_eps, out_eps, batch_size_mis)
+
+        equal_eps = []
+        for ep in out_eps:
+            print("Endpoint:", ep + ", ", "Num spans:", len(out_span_partitions[ep]))
+            if self.overall_skip_budget[ep] == 0:
+                equal_eps.append(ep)
+
+
         if self.true_dist:
             self.BuildTrueDistributions(in_span_partitions, out_span_partitions, in_eps, out_eps, true_assignments)
         else:
@@ -669,19 +857,19 @@ def FindTopKAssignments(self, in_span, out_eps, out_span_partitions, K):
         for in_span in in_spans:
             if cnt % batch_size == 0:
                 # self.ComputeEpPairDistParams(in_span_partitions, out_span_partitions, out_eps, cnt, min(len(in_spans), cnt + batch_size))
-                # self.ComputeEpPairDistParams3(in_span_partitions, out_span_partitions, out_eps, cnt, min(len(in_spans), cnt + batch_size), invocation_graph)
+                # self.ComputeEpPairDistParams3(in_span_partitions, out_span_partitions, out_eps, cnt, min(len(in_spans), cnt + batch_size))
                 print("Finished %d spans, unassigned spans: %d" % (cnt, cnt_unassigned))
 
-            top_k = self.FindTopKAssignments(in_eps, in_span, out_eps, out_span_partitions_copy, topK, invocation_graph)
-            top_k_2 = self.FindTopKAssignments(in_eps, in_span, out_eps, out_span_partitions, topK, invocation_graph)
-            self.AddTopKAssignments(in_span, top_k_2, all_topk_assignments, out_span_partitions_copy, out_eps)
+            top_k = self.FindTopKAssignments(in_eps, in_span, out_eps, out_span_partitions_copy, topK)
+            top_k_2 = self.FindTopKAssignments(in_eps, in_span, out_eps, out_span_partitions, topK)
+            self.AddTopKAssignments(in_span, top_k_2, all_topk_assignments, out_span_partitions_copy, out_eps, skips=True)
             span_to_top_assignments[in_span] = top_k
             top_assignments.append(top_k)
             batch_in_spans.append(in_span)
             cnt += 1
 
-            # if cnt % batch_size_mis == 0:
-            if (cnt - 1) in window_ends:
+            if cnt % batch_size_mis == 0:
+            # if (cnt - 1) in window_ends:
                 assignments = self.GetAssignmentsMIS(top_assignments)
                 assert len(assignments) == len(top_assignments) == len(batch_in_spans)
                 for ind in range(len(assignments)):
@@ -703,7 +891,8 @@ def FindTopKAssignments(self, in_span, out_eps, out_span_partitions, K):
                         all_assignments,
                         out_span_partitions_copy,
                         out_eps,
-                        delete_out_spans=True
+                        delete_out_spans=True,
+                        skips=True
                     )
                     cnt_unassigned += int(len(assignment) == 0)
                 top_assignments = []
@@ -809,7 +998,7 @@ def FindTopKAssignments(self, in_span, out_eps, out_span_partitions, K):
         def get_mwis(G):
             '''
             Based on "A column generation approach for graph coloring" from
-            Mehrotra and Trick, 1995
+            Mehrotra and Trick, 1995, using recursion formula:
             '''
             global best_score
             # score stores the best score along the path explored so far
