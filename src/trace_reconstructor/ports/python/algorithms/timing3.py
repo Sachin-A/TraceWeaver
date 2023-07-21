@@ -674,6 +674,62 @@ class Timing7(Timing):
         batch_size_mis
     ):
 
+        def WaterFill(window_diffs, window_counts, skip_budget, ep):
+
+            if skip_budget <= 0:
+                return
+
+            num_windows = len(window_diffs)
+            window_keys = copy.deepcopy(sorted(self.time_windows, key = lambda x: x[0]))
+
+            index_to_key = {}
+            for i, window_key in enumerate(window_keys):
+                index_to_key[i] = window_key[:2]
+
+            existing_spans = np.zeros(len(window_counts))
+            expected_spans = np.zeros(len(window_counts))
+            for i in range(len(window_counts)):
+                existing_spans[i] = copy.deepcopy((window_counts[index_to_key[i]]))
+                expected_spans[i] = copy.deepcopy((window_keys[i][2]))
+
+            # Sort the windows in decreasing order of existing spans
+            sorted_indices = np.argsort(existing_spans)[::-1]
+            sorted_existing_spans = existing_spans[sorted_indices]
+
+            # Initialize resource allocation vector
+            skip_allocation = np.zeros(num_windows)
+
+            # Calculate the max window span count (i.e., water level in waterfilling)
+            lambda_ = 0
+
+            for i in range(num_windows):
+                lambda_ = (skip_budget + np.sum(sorted_existing_spans[:i + 1])) // (i + 1)
+                total_remaining = (skip_budget + np.sum(sorted_existing_spans[:i + 1])) % (i + 1)
+                if lambda_ <= sorted_existing_spans[i]:
+                    break
+
+            # Allocate additional resources to windows based on water-filling
+            remaining = 0
+            for i in range(num_windows):
+                remaining += max(lambda_ - sorted_existing_spans[i], 0) - min(max(lambda_ - sorted_existing_spans[i], 0), expected_spans[i] - sorted_existing_spans[i])
+                skip_allocation[sorted_indices[i]] = min(max(lambda_ - sorted_existing_spans[i], 0), expected_spans[i] - sorted_existing_spans[i])
+            total_remaining += remaining
+
+            while total_remaining > 0:
+                no_change = True
+                for i in reversed(range(num_windows)):
+                    if total_remaining > 0 and skip_allocation[sorted_indices[i]] < (expected_spans[i] - sorted_existing_spans[i]):
+                        skip_allocation[sorted_indices[i]] += 1
+                        no_change = False
+                        total_remaining -= 1
+                if no_change:
+                    break
+
+            for i in range(len(window_counts)):
+                self.skip_count_per_window[ep][index_to_key[i]] = skip_allocation[i]
+
+            return
+
         def TackleMismatch(ep):
 
             skip_budget = self.overall_skip_budget[ep]
@@ -711,6 +767,9 @@ class Timing7(Timing):
             #         break
 
             # x = copy.deepcopy([v for k, v in self.skip_count_per_window[ep].items()])
+
+            WaterFill(window_diffs, window_counts, skip_budget_copy, ep)
+
             # y = copy.deepcopy([v for k, v in self.skip_count_per_window[ep].items()])
 
             # if skip_budget_copy > 0:
