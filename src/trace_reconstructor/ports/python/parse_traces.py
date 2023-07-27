@@ -2,21 +2,27 @@ import os
 import sys
 import json
 import math
-import pickle5 as pickle
-from algorithms.fcfs import FCFS
-from algorithms.fcfs2 import FCFS2
-from algorithms.timing import Timing
-from algorithms.timing2 import Timing2
-from algorithms.wap5_og import WAP5_OG
-from algorithms.vpath import VPATH
-import math
 import copy
+import random
+import pickle
+import string
+import numpy as np
+from fcfs import FCFS
+from vpath import VPATH
+from fcfs2 import FCFS2
+from timing import Timing
+from timing2 import Timing2
+from timing3 import Timing3
+from wap5_og import WAP5_OG
+from deepdiff import DeepDiff
+import networkx as nx
+import matplotlib.pyplot as plt
+from scipy import stats
+
+# np.seterr(all='raise')
 
 VERBOSE = False
 random.seed(10)
-
-all_spans = dict()
-all_processes = dict()
 
 process_map_1 = {
     "service5": "service3",
@@ -31,6 +37,8 @@ satisfied_float = {}
 replica_id = {}
 new_replica_id = {}
 
+all_spans = dict()
+all_processes = dict()
 
 class Span(object):
     def __init__(
@@ -43,6 +51,7 @@ class Span(object):
         references,
         process_id,
         span_kind,
+        span_tags
     ):
         self.sid = sid
         self.trace_id = trace_id
@@ -52,7 +61,10 @@ class Span(object):
         self.references = references
         self.process_id = process_id
         self.span_kind = span_kind
+        self.tags = span_tags
         self.children_spans = []
+        self.taken = False
+        self.ep = None
 
     def AddChild(self, child_span_id):
         self.children_spans.append(child_span_id)
@@ -81,12 +93,24 @@ class Span(object):
         return self.start_mus < other.start_mus
 
     def __repr__(self):
-        return "Span:(%s, %d, %d, %s)" % (
-            self.op_name,
-            self.start_mus,
-            self.duration_mus,
-            self.span_kind,
-        )
+        if self.start_mus == "None":
+            return "Span:(%s, %s, %s, %s, %s, %s)" % (
+                self.trace_id,
+                self.sid,
+                self.op_name,
+                self.start_mus,
+                self.duration_mus,
+                self.span_kind,
+            )
+        else:
+            return "Span:(%s, %s, %s, %d, %d, %s)" % (
+                self.trace_id,
+                self.sid,
+                self.op_name,
+                self.start_mus,
+                self.duration_mus,
+                self.span_kind,
+            )
 
     def __str__(self):
         return self.__repr__()
@@ -210,6 +234,14 @@ def FindOrder(in_span_partitions, out_span_partitions, true_assignments):
 
     return G1
 
+def GetOutEpsInOrder(out_span_partitions):
+    eps = []
+    for ep, spans in out_span_partitions.items():
+        assert len(spans) > 0
+        eps.append((ep, spans[0].start_mus))
+    eps.sort(key=lambda x: x[1])
+    return [x[0] for x in eps]
+
 '''
 FOR all e2e requests
 WHICH
@@ -219,48 +251,30 @@ FIND
     the worst performing service AND
     its mean service latency for these requests
 '''
-#maindir = "152"
-maindir = "10-1"
+
 def sampleQuery():
-    rrange = range(4, 5)
-    if "25-1" in maindir or "10-1" in maindir:
-        rrange = range(0, 1)
-    for j in rrange:
+
+    for j in range(4, 5):
 
         query_latency = {}
 
-        filename = "plots/vipul/" + maindir + "/e2e_" + str((j + 1) * 25) + ".pickle"
-        if "153" in sys.argv[1]:
-            filename = "plots/vipul/153/e2e_" + str((j + 1) * 25) + ".pickle"
-        #elif "25-1" in sys.argv[1]:
-        #    filename = "plots/vipul/25-1/e2e_" + str((j + 1) * 25) + ".pickle"
-
-        with open(filename, 'rb') as afile:
+        with open("plots/e2e_" + str((j + 1) * 25) + "_version2.pickle", 'rb') as afile:
             e2e_traces = pickle.load(afile)
 
         for method in e2e_traces.keys():
 
             true_traces = e2e_traces[method][0]
 
-            true_traces = list(
+            true_traces = dict(
                 sorted(
                     true_traces.items(),
-                    key=lambda x: x[1][0].start_mus
+                    key=lambda x: x[1][-1].start_mus + x[1][-1].duration_mus - x[1][0].start_mus
                 )
             )
-            percentile = 98
-            nreq = 0
-            nreq2 = nreq + 500
 
-            #p1 = int(0.80 * len(true_traces))
-            start_time = true_traces[nreq][1][0].start_mus
-            end_time = true_traces[nreq2][1][0].start_mus
-
-            def FilterSpan(span, all_spans=False):
-                return (
-                    (hash(span.trace_id) % 1 == 0 or all_spans) and
-                    span.start_mus > start_time and span.start_mus < end_time
-                )
+            # p1 = int(0.95 * len(true_traces))
+            p1 = int(0 * len(true_traces))
+            start_time = list(true_traces.items())[100][1][0].start_mus
 
             # true_traces = list(
             #     filter(
@@ -268,76 +282,44 @@ def sampleQuery():
             #         list(true_traces.items())[p1:]
             #     )
             # )
-            if "all_spans" not in sys.argv[-1]:
-                true_traces = list(
-                    filter(
-                        lambda x: FilterSpan(x[1][0]),
-                        true_traces,
-                    )
+            true_traces = list(
+                filter(
+                    lambda x: x[1][0].start_mus < start_time,
+                    list(true_traces.items())[p1:]
                 )
-                print(len(true_traces))
-                true_traces.sort(
-                        key=lambda x: x[1][-1].start_mus + x[1][-1].duration_mus - x[1][0].start_mus
-                    )
-                p1 = int(percentile * float(len(true_traces)/100))
-                true_traces = true_traces[p1:]
-                # true_traces = list(
-                #     filter(
-                #         lambda x: x[1][0].start_mus > 0,
-                #         list(true_traces.items())[p1:]
-                #     )
-                # )
-                pred_traces = e2e_traces[method][1]
-                pred_traces_assigned = []
+            )
+            # true_traces = list(
+            #     filter(
+            #         lambda x: x[1][0].start_mus > 0,
+            #         list(true_traces.items())[p1:]
+            #     )
+            # )
 
-                for trace in true_traces:
-                    if not any(x is None for x in pred_traces[trace[0]]):
-                        pred_traces_assigned.append((trace[0], pred_traces[trace[0]]))
+            pred_traces = e2e_traces[method][1]
+            pred_traces_assigned = []
 
-                latency_per_service_true = [[] for i in range(5)]
-                latency_per_service_pred = [[] for i in range(5)]
+            for trace in true_traces:
+                if not any(x is None for x in pred_traces[trace[0]]):
+                    pred_traces_assigned.append((trace[0], pred_traces[trace[0]]))
 
-                for _, trace in true_traces:
-                    for i, span in enumerate(trace):
-                        latency_per_service_true[i].append((span.trace_id, span.sid, span.start_mus, span.duration_mus))
-                for _, trace in pred_traces_assigned:
-                    for i, span in enumerate(trace):
-                        latency_per_service_pred[i].append((span.trace_id, span.sid, span.start_mus, span.duration_mus))
+            latency_per_service_true = [[] for i in range(5)]
+            latency_per_service_pred = [[] for i in range(5)]
 
-
-            else:
-                latency_per_service_true = [[] for i in range(5)]
-                latency_per_service_pred = [[] for i in range(5)]
-                for i in range(5):
-                    traces_i = list(
-                        filter(
-                            lambda x: FilterSpan(x[1][i], all_spans=True),
-                            true_traces
-                            #list(true_traces.items())[p1:]
-                        )
-                    )
-                    traces_i.sort(
-                        key=lambda x: x[1][i].duration_mus
-                    )
-                    p1 = int(percentile * float(len(traces_i)/100))
-                    print("p1", p1, len(traces_i))
-                    traces_i = traces_i[p1:]
-                    #print(traces_i)
-                    for _, trace in traces_i:
-                        span = trace[i]
-                        latency_per_service_true[i].append((span.trace_id, span.sid, span.start_mus, span.duration_mus))
-                        latency_per_service_pred[i].append((span.trace_id, span.sid, span.start_mus, span.duration_mus))
+            for _, trace in true_traces:
+                for i, span in enumerate(trace):
+                    latency_per_service_true[i].append((span.trace_id, span.sid, span.start_mus, span.duration_mus))
+            for _, trace in pred_traces_assigned:
+                for i, span in enumerate(trace):
+                    latency_per_service_pred[i].append((span.trace_id, span.sid, span.start_mus, span.duration_mus))
 
             query_latency[method] = [latency_per_service_true, latency_per_service_pred]
+
         load_level = (j + 1) * 25
-        nreq = "_na_"
-        percentile = "_na_"
-        if "all_spans" in sys.argv[-1]:
-            with open('plots/vipul/query_latency_' + str(load_level) + '_all_version2_before' + str(nreq) + '_p' + str(percentile) + '.pickle', 'wb') as handle:
-                pickle.dump(query_latency, handle, protocol = pickle.HIGHEST_PROTOCOL)
-        else:
-            with open('plots/vipul/query_latency_' + str(load_level) + '_version2_before' + str(nreq) + '_p' + str(percentile) + '.pickle', 'wb') as handle:
-                pickle.dump(query_latency, handle, protocol = pickle.HIGHEST_PROTOCOL)
+
+        with open('plots/query_latency_' + str(load_level) + '_version2_randomSet.pickle', 'wb') as handle:
+            pickle.dump(query_latency, handle, protocol = pickle.HIGHEST_PROTOCOL)
+        with open('plots/query_latency_' + str(load_level) + '_all_version2_randomSet.pickle', 'wb') as handle:
+            pickle.dump(query_latency, handle, protocol = pickle.HIGHEST_PROTOCOL)
 
 
 def GetAllTracesInDir(directory):
@@ -349,6 +331,7 @@ def GetAllTracesInDir(directory):
 
 
 def ParseSpansJson(spans_json):
+
     spans = {}
     for span in spans_json:
         references = []
@@ -362,9 +345,11 @@ def ParseSpansJson(spans_json):
         op_name = span.get("operationName", None)
         process_id = span["processID"]
         span_kind = None
+
         for tag in span["tags"]:
             if tag["key"] == "span.kind":
                 span_kind = tag["value"]
+
         spans[span_id] = Span(
             trace_id,
             sid,
@@ -374,11 +359,13 @@ def ParseSpansJson(spans_json):
             references,
             process_id,
             span_kind,
+            span["tags"]
         )
+
     return spans
 
 
-def ParseProcessessJson(processes_json):
+def ParseProcessesJson(processes_json):
     processes = {}
     for pid in processes_json:
         processes[pid] = processes_json[pid]["serviceName"]
@@ -667,22 +654,6 @@ def ProcessTraceData(data):
         return 1
     return 0
 
-def ParseInputPickle(filename):
-    with open(filename, 'rb') as pfile:
-        data = pickle.load(pfile)
-        print (len(data.keys()))
-        for k in data.keys():
-            print(k, type(data[k]))
-            for t in data[k]:
-                print("new entry")
-                for x in t:
-                    print(x)
-            sys.exit()
-
-
-input_pickle_file = sys.argv[1]
-ParseInputPickle(input_pickle_file)
-
 traces_dir = sys.argv[1]
 traces = GetAllTracesInDir(traces_dir)
 traces.sort()
@@ -751,6 +722,11 @@ def AccuracyForService(pred_assignments, true_assignments, in_span_partitions):
     for in_span in in_spans:
         correct = True
         for ep in true_assignments.keys():
+            if isinstance(pred_assignments[ep][in_span.GetId()], list):
+                if len(pred_assignments[ep][in_span.GetId()]) > 1:
+                    correct = False
+                else:
+                    pred_assignments[ep][in_span.GetId()] = pred_assignments[ep][in_span.GetId()][0]
             correct = correct and (
                 pred_assignments[ep][in_span.GetId()]
                 == true_assignments[ep][in_span.GetId()]
@@ -840,6 +816,46 @@ def PrintLatency12(trace_acc):
         x = x[0] - min_time, x[1], x[2], x[3], x[4]
         print(x)
 
+def BinAccuracyByServiceTimes(method):
+
+    for j in range(4, 5):
+
+        query_latency = {}
+
+        with open("plots/e2e_" + str((j + 1) * 25) + ".pickle", 'rb') as afile:
+            e2e_traces = pickle.load(afile)
+
+        true_traces = e2e_traces[method][0]
+        pred_traces = e2e_traces[method][1]
+
+        all_traces = []
+
+        for trace in true_traces.items():
+            true_trace = true_traces[trace[0]]
+            duration = true_trace[1].start_mus - (true_trace[0].start_mus + true_trace[0].duration_mus)
+            if pred_traces[trace[0]][1]:
+                correct = true_trace[1].sid == pred_traces[trace[0]][1].sid
+            else:
+                correct = False
+            all_traces.append((duration, correct, 1))
+
+        all_traces.sort()
+        for i in range(1, len(all_traces)):
+            _, c, n = all_traces[i - 1]
+            t0, c0, n0 = all_traces[i]
+            all_traces[i] = (t0, c + c0, n + n0)
+        nbins = 10
+        prev_c, prev_n = 0, 0
+        accuracy = []
+        for b in range(nbins):
+            d, c, n = all_traces[int((len(all_traces) * (b + 1)) / nbins - 1)]
+            c, n = c - prev_c, n - prev_n
+            prev_c, prev_n = prev_c + c, prev_n + n
+            percentile = (b + 1) * 100 / nbins
+            acc = c / n
+            accuracy.append((percentile, acc, d / 1000.0))
+        return accuracy
+
 def BinAccuracyByResponseTimes(trace_acc):
     all_traces = []
     for _, span in all_spans.items():
@@ -869,26 +885,6 @@ def BinAccuracyByResponseTimes(trace_acc):
         accuracy.append((percentile, acc, d / 1000.0))
     return accuracy
 
-def AccuracyEndToEnd(
-    pred_assignments_by_process, true_assignments_by_process, in_spans_by_process
-):
-    processes = true_assignments_by_process.keys()
-    trace_acc = {}
-    for process in processes:
-        for in_span in in_spans_by_process[process]:
-            if in_span.trace_id not in trace_acc:
-                trace_acc[in_span.trace_id] = True
-            true_assignments = true_assignments_by_process[process]
-            pred_assignments = pred_assignments_by_process[process]
-            for ep in true_assignments.keys():
-                if (
-                    true_assignments[ep][in_span.GetId()]
-                    != pred_assignments[ep][in_span.GetId()]
-                ):
-                    trace_acc[in_span.trace_id] = False
-    correct = sum(trace_acc[tid] for tid in trace_acc)
-    return trace_acc, float(correct) / len(trace_acc)
-
 def ConstructEndToEndTraces(
     pred_assignments_by_process, true_assignments_by_process, in_spans_by_process
 ):
@@ -912,31 +908,53 @@ def ConstructEndToEndTraces(
                 true_traces[in_span.trace_id].append(
                     all_spans.get(true_assignments[ep][in_span.GetId()])
                 )
-                pred_traces[in_span.trace_id].append(
-                    all_spans.get(pred_assignments[ep][in_span.GetId()])
-                )
+                options = pred_assignments[ep].get(in_span.GetId(), None)
+                if isinstance(options, list):
+                    for option in options:
+                        pred_traces[in_span.trace_id].append(
+                            all_spans.get(option, None)
+                        )
+                else:
+                    pred_traces[in_span.trace_id].append(
+                        all_spans.get(options, None)
+                    )
     OrderTraces(true_traces)
     OrderTraces(pred_traces)
 
     return true_traces, pred_traces
 
 predictors = [
-    ("Greedy++", Timing2(all_spans, all_processes)),
-    #("Greedy", Timing(all_spans, all_processes)),
-    #("FCFS", FCFS(all_spans, all_processes)),
-    #("FCFS++", FCFS2(all_spans, all_processes)),
+    ("MaxScoreBatchSubsetWithSkips", Timing3(all_spans, all_processes)),
+    # ("MaxScoreBatch", Timing2(all_spans, all_processes)),
+    # ("MaxScoreBatchParallel", Timing2(all_spans, all_processes)),
+    # ("MaxScore", Timing(all_spans, all_processes)),
+    ("WAP5_OG", WAP5_OG(all_spans, all_processes)),
+    ("FCFS", FCFS(all_spans, all_processes)),
+    # ("ArrivalOrder", FCFS2(all_spans, all_processes)),
+    # ("VPath", VPATH(all_spans, all_processes)),
 ]
 
+accuracy_per_process = {}
 accuracy_overall = {}
+topk_accuracy_overall = {}
 accuracy_percentile_bins = {}
 traces_overall = {}
+
 for method, predictor in predictors:
+
+    random.seed(10)
+
+    if method == "MaxScoreBatch" or method == "MaxScoreBatchSubsetWithSkips":
+        confidence_scores_by_process = {}
+    if method == "MaxScoreBatchSubset" or method == "MaxScoreBatchParallel" or method == "MaxScoreBatch":
+        candidates_per_process = {}
 
     true_assignments_by_process = {}
     pred_assignments_by_process = {}
-    for process in out_spans_by_process.keys():
-        in_spans = in_spans_by_process[process]
-        out_spans = out_spans_by_process[process]
+    pred_topk_assignments_by_process = {}
+    for process_id, process in enumerate(out_spans_by_process.keys()):
+        in_spans = copy.deepcopy(in_spans_by_process[process])
+        out_spans = copy.deepcopy(out_spans_by_process[process])
 
         if len(out_spans) == 0:
             continue
@@ -953,45 +971,187 @@ for method, predictor in predictors:
                 part.sort(key=lambda x: x.start_mus)
             return partitions
 
-         # partition spans by subservice at the other end
+        print("Process: ", process)
+        # partition spans by subservice at the other end
         in_span_partitions = PartitionSpansByEndPoint(
             in_spans, lambda x: x.GetParentProcess()
         )
-        print("Incoming span partitions", process, in_span_partitions.keys())
+        print("Incoming span partitions: ", process, in_span_partitions.keys())
         out_span_partitions = PartitionSpansByEndPoint(
             out_spans, lambda x: x.GetChildProcess()
         )
-        print("Outgoing span partitions", process, out_span_partitions.keys())
+        print("Outgoing span partitions: ", process, out_span_partitions.keys())
+
+        if len(in_span_partitions.keys()) > 1:
+            print("SKIPPING THIS PROCESS:", process)
+            continue
+
+        if sys.argv[3] == "parallel" or method == "MaxScoreBatchParallel":
+            parallel = True
+        else:
+            parallel = False
+
+        # if process == "frontend":
+        #     continue
+
+        if sys.argv[4] == "instrumented" and process == "search":
+            print(process)
+            instrumented_hops = []
+        else:
+            instrumented_hops = []
 
         true_assignments = GetGroundTruth(in_span_partitions, out_span_partitions)
+
+        copy_x = copy.deepcopy(in_span_partitions)
+        copy_y = copy.deepcopy(out_span_partitions)
+        copy_z = copy.deepcopy(true_assignments)
+
         invocation_graph = FindOrder(in_span_partitions, out_span_partitions, true_assignments)
-        pred_assignments = predictor.FindAssignments(
-            process, in_span_partitions, out_span_partitions, invocation_graph
-        )
+
+        # repeats = int(sys.argv[7])
+        # factor = int(sys.argv[8])
+        # in_span_partitions, out_span_partitions = repeatChangeSpans(in_span_partitions, out_span_partitions, repeats=repeats, factor=factor)
+        # true_assignments = GetGroundTruth(in_span_partitions, out_span_partitions)
+
+        # print(bool(DeepDiff(copy_x, in_span_partitions)))
+        # print(bool(DeepDiff(copy_y, out_span_partitions)))
+        # print(bool(DeepDiff(copy_z, true_assignments)))
+
+        # in_ep, _ = list(in_span_partitions.items())[0]
+        # for in_span in in_span_partitions[in_ep]:
+        #     print(in_span)
+        #     input()
+        #     for out_ep in out_span_partitions.keys():
+        #         out_span_id = true_assignments[out_ep][in_span.GetId()]
+        #         print(all_spans[out_span_id])
+        #         input()
+
+        if method == "MaxScoreBatch" or method == "MaxScoreBatchParallel":
+            if process == "service1":
+                parallel = True
+            pred_assignments, not_best_count, num_spans, per_span_candidates = predictor.FindAssignments(
+                process, in_span_partitions, out_span_partitions, parallel, instrumented_hops, true_assignments
+            )
+        elif method == "MaxScoreBatchSubset":
+            if process == "service1":
+                parallel = True
+            pred_assignments, not_best_count, num_spans, per_span_candidates = predictor.FindAssignments(
+                process, in_span_partitions, out_span_partitions, parallel, instrumented_hops, true_assignments
+            )
+        elif method == "MaxScore":
+            if process == "service1":
+                parallel = True
+            pred_assignments = predictor.FindAssignments(
+                process, in_span_partitions, out_span_partitions, True, instrumented_hops, true_assignments
+            )
+        elif method == "MaxScoreBatchSubsetWithSkips":
+            if process == "service1":
+                parallel = True
+            pred_assignments, pred_topk_assignments, not_best_count, num_spans, per_span_candidates = predictor.FindAssignments(
+                process, in_span_partitions, out_span_partitions, parallel, instrumented_hops, true_assignments, invocation_graph
+            )
+        elif method == "MaxScoreBatchSubsetWithTrueSkips":
+            pred_assignments, pred_topk_assignments, not_best_count, num_spans, per_span_candidates = predictor.FindAssignments(
+                process, in_span_partitions, out_span_partitions, parallel, instrumented_hops, true_assignments, invocation_graph, True, False
+            )
+        elif method == "MaxScoreBatchSubsetWithTrueDist":
+            pred_assignments, pred_topk_assignments, not_best_count, num_spans, per_span_candidates = predictor.FindAssignments(
+                process, in_span_partitions, out_span_partitions, parallel, instrumented_hops, true_assignments, invocation_graph, False, True
+            )
+        else:
+            pred_assignments = predictor.FindAssignments(
+                process, in_span_partitions, out_span_partitions, parallel, instrumented_hops, true_assignments
+            )
+
         acc = AccuracyForService(pred_assignments, true_assignments, in_span_partitions)
-        print("Accuracy for service %s: %.3f\n" % (process, acc))
+        print("Accuracy for service %s: %.3f%%\n" % (process, acc * 100))
+        if method == "MaxScoreBatchSubsetWithSkips":
+            acc2 = TopKAccuracyForService(pred_topk_assignments, true_assignments, in_span_partitions)
+            print("Top K accuracy for service %s: %.3f%%\n" % (process, acc2 * 100))
         true_assignments_by_process[process] = true_assignments
         pred_assignments_by_process[process] = pred_assignments
+        if method == "MaxScoreBatchSubsetWithSkips":
+            pred_topk_assignments_by_process[process] = pred_topk_assignments
+
+        accuracy_per_process[(method, process_id)] = acc
+
+        if method == "MaxScoreBatch" or method == "MaxScoreBatchSubsetWithSkips":
+            print(not_best_count, num_spans)
+            confidence_scores_by_process[process] = [acc, not_best_count, num_spans]
+
+        if method == "MaxScoreBatchSubset" or method == "MaxScoreBatchParallel":
+            candidates_per_process[process] = per_span_candidates
+
+        # new_count = 0
+        # max_count = 0
+        # values1 = []
+        # values2 = []
+        # top5 = []
+        # for key, value in per_span_candidates.items():
+        #     if process == "init-service":
+        #         break
+        #     # print(process)
+        #     # print(key, value)
+        #     if value > max_count and bool(AccuracyForSpan(pred_assignments, true_assignments, key)):
+        #         max_count = value
+        #     if bool(AccuracyForSpan(pred_assignments, true_assignments, key)):
+        #         values1.append(value)
+        #     else:
+        #         values2.append((key, value))
+        #         top5.append(bool(TopKAccuracyForSpan(pred_topk_assignments, true_assignments, key)))
+        #     # print(bool(AccuracyForSpan(pred_assignments, true_assignments, key)))
+        #     # input()
+        #     # new_count += 1
+        #     # if new_count == 20:
+        #     #     break
+        # # print(values2)
+        # # print(top5)
+        # # input()
 
     trace_acc, acc_e2e = AccuracyEndToEnd(
         pred_assignments_by_process, true_assignments_by_process, in_spans_by_process
     )
+    if method == "MaxScoreBatchSubsetWithSkips":
+        trace_acc_2, acc_e2e_2 = TopKAccuracyEndToEnd(
+            pred_topk_assignments_by_process, true_assignments_by_process, in_spans_by_process
+        )
     true_traces_e2e, pred_traces_e2e = ConstructEndToEndTraces(
         pred_assignments_by_process, true_assignments_by_process, in_spans_by_process
     )
     traces_overall[method] = [true_traces_e2e, pred_traces_e2e]
 
-    print("End-to-end accuracy for method %s: %.3f\n\n" % (method, acc_e2e))
+    print("End-to-end accuracy for method %s: %.3f%%\n\n" % (method, acc_e2e * 100))
+    if method == "MaxScoreBatchSubsetWithSkips":
+        print("End-to-end top K accuracy for method %s: %.3f%%\n\n" % (method, acc_e2e_2 * 100))
     accuracy_overall[method] = acc_e2e
+    if method == "MaxScoreBatchSubsetWithSkips":
+        accuracy_overall[method + "TopK"] = acc_e2e_2
     accuracy_percentile_bins[method] = BinAccuracyByResponseTimes(trace_acc)
-#'''
-'''
+
 load_level = sys.argv[2]
-with open('plots/vipul/' + maindir + '/e2e_' + str(load_level) + '.pickle', 'wb') as handle:
-    pickle.dump(traces_overall, handle, protocol = pickle.HIGHEST_PROTOCOL)
-with open('plots/vipul/' + maindir + '/bin_acc_' + str(load_level) + '.pickle', 'wb') as handle:
+name = sys.argv[3]
+
+for key in accuracy_overall.keys():
+    print("End-to-end accuracy for method: ", key, accuracy_overall[key])
+
+with open('plots/bin_acc' + "_" + str(load_level) + "_" + name + '.pickle', 'wb') as handle:
     pickle.dump(accuracy_percentile_bins, handle, protocol = pickle.HIGHEST_PROTOCOL)
-with open('plots/vipul/' + maindir + '/accuracy_' + str(load_level) + '.pickle', 'wb') as handle:
+with open('plots/accuracy' + "_" + str(load_level) + "_" + name + '.pickle', 'wb') as handle:
     pickle.dump(accuracy_overall, handle, protocol = pickle.HIGHEST_PROTOCOL)
-'''
-#sampleQuery()
+with open('plots/e2e' + "_" + str(load_level) + "_" + name + '.pickle', 'wb') as handle:
+    pickle.dump(traces_overall, handle, protocol = pickle.HIGHEST_PROTOCOL)
+# with open('plots/confidence_scores' + "_" + str(load_level) + "_" + name + '.pickle', 'wb') as handle:
+#     pickle.dump(confidence_scores_by_process, handle, protocol = pickle.HIGHEST_PROTOCOL)
+with open('plots/process_acc' + "_" + str(load_level) + "_" + name + '.pickle', 'wb') as handle:
+    pickle.dump(accuracy_per_process, handle, protocol = pickle.HIGHEST_PROTOCOL)
+# with open('plots/candidates' + "_" + str(load_level) + "_" + name + '.pickle', 'wb') as handle:
+#     pickle.dump(candidates_per_process, handle, protocol = pickle.HIGHEST_PROTOCOL)
+
+# sampleQuery()
+
+# x = {}
+# for method, predictor in predictors:
+#     x[method] = BinAccuracyByServiceTimes(method)
+
+# with open('plots/bin_acc_per_service_time_' + str(load_level) + '_service12_version3.pickle', 'wb') as handle:
+#     pickle.dump(x, handle, protocol = pickle.HIGHEST_PROTOCOL)

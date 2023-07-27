@@ -274,7 +274,7 @@ class Timing7(Timing):
 
         self.per_span_candidates[(stack[0].trace_id, stack[0].sid)] += 1
 
-    def FindTopKAssignments(self, in_eps, in_span, out_eps, out_span_partitions, K):
+    def FindTopKAssignments(self, in_eps, in_span, out_eps, out_span_partitions, K, invocation_graph):
         # f = open("dump.txt", "a")
 
         global top_assignments
@@ -289,6 +289,96 @@ class Timing7(Timing):
         if self.true_skips == False:
             for ep in out_eps:
                 out_span_partitions[ep].append(None)
+
+        # Handle skip spans in this version
+
+        def DfsTraverse2(stack, invocation_graph):
+            global top_assignments
+            i = len(stack)
+            if VERBOSE:
+                print("DFSTraverse2", i, out_eps, stack)
+            if i == len(out_span_partitions) + 1:
+                stack2 = []
+                for s in stack:
+                    stack2.append(s[1])
+                # for st in stack2:
+                    # print(st)
+                # input()
+                self.AddToCandidatesList(stack2)
+                # if self.ContainsSkip(stack2):
+                #     score = self.ScoreAssignmentWithSkip(stack2, normalized)
+                # elif self.parallel:
+                #     score = self.ScoreAssignmentParallel(stack2, normalized)
+                # else:
+                #     score = self.ScoreAssignmentSequential(stack2, normalized)
+                score = self.ScoreAssignmentAsPerInvocationGraph(stack, invocation_graph, out_eps, normalized)
+                # min heap
+                heapq.heappush(top_assignments, (score, stack))
+                if len(top_assignments) > K:
+                    heapq.heappop(top_assignments)
+            # elif i in self.instrumented_hops:
+            #     ep = out_eps[i - 1]
+            #     span_id = self.true_assignments[ep][in_span.GetId()]
+            #     for s in out_span_partitions[ep]:
+            #         if s.GetId() == span_id:
+            #             DfsTraverse2(stack + [s])
+            #             break
+            else:
+                ep = out_eps[i - 1]
+                if self.true_skips == True and self.true_assignments[ep][in_span.GetId()][0] == "Skip":
+                    new_span_id = self.GenerateRandomID()
+                    skip_span = Span("None", new_span_id, "None", "None", "None", "None", "None", "None")
+                    DfsTraverse2(stack + [(ep, skip_span)], invocation_graph)
+                else:
+                    for x, s in enumerate(out_span_partitions[ep]):
+                        if self.true_skips == False and s == None:
+                            skip_span = self.FetchSkipFromWindow(ep, in_span.start_mus)
+                            if skip_span != None:
+                                DfsTraverse2(stack + [(ep, skip_span)], invocation_graph)
+                        else:
+                            before_eps = invocation_graph.in_edges(ep)
+                            candidate = True
+
+                            if (
+                                in_span.start_mus > s.start_mus or
+                                s.start_mus + s.duration_mus > in_span.start_mus + in_span.duration_mus
+                            ):
+                                candidate = False
+                                continue
+
+                            b_span = "None"
+                            for (before_ep, self_ep) in before_eps:
+                                # print(before_ep, self_ep)
+                                # input()
+                                # ep_index = out_eps.index(before_ep)
+                                # b_ep = 250[ep_index + 1][0]
+                                # b_span = stack[ep_index + 1][1]
+                                # assert b_ep == before_ep
+
+                                idx = next((i for i, (v, *_) in enumerate(stack) if v == before_ep), None)
+                                # if idx == None:
+                                #     print(topological_sort_grouped(invocation_graph))
+                                #     print(before_ep, self_ep)
+                                assert idx != None
+                                b_ep = stack[idx][0]
+                                b_span = stack[idx][1]
+                                assert b_ep == before_ep
+
+                                if b_span.trace_id == "None":
+                                    continue
+
+                                if (
+                                    b_span.start_mus + b_span.duration_mus > s.start_mus
+                                ):
+                                    candidate = False
+                                    continue
+
+                            if candidate:
+                                # if self.process == "search":
+                                if b_span == "None":
+                                    b_span = stack[0][1]
+                                # f.write(str(b_span) + ", " + str(s) + "\n")
+                                DfsTraverse2(stack + [(ep, s)], invocation_graph)
 
         def DfsTraverse(stack, depth, l_non_skip_depth, l_start, l_duration):
             # print(depth, l_non_skip_depth)
@@ -430,15 +520,31 @@ class Timing7(Timing):
                                         # f.write(str(last_span) + ", " + str(s) + "\n")
                                         DfsTraverse(stack + [s], depth + 1, l_non_skip_depth + 1, None, None)
 
-        DfsTraverse([in_span], 1, 1, None, None)
-        top_assignments.sort(reverse=True)
+        # DfsTraverse([in_span], 1, 1, None, None)
+        # top_assignments.sort(reverse=True)
+        # if self.true_skips == False:
+        #     for ep in out_eps:
+        #         out_span_partitions[ep].pop()
+
+        # # f.close()
+
+        # return top_assignments
+
+        in_ep = in_eps[0]
+
+        DfsTraverse2([(in_ep, in_span)], invocation_graph)
+        top_assignments2 = []
+        for assignment in top_assignments:
+            s_assignment = (assignment[0], [s[1] for s in assignment[1]])
+            top_assignments2.append(s_assignment)
+        top_assignments2.sort(reverse=True)
         if self.true_skips == False:
             for ep in out_eps:
                 out_span_partitions[ep].pop()
 
         # f.close()
 
-        return top_assignments
+        return top_assignments2
 
     def GetSpanIDNotation(self, out_eps, assignment, type1):
         span_id_notation = []
@@ -616,6 +722,74 @@ class Timing7(Timing):
             t1 = [s.start_mus + s.duration_mus for s in t1[s1: e1]]
             t2 = [s.start_mus + s.duration_mus for s in t2[s2: e2]]
             ComputeDistParams(ep1, ep2, t1, t2)
+
+    def ComputeEpPairDistParams3(
+        self,
+        in_span_partitions,
+        out_span_partitions,
+        out_eps,
+        in_span_start,
+        in_span_end,
+        invocation_graph
+    ):
+
+        def ComputeDistParams(ep1, ep2, t1, t2):
+            t1 = t1[in_span_start:in_span_end]
+            t2 = t2[in_span_start:in_span_end]
+            assert len(t1) == len(t2)
+            mean = (sum(t2) - sum(t1)) / len(t1)
+            if len(t1) == 0:
+                print("len(t1)")
+                input()
+            batch_means = []
+            nbatches = 10
+            batch_size = math.ceil(float(len(t1)) / nbatches)
+            if nbatches == 0:
+                print("nbatches")
+                input()
+            for i in range(nbatches):
+                start = i * batch_size
+                end = min(len(t1), (i + 1) * batch_size)
+                if end - start > 0:
+                    batch_means.append(
+                        (sum(t2[start:end]) - sum(t1[start:end])) / (end - start)
+                    )
+            std = math.sqrt(batch_size) * scipy.stats.tstd(batch_means)
+            if VERBOSE:
+                print(
+                    "Computing ep pair (%s, %s), distribution params: %f, %f"
+                    % (ep1, ep2, mean, std)
+                )
+            self.services_times[(ep1, ep2)] = mean, std
+
+        in_ep = list(in_span_partitions.keys())[0]
+
+        for out_ep in out_span_partitions.keys():
+
+            if len(invocation_graph.in_edges(out_ep)) == 0:
+                t1 = sorted([s.start_mus for s in in_span_partitions[in_ep]])
+                t2 = sorted([s.start_mus for s in out_span_partitions[out_ep]])
+                ComputeDistParams(in_ep, out_ep, t1, t2)
+
+            before_eps = invocation_graph.in_edges(out_ep)
+
+            for (before_ep, self_ep) in before_eps:
+
+                if not self.AlsoNonPrimaryAncestor(before_ep, self_ep, invocation_graph):
+
+                    if before_ep == in_ep:
+                        t1 = sorted([s.start_mus for s in in_span_partitions[before_ep]])
+                        t2 = sorted([s.start_mus for s in out_span_partitions[self_ep]])
+                        ComputeDistParams(before_ep, self_ep, t1, t2)
+
+                    else:
+                        t1 = sorted([s.start_mus + s.duration_mus for s in out_span_partitions[before_ep]])
+                        t2 = sorted([s.start_mus for s in out_span_partitions[self_ep]])
+                        ComputeDistParams(before_ep, self_ep, t1, t2)
+
+            t1 = sorted([s.start_mus + s.duration_mus for s in out_span_partitions[out_ep]])
+            t2 = sorted([s.start_mus + s.duration_mus for s in in_span_partitions[in_ep]])
+            ComputeDistParams(out_ep, in_ep, t1, t2)
 
     def FetchSkipFromWindow(
         self,
@@ -854,7 +1028,7 @@ class Timing7(Timing):
 
         return windows
 
-    def FindAssignments(self, process, in_span_partitions, out_span_partitions, parallel, instrumented_hops, true_assignments, true_skips = False, true_dist = False):
+    def FindAssignments(self, process, in_span_partitions, out_span_partitions, parallel, instrumented_hops, true_assignments, invocation_graph, true_skips = False, true_dist = False):
         assert len(in_span_partitions) == 1
         self.process = process
         self.parallel = parallel
@@ -916,11 +1090,11 @@ class Timing7(Timing):
         for in_span in in_spans:
             if cnt % batch_size == 0:
                 # self.ComputeEpPairDistParams(in_span_partitions, out_span_partitions, out_eps, cnt, min(len(in_spans), cnt + batch_size))
-                # self.ComputeEpPairDistParams3(in_span_partitions, out_span_partitions, out_eps, cnt, min(len(in_spans), cnt + batch_size))
+                # self.ComputeEpPairDistParams3(in_span_partitions, out_span_partitions, out_eps, cnt, min(len(in_spans), cnt + batch_size), invocation_graph)
                 print("Finished %d spans, unassigned spans: %d" % (cnt, cnt_unassigned))
 
-            top_k = self.FindTopKAssignments(in_eps, in_span, out_eps, out_span_partitions_copy, topK)
-            top_k_2 = self.FindTopKAssignments(in_eps, in_span, out_eps, out_span_partitions, topK)
+            top_k = self.FindTopKAssignments(in_eps, in_span, out_eps, out_span_partitions_copy, topK, invocation_graph)
+            top_k_2 = self.FindTopKAssignments(in_eps, in_span, out_eps, out_span_partitions, topK, invocation_graph)
             self.AddTopKAssignments(in_span, top_k_2, all_topk_assignments, out_span_partitions_copy, out_eps, skips=True)
             span_to_top_assignments[in_span] = top_k
             top_assignments.append(top_k)
@@ -1057,8 +1231,7 @@ class Timing7(Timing):
         def get_mwis(G):
             '''
             Based on "A column generation approach for graph coloring" from
-            Mehrotra and Trick, 1995, using recursion formula:
-            '''
+            Mehrotra and Trick, 1995'''
             global best_score
             # score stores the best score along the path explored so far
             key = tuple(sorted(G.nodes()))
