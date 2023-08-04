@@ -333,6 +333,8 @@ def GetAllTracesInDir(directory):
 def ParseSpansJson(spans_json):
 
     spans = {}
+    # random_num = random.randint(0, 999)
+    # random_num2 = random.randint(0, 999)
     for span in spans_json:
         references = []
         for ref in span["references"]:
@@ -350,6 +352,47 @@ def ParseSpansJson(spans_json):
             if tag["key"] == "span.kind":
                 span_kind = tag["value"]
 
+        # if random_num < int(sys.argv[9]):
+        #     replica_id[trace_id] = "recommendation1"
+        #     if random_num2 >= 666:
+        #         score = random.uniform(0, 4)
+        #         satisfied_float[trace_id] = score
+        #     elif random_num2 >= 333 and random_num2 < 666:
+        #         score = random.uniform(4, 8)
+        #         satisfied_float[trace_id] = score
+        #     elif random_num2 < 333:
+        #         score = random.uniform(8, 10)
+        #         satisfied_float[trace_id] = score
+        # else:
+        #     replica_id[trace_id] = "recommendation2"
+        #     if random_num2 >= 550:
+        #         score = random.uniform(0, 4)
+        #         satisfied_float[trace_id] = score
+        #     elif random_num2 >= 333 and random_num2 < 570:
+        #         score = random.uniform(4, 8)
+        #         satisfied_float[trace_id] = score
+        #     elif random_num2 < 333:
+        #         score = random.uniform(8, 10)
+        #         satisfied_float[trace_id] = score
+
+        # for tag in span["tags"]:
+        #     if tag["key"] == "span.kind":
+        #         span_kind = tag["value"]
+        #     if tag["key"] == "replicaType":
+        #         replica_id[trace_id] = tag["value"]
+        #         if tag["value"] == "recommendation1":
+        #             if random_num2 < 800:
+        #                 satisfied_bool[trace_id] = True
+        #             else:
+        #                 satisfied_bool[trace_id] = False
+        #         elif tag["value"] == "recommendation2":
+        #             if random_num2 < 700:
+        #                 satisfied_bool[trace_id] = True
+        #             else:
+        #                 satisfied_bool[trace_id] = False
+        #     # if tag["key"] == "satisfied":
+        #     #     satisfied_bool[trace_id] = tag["value"]
+
         spans[span_id] = Span(
             trace_id,
             sid,
@@ -361,7 +404,10 @@ def ParseSpansJson(spans_json):
             span_kind,
             span["tags"]
         )
-
+    # if random_num2 < 990:
+    #     replica_id[trace_id] = "A"
+    # else:
+    #     replica_id[trace_id] = "B"
     return spans
 
 
@@ -923,6 +969,91 @@ def ConstructEndToEndTraces(
 
     return true_traces, pred_traces
 
+def AddCachingEffect(true_assignments, in_span_partitions, out_span_partitions, cache_rate, exponential = False):
+
+    np.random.seed(10)
+
+    def FindSpan(partition, span_id):
+        index = -1
+        for i, span in enumerate(partition):
+            if span.GetId() == span_id:
+                index = i
+                break
+
+        if index != -1:
+            return partition[index]
+
+    def AdjustSpans(in_span_partitions, out_span_partitions, in_span_id, cache_duration_mus, eps, chosen_ep_number):
+        trace_id = in_span_id[0]
+        for ep in in_span_partitions.keys():
+            for span in in_span_partitions[ep]:
+                if span.GetId()[0] == trace_id:
+                    span.duration_mus -= cache_duration_mus
+        for i, ep in enumerate(eps):
+            if i > chosen_ep_number:
+                for span in out_span_partitions[ep]:
+                    if span.GetId()[0] == trace_id:
+                        span.start_mus -= cache_duration_mus
+
+    def DeleteSpan(partition, span_id):
+        index = -1
+        for i, span in enumerate(partition):
+            if span.GetId() == span_id:
+                index = i
+                break
+
+        if index != -1:
+            del partition[index]
+
+    eps = GetOutEpsInOrder(out_span_partitions)
+    chosen_ep_number = 1
+    chosen_ep = eps[chosen_ep_number]
+
+    exponential = True
+    if exponential:
+        lambda_parameter = 0.001
+        in_ep = list(in_span_partitions.keys())[0]
+        num_spans = len(in_span_partitions[in_ep])
+        samples = np.random.exponential(scale=1/lambda_parameter, size=int(cache_rate * num_spans))
+        indices = [int(sample) % num_spans for sample in samples]
+        # unique_indices = np.random.choice(num_spans, size=int(cache_rate * num_spans), replace=False, p=np.exp(-lambda_parameter))
+        p = np.asarray(np.exp(-lambda_parameter * np.arange(num_spans))).astype('float64')
+        p = p / np.sum(p)
+        unique_indices = np.random.choice(np.arange(num_spans), size=int(cache_rate * num_spans), replace=False, p=p)
+        # print(samples)
+        # print(indices)
+        # print(sorted(unique_indices))
+        # print(len((unique_indices)))
+        # input()
+
+    for i, in_span in enumerate(in_spans):
+        random_num = random.randint(0, 999)
+        # if random_num < (cache_rate * 1000):
+        if i in unique_indices:
+            for ep in out_span_partitions.keys():
+                if ep == chosen_ep:
+                    # print("\n Before:\n")
+                    # print(in_span)
+                    # for ep1 in out_span_partitions.keys():
+                    #     print(all_spans[true_assignments[ep1][in_span.GetId()]])
+                    span_ID = true_assignments[ep][in_span.GetId()]
+                    span = FindSpan(out_span_partitions[ep], span_ID)
+                    true_assignments[ep][in_span.GetId()] = ('Skip', 'Skip')
+                    AdjustSpans(in_span_partitions, out_span_partitions, in_span.GetId(), span.duration_mus, eps, chosen_ep_number)
+                    DeleteSpan(out_span_partitions[ep], span.GetId())
+                    # print("\n After:\n")
+                    # print(in_span)
+                    # for ep1 in out_span_partitions.keys():
+                    #     if true_assignments[ep1][in_span.GetId()] in all_spans:
+                    #         x = all_spans[true_assignments[ep1][in_span.GetId()]]
+                    #     else:
+                    #         x = "Skip"
+                    #     print(x)
+                    # input()
+                    break
+
+    return true_assignments
+
 predictors = [
     ("MaxScoreBatchSubsetWithSkips", Timing3(all_spans, all_processes)),
     # ("MaxScoreBatch", Timing2(all_spans, all_processes)),
@@ -939,6 +1070,7 @@ accuracy_overall = {}
 topk_accuracy_overall = {}
 accuracy_percentile_bins = {}
 traces_overall = {}
+cache_updated = False
 
 for method, predictor in predictors:
 
@@ -1012,6 +1144,10 @@ for method, predictor in predictors:
         # factor = int(sys.argv[8])
         # in_span_partitions, out_span_partitions = repeatChangeSpans(in_span_partitions, out_span_partitions, repeats=repeats, factor=factor)
         # true_assignments = GetGroundTruth(in_span_partitions, out_span_partitions)
+
+        if process == "frontend" and (method != "MaxScoreBatch" or method != "MaxScoreBatchParallel" or method !=  "FCFS" or method !=  "ArrivalOrder"):
+            print("cache %: ", float(sys.argv[5]) * 100)
+            true_assignments = AddCachingEffect(true_assignments, in_span_partitions, out_span_partitions, cache_rate=float(sys.argv[5]))
 
         # print(bool(DeepDiff(copy_x, in_span_partitions)))
         # print(bool(DeepDiff(copy_y, out_span_partitions)))
@@ -1130,21 +1266,22 @@ for method, predictor in predictors:
 
 load_level = sys.argv[2]
 name = sys.argv[3]
+cache = sys.argv[5]
 
 for key in accuracy_overall.keys():
     print("End-to-end accuracy for method: ", key, accuracy_overall[key])
 
-with open('plots/bin_acc' + "_" + str(load_level) + "_" + name + '.pickle', 'wb') as handle:
+with open('plots/bin_acc' + "_" + str(load_level) + "_" + name + "_" + cache + '.pickle', 'wb') as handle:
     pickle.dump(accuracy_percentile_bins, handle, protocol = pickle.HIGHEST_PROTOCOL)
-with open('plots/accuracy' + "_" + str(load_level) + "_" + name + '.pickle', 'wb') as handle:
+with open('plots/accuracy' + "_" + str(load_level) + "_" + name + "_" + cache + '.pickle', 'wb') as handle:
     pickle.dump(accuracy_overall, handle, protocol = pickle.HIGHEST_PROTOCOL)
-with open('plots/e2e' + "_" + str(load_level) + "_" + name + '.pickle', 'wb') as handle:
+with open('plots/e2e' + "_" + str(load_level) + "_" + name + "_" + cache + '.pickle', 'wb') as handle:
     pickle.dump(traces_overall, handle, protocol = pickle.HIGHEST_PROTOCOL)
-# with open('plots/confidence_scores' + "_" + str(load_level) + "_" + name + '.pickle', 'wb') as handle:
+# with open('plots/confidence_scores' + "_" + str(load_level) + "_" + name + "_" + cache + '.pickle', 'wb') as handle:
 #     pickle.dump(confidence_scores_by_process, handle, protocol = pickle.HIGHEST_PROTOCOL)
-with open('plots/process_acc' + "_" + str(load_level) + "_" + name + '.pickle', 'wb') as handle:
+with open('plots/process_acc' + "_" + str(load_level) + "_" + name + "_" + cache + '.pickle', 'wb') as handle:
     pickle.dump(accuracy_per_process, handle, protocol = pickle.HIGHEST_PROTOCOL)
-# with open('plots/candidates' + "_" + str(load_level) + "_" + name + '.pickle', 'wb') as handle:
+# with open('plots/candidates' + "_" + str(load_level) + "_" + name + "_" + cache + '.pickle', 'wb') as handle:
 #     pickle.dump(candidates_per_process, handle, protocol = pickle.HIGHEST_PROTOCOL)
 
 # sampleQuery()
