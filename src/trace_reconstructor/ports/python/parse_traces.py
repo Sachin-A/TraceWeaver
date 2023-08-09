@@ -7,17 +7,19 @@ import random
 import pickle
 import string
 import numpy as np
-from fcfs import FCFS
-from vpath import VPATH
-from fcfs2 import FCFS2
-from timing import Timing
-from timing2 import Timing2
-from timing3 import Timing3
-from wap5_og import WAP5_OG
-from deepdiff import DeepDiff
 import networkx as nx
-import matplotlib.pyplot as plt
 from scipy import stats
+from deepdiff import DeepDiff
+import matplotlib.pyplot as plt
+
+from algorithms.fcfs import FCFS
+from algorithms.fcfs2 import FCFS2
+from algorithms.vpath import VPATH
+from algorithms.wap5_og import WAP5_OG
+from algorithms.deepflow import DeepFlow
+from algorithms.timing import Timing
+from algorithms.timing2 import Timing2
+from algorithms.timing3 import Timing3
 
 # np.seterr(all='raise')
 
@@ -1063,6 +1065,7 @@ predictors = [
     ("FCFS", FCFS(all_spans, all_processes)),
     # ("ArrivalOrder", FCFS2(all_spans, all_processes)),
     # ("VPath", VPATH(all_spans, all_processes)),
+    # ("DeepFlow", DeepFlow(all_spans, all_processes)),
 ]
 
 accuracy_per_process = {}
