@@ -131,6 +131,60 @@ class Timing(object):
             return math.log(cp)
         """
 
+    def AllSkip(self, assignment):
+        for i in assignment[1:]:
+            if i.trace_id != "None":
+                return False
+        return True
+
+    def AllSkip2(self, assignment):
+        for i in assignment[1:]:
+            if i[1].trace_id != "None":
+                return False
+        return True
+
+    def ScoreAssignmentWithSkip(self, assignment, normalized = False):
+        cost = 0
+        num_mappings = 0
+
+        if self.AllSkip(assignment):
+            # print(assignment)
+            # print(0)
+            # input()
+            return 0
+
+        for i in range(len(assignment) + 1):
+
+            if i == len(assignment):
+                curr_ep = assignment[0].GetParentProcess()
+                curr_time = assignment[0].start_mus + assignment[0].duration_mus
+                cost += self.GetEpPairCost(prev_ep, curr_ep, prev_time, curr_time, normalized)
+
+            else:
+                if assignment[i].trace_id != "None":
+                    num_mappings += 1
+                    if i != 0:
+                        curr_ep = assignment[i].GetChildProcess()
+                        curr_time = assignment[i].start_mus
+                        cost += self.GetEpPairCost(prev_ep, curr_ep, prev_time, curr_time, normalized)
+
+                    prev_ep = (
+                        assignment[i].GetParentProcess()
+                        if i == 0
+                        else assignment[i].GetChildProcess()
+                    )
+                    prev_time = (
+                        assignment[i].start_mus
+                        if i == 0
+                        else assignment[i].start_mus + assignment[i].duration_mus
+                    )
+
+        # print(assignment)
+        # print(cost)
+        # input()
+        # return cost / len(assignment)
+        return cost / (num_mappings)
+
     def ScoreAssignmentSequential(self, assignment, normalized = False):
         cost = 0
         for i in range(len(assignment)):
@@ -191,6 +245,136 @@ class Timing(object):
 
         if normalized:
             return cost / len(assignment)
+        return cost
+
+    def AlsoNonPrimaryAncestor(self, before_ep, current_ep, invocation_graph):
+        all_paths = list(nx.all_simple_paths(invocation_graph, source=before_ep, target=current_ep, cutoff=2))
+        if not all_paths:
+            assert False
+        else:
+            for i, path in enumerate(all_paths):
+                path_length = len(path) - 1
+                if path_length > 1:
+                    return True
+        return False
+
+    def ScoreAssignmentAsPerInvocationGraph(self, assignment, invocation_graph, out_eps, normalized = False):
+
+        # print("New")
+
+        if self.AllSkip2(assignment):
+            return 0
+
+        def FindValidAncestor(ep):
+
+            before_eps = invocation_graph.in_edges(ep)
+            if len(before_eps) == 0:
+                return None
+
+            valid_spans = []
+            invalid_spans = []
+            for (before_ep, self_ep) in before_eps:
+
+                ep_index = out_eps.index(before_ep)
+                b_ep = assignment[ep_index + 1][0]
+                b_span = assignment[ep_index + 1][1]
+                assert b_ep == before_ep
+
+                if b_span.trace_id != "None":
+                    valid_spans.append((b_ep, b_span))
+                else:
+                    invalid_spans.append((b_ep, b_span))
+
+            if len(valid_spans) > 0:
+                return valid_spans
+                # return max(valid_spans, key = lambda x: x[1].start_mus + x[1].duration_mus)
+            else:
+                next_layer_spans = []
+                for (ep, span) in invalid_spans:
+                    x = FindValidAncestor(ep)
+                    if x != None:
+                        next_layer_spans.append(x)
+                return next_layer_spans
+
+        def AlsoNonPrimaryAncestor(before_ep, current_ep):
+            all_paths = list(nx.all_simple_paths(invocation_graph, source=before_ep, target=current_ep, cutoff=2))
+            if not all_paths:
+                assert False
+            else:
+                for i, path in enumerate(all_paths):
+                    path_length = len(path) - 1
+                    if path_length > 1:
+                        return True
+            return False
+
+        cost = 0
+        num_mappings = 0
+        first_ep, first_span = assignment[0]
+
+        assignment_without_skips = []
+        for a in assignment:
+            if a[1].trace_id != "None":
+                assignment_without_skips.append(a)
+
+        last_ep, last_span = max(assignment_without_skips[1:], key = lambda x: x[1].start_mus + x[1].duration_mus)
+
+        for (current_ep, current_span) in assignment[1:]:
+            before_eps = invocation_graph.in_edges(current_ep)
+
+            if current_span.trace_id == "None":
+                continue
+
+            for (before_ep, self_ep) in before_eps:
+
+                ep_index = out_eps.index(before_ep)
+                b_ep = assignment[ep_index + 1][0]
+                b_span = assignment[ep_index + 1][1]
+                assert b_ep == before_ep
+
+                if not AlsoNonPrimaryAncestor(before_ep, current_ep):
+
+                    if b_span.trace_id == "None":
+                        valid_spans = FindValidAncestor(b_ep)
+                        if valid_spans == None:
+                            cost += self.GetEpPairCost(first_ep, current_ep, first_span.start_mus, current_span.start_mus, normalized)
+                            num_mappings += 1
+                            # print(first_ep, current_ep)
+                            # print(num_mappings)
+                            # input()
+                        else:
+                            latest = max(valid_spans, key = lambda x: x[1].start_mus + x[1].duration_mus)
+                            cost += self.GetEpPairCost(latest[0], current_ep, latest[1].start_mus, current_span.start_mus, normalized)
+                            num_mappings += 1
+                            # print(latest[0], current_ep)
+                            # print(num_mappings)
+                            # input()
+
+                        continue
+
+                    # print(before_ep, current_ep)
+                    cost += self.GetEpPairCost(before_ep, current_ep, b_span.start_mus + b_span.duration_mus, current_span.start_mus, normalized)
+                    num_mappings += 1
+                    # print(num_mappings)
+
+            if len(invocation_graph.in_edges(current_ep)) == 0:
+                # print(first_ep, current_ep)
+                cost += self.GetEpPairCost(first_ep, current_ep, first_span.start_mus, current_span.start_mus, normalized)
+                num_mappings += 1
+                # print(num_mappings)
+
+            if current_ep == last_ep:
+                # print(current_ep, first_ep)
+                cost += self.GetEpPairCost(current_ep, first_ep, current_span.start_mus + current_span.duration_mus, first_span.start_mus + first_span.duration_mus, normalized)
+                num_mappings += 1
+                # print(num_mappings)
+
+        # if len(assignment_without_skips) < len(assignment):
+        #     print(num_mappings)
+        #     input()
+
+        # print(num_mappings, normalized)
+        if normalized:
+            return cost / num_mappings
         return cost
 
     def FindMinCostAssignment(self, in_span, out_eps, out_span_partitions):
@@ -273,14 +457,21 @@ class Timing(object):
         all_assignments,
         out_span_partitions,
         out_eps,
-        delete_out_spans=False
+        delete_out_spans=False,
+        skips=False
     ):
         # add assignment to all_assignments
         for ep in out_eps:
             if ep not in all_assignments:
                 all_assignments[ep] = {}
             out_span = assignment.get(ep, None)
-            out_span_id = out_span.GetId() if out_span is not None else ("NA", "NA")
+            if skips:
+                if out_span is None:
+                    out_span_id = ("NA", "NA")
+                else:
+                    out_span_id = out_span.GetId() if out_span.trace_id != "None" else ('Skip', 'Skip')
+            else:
+                out_span_id = out_span.GetId() if out_span is not None else ("NA", "NA")
             all_assignments[ep][in_span.GetId()] = out_span_id
 
         if delete_out_spans:
@@ -297,7 +488,8 @@ class Timing(object):
         topk_assignments,
         all_topk_assignments,
         out_span_partitions,
-        out_eps
+        out_eps,
+        skips=False
     ):
         for i, ep in enumerate(out_eps):
             if ep not in all_topk_assignments:
@@ -306,7 +498,13 @@ class Timing(object):
             for assignment in topk_assignments:
                 assignment = assignment[1]
                 out_span = assignment[i + 1]
-                out_span_id = out_span.GetId() if out_span is not None else ("NA", "NA")
+                if skips:
+                    if out_span is None:
+                        out_span_id = ("NA", "NA")
+                    else:
+                        out_span_id = out_span.GetId() if out_span.trace_id != "None" else ('Skip', 'Skip')
+                else:
+                    out_span_id = out_span.GetId() if out_span is not None else ("NA", "NA")
                 all_topk_assignments[ep][in_span.GetId()].append(out_span_id)
 
     def FindAssignments(self, process, in_span_partitions, out_span_partitions, parallel, instrumented_hops, true_assignments):

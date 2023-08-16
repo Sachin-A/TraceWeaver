@@ -1,7 +1,7 @@
 import time
 import math
 import scipy.stats
-from timing import Timing
+from algorithms.timing import Timing
 import copy
 import sys
 import random, string
@@ -85,7 +85,7 @@ class Span(object):
     def __str__(self):
         return self.__repr__()
 
-class Timing7(Timing):
+class Timing3(Timing):
     def __init__(self, all_spans, all_processes):
         super().__init__(all_spans, all_processes)
         self.all_spans = all_spans

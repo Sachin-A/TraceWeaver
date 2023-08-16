@@ -1,6 +1,6 @@
 import math
 import scipy.stats
-from timing import Timing
+from algorithms.timing import Timing
 import copy
 import sys
 import networkx as nx
