@@ -156,7 +156,7 @@ class Timing(object):
         for i in range(len(assignment) + 1):
 
             if i == len(assignment):
-                curr_ep = assignment[0].GetParentProcess()
+                curr_ep = assignment[0].GetParentProcess(self.all_processes, self.all_spans)
                 curr_time = assignment[0].start_mus + assignment[0].duration_mus
                 cost += self.GetEpPairCost(prev_ep, curr_ep, prev_time, curr_time, normalized)
 
@@ -164,14 +164,14 @@ class Timing(object):
                 if assignment[i].trace_id != "None":
                     num_mappings += 1
                     if i != 0:
-                        curr_ep = assignment[i].GetChildProcess()
+                        curr_ep = assignment[i].GetChildProcess(self.all_processes, self.all_spans)
                         curr_time = assignment[i].start_mus
                         cost += self.GetEpPairCost(prev_ep, curr_ep, prev_time, curr_time, normalized)
 
                     prev_ep = (
-                        assignment[i].GetParentProcess()
+                        assignment[i].GetParentProcess(self.all_processes, self.all_spans)
                         if i == 0
-                        else assignment[i].GetChildProcess()
+                        else assignment[i].GetChildProcess(self.all_processes, self.all_spans)
                     )
                     prev_time = (
                         assignment[i].start_mus
@@ -189,9 +189,9 @@ class Timing(object):
         cost = 0
         for i in range(len(assignment)):
             curr_ep = (
-                assignment[i].GetParentProcess()
+                assignment[i].GetParentProcess(self.all_processes, self.all_spans)
                 if i == 0
-                else assignment[i].GetChildProcess()
+                else assignment[i].GetChildProcess(self.all_processes, self.all_spans)
             )
             curr_time = (
                 assignment[i].start_mus
@@ -201,9 +201,9 @@ class Timing(object):
 
             next_i = (i + 1) % len(assignment)
             next_ep = (
-                assignment[next_i].GetParentProcess()
+                assignment[next_i].GetParentProcess(self.all_processes, self.all_spans)
                 if next_i == 0
-                else assignment[next_i].GetChildProcess()
+                else assignment[next_i].GetChildProcess(self.all_processes, self.all_spans)
             )
             next_time = (
                 assignment[next_i].start_mus + assignment[next_i].duration_mus
@@ -221,10 +221,10 @@ class Timing(object):
     def ScoreAssignmentParallel(self, assignment, normalized = False):
         cost = 0
         for i in range(1, len(assignment)):
-            curr_ep = assignment[0].GetParentProcess()
+            curr_ep = assignment[0].GetParentProcess(self.all_processes, self.all_spans)
             curr_time = float(assignment[0].start_mus)
 
-            next_ep = assignment[i].GetChildProcess()
+            next_ep = assignment[i].GetChildProcess(self.all_processes, self.all_spans)
             next_time = float(assignment[i].start_mus)
             if VERBOSE:
                 print("Computing cost between", curr_ep, next_ep)

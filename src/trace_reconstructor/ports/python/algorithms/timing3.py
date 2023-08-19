@@ -1,89 +1,18 @@
+import sys
 import time
 import math
-import scipy.stats
-from algorithms.timing import Timing
 import copy
-import sys
-import random, string
-import networkx as nx
 import heapq
 import numpy as np
+import scipy.stats
+import random, string
+import networkx as nx
+from spans import Span
+from algorithms.timing import Timing
 from networkx.algorithms import approximation
 
 VERBOSE = False
 EPS = 1e-6
-
-class Span(object):
-    def __init__(
-        self,
-        trace_id,
-        sid,
-        start_mus,
-        duration_mus,
-        op_name,
-        references,
-        process_id,
-        span_kind,
-    ):
-        self.sid = sid
-        self.trace_id = trace_id
-        self.start_mus = start_mus
-        self.duration_mus = duration_mus
-        self.op_name = op_name
-        self.references = references
-        self.process_id = process_id
-        self.span_kind = span_kind
-        self.children_spans = []
-        self.taken = False
-
-    def AddChild(self, child_span_id):
-        self.children_spans.append(child_span_id)
-
-    def GetChildProcess(self):
-        assert self.span_kind == "client"
-        assert len(self.children_spans) == 1
-        return all_processes[self.trace_id][
-            all_spans[self.children_spans[0]].process_id
-        ]
-
-    def GetParentProcess(self):
-        if self.IsRoot():
-            return "client_" + self.op_name
-        assert len(self.references) == 1
-        parent_span_id = self.references[0]
-        return all_processes[self.trace_id][all_spans[parent_span_id].process_id]
-
-    def GetId(self):
-        return (self.trace_id, self.sid)
-
-    def IsRoot(self):
-        return len(self.references) == 0
-
-    def __lt__(self, other):
-        return self.start_mus < other.start_mus
-
-    def __repr__(self):
-        if self.start_mus == "None":
-            return "Span:(%s, %s, %s, %s, %s, %s)" % (
-                self.trace_id,
-                self.sid,
-                self.op_name,
-                self.start_mus,
-                self.duration_mus,
-                self.span_kind,
-            )
-        else:
-            return "Span:(%s, %s, %s, %d, %d, %s)" % (
-                self.trace_id,
-                self.sid,
-                self.op_name,
-                self.start_mus,
-                self.duration_mus,
-                self.span_kind,
-            )
-
-    def __str__(self):
-        return self.__repr__()
 
 class Timing3(Timing):
     def __init__(self, all_spans, all_processes):
@@ -202,11 +131,11 @@ class Timing3(Timing):
         spans = []
         for in_ep in in_eps:
             for span in in_span_partitions[in_ep]:
-                span.ep = span.GetParentProcess()
+                span.ep = span.GetParentProcess(self.all_processes, self.all_spans)
             spans.extend(in_span_partitions[in_ep])
         for out_ep in out_eps:
             for span in out_span_partitions[out_ep]:
-                span.ep = span.GetChildProcess()
+                span.ep = span.GetChildProcess(self.all_processes, self.all_spans)
             spans.extend(out_span_partitions[out_ep])
         spans.sort(key=lambda x: x.start_mus)
         self.large_delay = max([span.duration_mus for in_ep in in_eps for span in in_span_partitions[in_ep]])
@@ -327,7 +256,7 @@ class Timing3(Timing):
                 ep = out_eps[i - 1]
                 if self.true_skips == True and self.true_assignments[ep][in_span.GetId()][0] == "Skip":
                     new_span_id = self.GenerateRandomID()
-                    skip_span = Span("None", new_span_id, "None", "None", "None", "None", "None", "None")
+                    skip_span = Span("None", new_span_id, "None", "None", "None", "None", "None", "None", "None")
                     DfsTraverse2(stack + [(ep, skip_span)], invocation_graph)
                 else:
                     for x, s in enumerate(out_span_partitions[ep]):
@@ -423,6 +352,7 @@ class Timing3(Timing):
                     skip_span = Span(
                         "None",
                         new_span_id,
+                        "None",
                         "None",
                         "None",
                         "None",
@@ -963,6 +893,7 @@ class Timing3(Timing):
                     skip_span = Span(
                             "None",
                             new_span_id,
+                            "None",
                             "None",
                             "None",
                             "None",

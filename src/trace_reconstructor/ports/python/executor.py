@@ -6,6 +6,7 @@ import copy
 import random
 import pickle
 import string
+import argparse
 import numpy as np
 import networkx as nx
 from scipy import stats
@@ -21,10 +22,47 @@ from algorithms.timing import Timing
 from algorithms.timing2 import Timing2
 from algorithms.timing3 import Timing3
 
-# np.seterr(all='raise')
+from spans import Span
+from helpers.utils import get_project_root
+from helpers.transforms import repeat_change_spans
+from helpers.transforms import create_cache_hits
+
+parser = argparse.ArgumentParser(description='Map incoming and outgoing spans at each service.')
+parser.add_argument('--directory', type=ascii, required=True,
+                    help='relative location for directory with Jaeger-style spans')
+parser.add_argument('--load_level', type=int, required=False, default=0,
+                    help='provide load level if static test')
+parser.add_argument('--test_name', type=ascii, required=False, default="test",
+                    help='custom name for tracing test')
+parser.add_argument('--parallel', type=int, required=False, default=0, choices=[0, 1],
+                    help='treat sibling relationships as parallel?')
+parser.add_argument('--instrumented', type=int, required=False, default=0, choices=[0, 1],
+                    help='treat some hops as instrumented?')
+parser.add_argument('--cache_rate', type=float, required=True, default=0,
+                    help='rate of artificial caching to apply if needed')
+parser.add_argument('--fix', type=int, required=True, default=0, choices=[0, 1],
+                    help='do spans require format fixing?')
+parser.add_argument('--repeat_factor', type=int, required=False, default=1,
+                    help='factor by which spans are duplicated to increase dataset size')
+parser.add_argument('--compress_factor', type=int, required=False, default=1,
+                    help='factor by which to reduce spacing between adjacent spans')
+args = parser.parse_args()
+
+PROJECT_ROOT = get_project_root()
+TRACES_DIR = os.path.join(PROJECT_ROOT, args.directory.strip('\''))
+PLOTS_DIR = os.path.join(PROJECT_ROOT, "plots/")
+LOAD_LEVEL = args.load_level
+TEST_NAME = args.test_name.strip('\'')
+PARALLEL = bool(args.parallel)
+INSTRUMENTED = bool(args.instrumented)
+CACHE_RATE = args.cache_rate
+FIX = bool(args.fix)
+REPEAT_FACTOR = args.repeat_factor
+COMPRESS_FACTOR = args.compress_factor
 
 VERBOSE = False
 random.seed(10)
+# np.seterr(all='raise')
 
 process_map_1 = {
     "service5": "service3",
@@ -41,132 +79,6 @@ new_replica_id = {}
 
 all_spans = dict()
 all_processes = dict()
-
-class Span(object):
-    def __init__(
-        self,
-        trace_id,
-        sid,
-        start_mus,
-        duration_mus,
-        op_name,
-        references,
-        process_id,
-        span_kind,
-        span_tags
-    ):
-        self.sid = sid
-        self.trace_id = trace_id
-        self.start_mus = start_mus
-        self.duration_mus = duration_mus
-        self.op_name = op_name
-        self.references = references
-        self.process_id = process_id
-        self.span_kind = span_kind
-        self.tags = span_tags
-        self.children_spans = []
-        self.taken = False
-        self.ep = None
-
-    def AddChild(self, child_span_id):
-        self.children_spans.append(child_span_id)
-
-    def GetChildProcess(self):
-        assert self.span_kind == "client"
-        assert len(self.children_spans) == 1
-        return all_processes[self.trace_id][
-            all_spans[self.children_spans[0]].process_id
-        ]
-
-    def GetParentProcess(self):
-        if self.IsRoot():
-            return "client_" + self.op_name
-        assert len(self.references) == 1
-        parent_span_id = self.references[0]
-        return all_processes[self.trace_id][all_spans[parent_span_id].process_id]
-
-    def GetId(self):
-        return (self.trace_id, self.sid)
-
-    def IsRoot(self):
-        return len(self.references) == 0
-
-    def __lt__(self, other):
-        return self.start_mus < other.start_mus
-
-    def __repr__(self):
-        if self.start_mus == "None":
-            return "Span:(%s, %s, %s, %s, %s, %s)" % (
-                self.trace_id,
-                self.sid,
-                self.op_name,
-                self.start_mus,
-                self.duration_mus,
-                self.span_kind,
-            )
-        else:
-            return "Span:(%s, %s, %s, %d, %d, %s)" % (
-                self.trace_id,
-                self.sid,
-                self.op_name,
-                self.start_mus,
-                self.duration_mus,
-                self.span_kind,
-            )
-
-    def __str__(self):
-        return self.__repr__()
-
-def repeatChangeSpans(in_span_partitions, out_span_partitions, repeats, factor):
-    assert len(in_span_partitions) == 1
-    in_span_partitions_old = copy.deepcopy(in_span_partitions)
-    out_span_partitions_old = copy.deepcopy(out_span_partitions)
-    ep_in, in_spans = list(in_span_partitions_old.items())[0]
-
-    span_inds = []
-    for ind, in_span in enumerate(in_spans):
-        time_order = True
-        for ep_out in out_span_partitions.keys():
-            out_span = out_span_partitions[ep_out][ind]
-            time_order = (
-                time_order
-                and (float(in_span.start_mus) <= float(out_span.start_mus))
-                and (
-                    float(out_span.start_mus) + float(out_span.duration_mus)
-                    <= float(in_span.start_mus) + float(in_span.duration_mus)
-                )
-            )
-        if time_order:
-            span_inds.append(ind)
-
-    in_span_partitions[ep_in] = []
-    for ep_out in out_span_partitions_old.keys():
-        out_span_partitions[ep_out] = []
-
-    span_inds = span_inds * repeats
-    random.shuffle(span_inds)
-    min_start_t = min(float(in_span.start_mus) for in_span in in_spans) / factor
-    max_start_t = max(float(in_span.start_mus) for in_span in in_spans) / factor
-    start_ts = sorted([random.uniform(min_start_t, max_start_t) for _ in span_inds])
-    for ind, start_t in zip(span_inds, start_ts):
-        # if len(in_span_partitions[ep_in]) > 40:
-        #    continue
-        trace_id = "".join(
-            random.choice(string.ascii_lowercase + string.digits) for _ in range(32)
-        )
-        in_span = copy.deepcopy(in_spans[ind])
-        in_span.start_mus = float(in_span.start_mus)
-        offset = start_t - in_span.start_mus
-        in_span.trace_id = trace_id
-        in_span.start_mus += offset
-        in_span_partitions[ep_in].append(in_span)
-        for ep_out in out_span_partitions_old.keys():
-            out_span = copy.deepcopy(out_span_partitions_old[ep_out][ind])
-            out_span.start_mus = float(out_span.start_mus)
-            out_span.trace_id = trace_id
-            out_span.start_mus += offset
-            out_span_partitions[ep_out].append(out_span)
-    return in_span_partitions, out_span_partitions
 
 def topological_sort_grouped(G):
     indegree_map = {v: d for v, d in G.in_degree() if d > 0}
@@ -205,7 +117,7 @@ def FindOrder(in_span_partitions, out_span_partitions, true_assignments):
         outgoing_eps = {}
         for out_ep in out_eps:
             span = all_spans[true_assignments[out_ep][in_span.GetId()]]
-            outgoing_spans.append([span.start_mus, span.duration_mus, span.GetParentProcess(), span.GetChildProcess()])
+            outgoing_spans.append([span.start_mus, span.duration_mus, span.GetParentProcess(all_processes, all_spans), span.GetChildProcess(all_processes, all_spans)])
         outgoing_spans.sort(key=lambda x: x[0])
 
         for i, x in enumerate(outgoing_spans):
@@ -236,14 +148,6 @@ def FindOrder(in_span_partitions, out_span_partitions, true_assignments):
 
     return G1
 
-def GetOutEpsInOrder(out_span_partitions):
-    eps = []
-    for ep, spans in out_span_partitions.items():
-        assert len(spans) > 0
-        eps.append((ep, spans[0].start_mus))
-    eps.sort(key=lambda x: x[1])
-    return [x[0] for x in eps]
-
 '''
 FOR all e2e requests
 WHICH
@@ -260,7 +164,7 @@ def sampleQuery():
 
         query_latency = {}
 
-        with open("plots/e2e_" + str((j + 1) * 25) + "_version2.pickle", 'rb') as afile:
+        with open(PLOTS_DIR + "e2e_" + str((j + 1) * 25) + "_version2.pickle", 'rb') as afile:
             e2e_traces = pickle.load(afile)
 
         for method in e2e_traces.keys():
@@ -316,11 +220,11 @@ def sampleQuery():
 
             query_latency[method] = [latency_per_service_true, latency_per_service_pred]
 
-        load_level = (j + 1) * 25
+        LOAD_LEVEL = (j + 1) * 25
 
-        with open('plots/query_latency_' + str(load_level) + '_version2_randomSet.pickle', 'wb') as handle:
+        with open(PLOTS_DIR + 'query_latency_' + str(LOAD_LEVEL) + '_version2_randomSet.pickle', 'wb') as handle:
             pickle.dump(query_latency, handle, protocol = pickle.HIGHEST_PROTOCOL)
-        with open('plots/query_latency_' + str(load_level) + '_all_version2_randomSet.pickle', 'wb') as handle:
+        with open(PLOTS_DIR + 'query_latency_' + str(LOAD_LEVEL) + '_all_version2_randomSet.pickle', 'wb') as handle:
             pickle.dump(query_latency, handle, protocol = pickle.HIGHEST_PROTOCOL)
 
 
@@ -587,12 +491,12 @@ def FixSpans2(spans, processes):
     return spans, processes
 
 def ParseJsonTrace(trace_json):
-    if sys.argv[6] == "fix":
+    if FIX:
         first_span = "init-span"
         # first_span = "ComposeReview"
-    elif sys.argv[6] == "no-fix":
-        # first_span = "HTTP GET /hotels"
-        first_span = "HTTP GET /recommendations"
+    else:
+        first_span = "HTTP GET /hotels"
+        # first_span = "HTTP GET /recommendations"
         # first_span = "[Todo] CompleteTodoCommandHandler"
     ret = []
     processes = None
@@ -629,13 +533,12 @@ in_spans_by_process = dict()
 out_spans_by_process = dict()
 
 def ProcessTraceData(data):
-
-    if sys.argv[6] == "fix":
+    if FIX:
         first_span = "init-span"
         # first_span = "ComposeReview"
-    elif sys.argv[6] == "no-fix":
-        # first_span = "HTTP GET /hotels"
-        first_span = "HTTP GET /recommendations"
+    else:
+        first_span = "HTTP GET /hotels"
+        # first_span = "HTTP GET /recommendations"
         # first_span = "[Todo] CompleteTodoCommandHandler"
 
     trace_id, spans, processes = data
@@ -702,8 +605,7 @@ def ProcessTraceData(data):
         return 1
     return 0
 
-traces_dir = sys.argv[1]
-traces = GetAllTracesInDir(traces_dir)
+traces = GetAllTracesInDir(TRACES_DIR)
 traces.sort()
 cnt = 0
 for trace in traces:
@@ -870,7 +772,7 @@ def BinAccuracyByServiceTimes(method):
 
         query_latency = {}
 
-        with open("plots/e2e_" + str((j + 1) * 25) + ".pickle", 'rb') as afile:
+        with open(PLOTS_DIR + "e2e_" + str((j + 1) * 25) + ".pickle", 'rb') as afile:
             e2e_traces = pickle.load(afile)
 
         true_traces = e2e_traces[method][0]
@@ -971,91 +873,6 @@ def ConstructEndToEndTraces(
 
     return true_traces, pred_traces
 
-def AddCachingEffect(true_assignments, in_span_partitions, out_span_partitions, cache_rate, exponential = False):
-
-    np.random.seed(10)
-
-    def FindSpan(partition, span_id):
-        index = -1
-        for i, span in enumerate(partition):
-            if span.GetId() == span_id:
-                index = i
-                break
-
-        if index != -1:
-            return partition[index]
-
-    def AdjustSpans(in_span_partitions, out_span_partitions, in_span_id, cache_duration_mus, eps, chosen_ep_number):
-        trace_id = in_span_id[0]
-        for ep in in_span_partitions.keys():
-            for span in in_span_partitions[ep]:
-                if span.GetId()[0] == trace_id:
-                    span.duration_mus -= cache_duration_mus
-        for i, ep in enumerate(eps):
-            if i > chosen_ep_number:
-                for span in out_span_partitions[ep]:
-                    if span.GetId()[0] == trace_id:
-                        span.start_mus -= cache_duration_mus
-
-    def DeleteSpan(partition, span_id):
-        index = -1
-        for i, span in enumerate(partition):
-            if span.GetId() == span_id:
-                index = i
-                break
-
-        if index != -1:
-            del partition[index]
-
-    eps = GetOutEpsInOrder(out_span_partitions)
-    chosen_ep_number = 1
-    chosen_ep = eps[chosen_ep_number]
-
-    exponential = True
-    if exponential:
-        lambda_parameter = 0.001
-        in_ep = list(in_span_partitions.keys())[0]
-        num_spans = len(in_span_partitions[in_ep])
-        samples = np.random.exponential(scale=1/lambda_parameter, size=int(cache_rate * num_spans))
-        indices = [int(sample) % num_spans for sample in samples]
-        # unique_indices = np.random.choice(num_spans, size=int(cache_rate * num_spans), replace=False, p=np.exp(-lambda_parameter))
-        p = np.asarray(np.exp(-lambda_parameter * np.arange(num_spans))).astype('float64')
-        p = p / np.sum(p)
-        unique_indices = np.random.choice(np.arange(num_spans), size=int(cache_rate * num_spans), replace=False, p=p)
-        # print(samples)
-        # print(indices)
-        # print(sorted(unique_indices))
-        # print(len((unique_indices)))
-        # input()
-
-    for i, in_span in enumerate(in_spans):
-        random_num = random.randint(0, 999)
-        # if random_num < (cache_rate * 1000):
-        if i in unique_indices:
-            for ep in out_span_partitions.keys():
-                if ep == chosen_ep:
-                    # print("\n Before:\n")
-                    # print(in_span)
-                    # for ep1 in out_span_partitions.keys():
-                    #     print(all_spans[true_assignments[ep1][in_span.GetId()]])
-                    span_ID = true_assignments[ep][in_span.GetId()]
-                    span = FindSpan(out_span_partitions[ep], span_ID)
-                    true_assignments[ep][in_span.GetId()] = ('Skip', 'Skip')
-                    AdjustSpans(in_span_partitions, out_span_partitions, in_span.GetId(), span.duration_mus, eps, chosen_ep_number)
-                    DeleteSpan(out_span_partitions[ep], span.GetId())
-                    # print("\n After:\n")
-                    # print(in_span)
-                    # for ep1 in out_span_partitions.keys():
-                    #     if true_assignments[ep1][in_span.GetId()] in all_spans:
-                    #         x = all_spans[true_assignments[ep1][in_span.GetId()]]
-                    #     else:
-                    #         x = "Skip"
-                    #     print(x)
-                    # input()
-                    break
-
-    return true_assignments
-
 predictors = [
     ("MaxScoreBatchSubsetWithSkips", Timing3(all_spans, all_processes)),
     # ("MaxScoreBatch", Timing2(all_spans, all_processes)),
@@ -1109,11 +926,11 @@ for method, predictor in predictors:
         print("Process: ", process)
         # partition spans by subservice at the other end
         in_span_partitions = PartitionSpansByEndPoint(
-            in_spans, lambda x: x.GetParentProcess()
+            in_spans, lambda x: x.GetParentProcess(all_processes, all_spans)
         )
         print("Incoming span partitions: ", process, in_span_partitions.keys())
         out_span_partitions = PartitionSpansByEndPoint(
-            out_spans, lambda x: x.GetChildProcess()
+            out_spans, lambda x: x.GetChildProcess(all_processes, all_spans)
         )
         print("Outgoing span partitions: ", process, out_span_partitions.keys())
 
@@ -1121,15 +938,15 @@ for method, predictor in predictors:
             print("SKIPPING THIS PROCESS:", process)
             continue
 
-        if sys.argv[3] == "parallel" or method == "MaxScoreBatchParallel":
-            parallel = True
+        if method == "MaxScoreBatchParallel":
+            PARALLEL = True
         else:
-            parallel = False
+            PARALLEL = False
 
         # if process == "frontend":
         #     continue
 
-        if sys.argv[4] == "instrumented" and process == "search":
+        if INSTRUMENTED and process == "search":
             print(process)
             instrumented_hops = []
         else:
@@ -1143,14 +960,12 @@ for method, predictor in predictors:
 
         invocation_graph = FindOrder(in_span_partitions, out_span_partitions, true_assignments)
 
-        # repeats = int(sys.argv[7])
-        # factor = int(sys.argv[8])
-        # in_span_partitions, out_span_partitions = repeatChangeSpans(in_span_partitions, out_span_partitions, repeats=repeats, factor=factor)
+        # in_span_partitions, out_span_partitions = repeat_change_spans(in_span_partitions, out_span_partitions, REPEAT_FACTOR, COMPRESS_FACTOR)
         # true_assignments = GetGroundTruth(in_span_partitions, out_span_partitions)
 
         if process == "frontend" and (method != "MaxScoreBatch" or method != "MaxScoreBatchParallel" or method !=  "FCFS" or method !=  "ArrivalOrder"):
-            print("cache %: ", float(sys.argv[5]) * 100)
-            true_assignments = AddCachingEffect(true_assignments, in_span_partitions, out_span_partitions, cache_rate=float(sys.argv[5]))
+            print("cache %: ", float(CACHE_RATE) * 100)
+            true_assignments = create_cache_hits(true_assignments, in_span_partitions, out_span_partitions, cache_rate=CACHE_RATE)
 
         # print(bool(DeepDiff(copy_x, in_span_partitions)))
         # print(bool(DeepDiff(copy_y, out_span_partitions)))
@@ -1167,39 +982,39 @@ for method, predictor in predictors:
 
         if method == "MaxScoreBatch" or method == "MaxScoreBatchParallel":
             if process == "service1":
-                parallel = True
+                PARALLEL = True
             pred_assignments, not_best_count, num_spans, per_span_candidates = predictor.FindAssignments(
-                process, in_span_partitions, out_span_partitions, parallel, instrumented_hops, true_assignments
+                process, in_span_partitions, out_span_partitions, PARALLEL, instrumented_hops, true_assignments
             )
         elif method == "MaxScoreBatchSubset":
             if process == "service1":
-                parallel = True
+                PARALLEL = True
             pred_assignments, not_best_count, num_spans, per_span_candidates = predictor.FindAssignments(
-                process, in_span_partitions, out_span_partitions, parallel, instrumented_hops, true_assignments
+                process, in_span_partitions, out_span_partitions, PARALLEL, instrumented_hops, true_assignments
             )
         elif method == "MaxScore":
             if process == "service1":
-                parallel = True
+                PARALLEL = True
             pred_assignments = predictor.FindAssignments(
                 process, in_span_partitions, out_span_partitions, True, instrumented_hops, true_assignments
             )
         elif method == "MaxScoreBatchSubsetWithSkips":
             if process == "service1":
-                parallel = True
+                PARALLEL = True
             pred_assignments, pred_topk_assignments, not_best_count, num_spans, per_span_candidates = predictor.FindAssignments(
-                process, in_span_partitions, out_span_partitions, parallel, instrumented_hops, true_assignments, invocation_graph
+                process, in_span_partitions, out_span_partitions, PARALLEL, instrumented_hops, true_assignments, invocation_graph
             )
         elif method == "MaxScoreBatchSubsetWithTrueSkips":
             pred_assignments, pred_topk_assignments, not_best_count, num_spans, per_span_candidates = predictor.FindAssignments(
-                process, in_span_partitions, out_span_partitions, parallel, instrumented_hops, true_assignments, invocation_graph, True, False
+                process, in_span_partitions, out_span_partitions, PARALLEL, instrumented_hops, true_assignments, invocation_graph, True, False
             )
         elif method == "MaxScoreBatchSubsetWithTrueDist":
             pred_assignments, pred_topk_assignments, not_best_count, num_spans, per_span_candidates = predictor.FindAssignments(
-                process, in_span_partitions, out_span_partitions, parallel, instrumented_hops, true_assignments, invocation_graph, False, True
+                process, in_span_partitions, out_span_partitions, PARALLEL, instrumented_hops, true_assignments, invocation_graph, False, True
             )
         else:
             pred_assignments = predictor.FindAssignments(
-                process, in_span_partitions, out_span_partitions, parallel, instrumented_hops, true_assignments
+                process, in_span_partitions, out_span_partitions, PARALLEL, instrumented_hops, true_assignments
             )
 
         acc = AccuracyForService(pred_assignments, true_assignments, in_span_partitions)
@@ -1267,24 +1082,20 @@ for method, predictor in predictors:
         accuracy_overall[method + "TopK"] = acc_e2e_2
     accuracy_percentile_bins[method] = BinAccuracyByResponseTimes(trace_acc)
 
-load_level = sys.argv[2]
-name = sys.argv[3]
-cache = sys.argv[5]
-
 for key in accuracy_overall.keys():
-    print("End-to-end accuracy for method: ", key, accuracy_overall[key])
+    print("End-to-end accuracy for method %s: %.3f%%" % (key, accuracy_overall[key]))
 
-with open('plots/bin_acc' + "_" + str(load_level) + "_" + name + "_" + cache + '.pickle', 'wb') as handle:
+with open(PLOTS_DIR + 'bin_acc' + "_" + str(LOAD_LEVEL) + "_" + TEST_NAME + "_" + str(CACHE_RATE) + '.pickle', 'wb') as handle:
     pickle.dump(accuracy_percentile_bins, handle, protocol = pickle.HIGHEST_PROTOCOL)
-with open('plots/accuracy' + "_" + str(load_level) + "_" + name + "_" + cache + '.pickle', 'wb') as handle:
+with open(PLOTS_DIR + 'accuracy' + "_" + str(LOAD_LEVEL) + "_" + TEST_NAME + "_" + str(CACHE_RATE) + '.pickle', 'wb') as handle:
     pickle.dump(accuracy_overall, handle, protocol = pickle.HIGHEST_PROTOCOL)
-with open('plots/e2e' + "_" + str(load_level) + "_" + name + "_" + cache + '.pickle', 'wb') as handle:
+with open(PLOTS_DIR + 'e2e' + "_" + str(LOAD_LEVEL) + "_" + TEST_NAME + "_" + str(CACHE_RATE) + '.pickle', 'wb') as handle:
     pickle.dump(traces_overall, handle, protocol = pickle.HIGHEST_PROTOCOL)
-# with open('plots/confidence_scores' + "_" + str(load_level) + "_" + name + "_" + cache + '.pickle', 'wb') as handle:
+# with open(PLOTS_DIR + 'confidence_scores' + "_" + str(LOAD_LEVEL) + "_" + TEST_NAME + "_" + str(CACHE_RATE) + '.pickle', 'wb') as handle:
 #     pickle.dump(confidence_scores_by_process, handle, protocol = pickle.HIGHEST_PROTOCOL)
-with open('plots/process_acc' + "_" + str(load_level) + "_" + name + "_" + cache + '.pickle', 'wb') as handle:
+with open(PLOTS_DIR + 'process_acc' + "_" + str(LOAD_LEVEL) + "_" + TEST_NAME + "_" + str(CACHE_RATE) + '.pickle', 'wb') as handle:
     pickle.dump(accuracy_per_process, handle, protocol = pickle.HIGHEST_PROTOCOL)
-# with open('plots/candidates' + "_" + str(load_level) + "_" + name + "_" + cache + '.pickle', 'wb') as handle:
+# with open(PLOTS_DIR + 'candidates' + "_" + str(LOAD_LEVEL) + "_" + TEST_NAME + "_" + str(CACHE_RATE) + '.pickle', 'wb') as handle:
 #     pickle.dump(candidates_per_process, handle, protocol = pickle.HIGHEST_PROTOCOL)
 
 # sampleQuery()
@@ -1293,5 +1104,5 @@ with open('plots/process_acc' + "_" + str(load_level) + "_" + name + "_" + cache
 # for method, predictor in predictors:
 #     x[method] = BinAccuracyByServiceTimes(method)
 
-# with open('plots/bin_acc_per_service_time_' + str(load_level) + '_service12_version3.pickle', 'wb') as handle:
+# with open(PLOTS_DIR + 'bin_acc_per_service_time_' + str(LOAD_LEVEL) + '_service12_version3.pickle', 'wb') as handle:
 #     pickle.dump(x, handle, protocol = pickle.HIGHEST_PROTOCOL)
