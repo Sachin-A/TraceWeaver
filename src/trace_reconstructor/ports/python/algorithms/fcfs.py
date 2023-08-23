@@ -16,7 +16,7 @@ class FCFS(object):
         all_assignments = { ep: {} for ep in out_span_partitions.keys() }
         for ind in range(len(in_spans)):
             for j, (ep, out_spans) in enumerate(out_span_partitions.items()):
-                if len(out_spans) <= ind:
+                if ind >= len(out_spans):
                     all_assignments[ep][in_spans[ind].GetId()] = ("NA", "NA")
                     continue
                 if (j + 1) in instrumented_hops:

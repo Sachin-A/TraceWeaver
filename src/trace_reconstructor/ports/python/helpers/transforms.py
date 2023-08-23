@@ -95,7 +95,7 @@ def create_cache_hits(true_assignments, in_span_partitions, out_span_partitions,
             del partition[index]
 
     eps = GetOutEpsInOrder(out_span_partitions)
-    chosen_ep_number = 1
+    chosen_ep_number = 0
     chosen_ep = eps[chosen_ep_number]
 
     exponential = True

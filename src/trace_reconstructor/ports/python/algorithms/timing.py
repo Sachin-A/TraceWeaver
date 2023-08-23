@@ -1,6 +1,6 @@
 import math
-import scipy.stats
 import copy
+import scipy.stats
 import networkx as nx
 
 VERBOSE = False
