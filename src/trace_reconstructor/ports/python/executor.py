@@ -13,23 +13,20 @@ from scipy import stats
 from deepdiff import DeepDiff
 import matplotlib.pyplot as plt
 
+import config
+from spans import Span
+import helpers.misc as misc
+import helpers.utils as utils
+import helpers.transforms as transforms
+
 from algorithms.fcfs import FCFS
 from algorithms.arrival_order import ArrivalOrder
-from algorithms.vpath import VPATH
+from algorithms.vpath import vPath
 from algorithms.wap5_og import WAP5_OG
 from algorithms.deepflow import DeepFlow
 from algorithms.timing import Timing
 from algorithms.timing2 import Timing2
 from algorithms.timing3 import Timing3
-
-from spans import Span
-from helpers.misc import get_project_root
-from helpers.transforms import repeat_change_spans
-from helpers.transforms import create_cache_hits
-from helpers.utils import GetOutEpsInOrder, GetGroundTruth
-from helpers.utils import AccuracyForSpan, TopKAccuracyForSpan
-from helpers.utils import AccuracyForService, TopKAccuracyForService
-from helpers.utils import AccuracyEndToEnd, TopKAccuracyEndToEnd
 
 parser = argparse.ArgumentParser(description='Map incoming and outgoing spans at each service.')
 parser.add_argument('--directory', type=ascii, required=True,
@@ -52,7 +49,7 @@ parser.add_argument('--compress_factor', type=int, required=False, default=1,
                     help='factor by which to reduce spacing between adjacent spans')
 args = parser.parse_args()
 
-PROJECT_ROOT = get_project_root()
+PROJECT_ROOT = misc.get_project_root()
 TRACES_DIR = os.path.join(PROJECT_ROOT, args.directory.strip('\''))
 PLOTS_DIR = os.path.join(PROJECT_ROOT, "plots/")
 LOAD_LEVEL = args.load_level
@@ -64,7 +61,6 @@ FIX = bool(args.fix)
 REPEAT_FACTOR = args.repeat_factor
 COMPRESS_FACTOR = args.compress_factor
 
-VERBOSE = False
 random.seed(10)
 # np.seterr(all='raise')
 
@@ -151,86 +147,6 @@ def FindOrder(in_span_partitions, out_span_partitions, true_assignments):
     print(topological_sort_grouped(G1))
 
     return G1
-
-'''
-FOR all e2e requests
-WHICH
-    were in the top 5% response latency bracket AND
-    were initiated after time X,
-FIND
-    the worst performing service AND
-    its mean service latency for these requests
-'''
-
-def sampleQuery():
-
-    for j in range(4, 5):
-
-        query_latency = {}
-
-        with open(PLOTS_DIR + "e2e_" + str((j + 1) * 25) + "_version2.pickle", 'rb') as afile:
-            e2e_traces = pickle.load(afile)
-
-        for method in e2e_traces.keys():
-
-            true_traces = e2e_traces[method][0]
-
-            true_traces = dict(
-                sorted(
-                    true_traces.items(),
-                    key=lambda x: x[1][-1].start_mus + x[1][-1].duration_mus - x[1][0].start_mus
-                )
-            )
-
-            # p1 = int(0.95 * len(true_traces))
-            p1 = int(0 * len(true_traces))
-            start_time = list(true_traces.items())[100][1][0].start_mus
-
-            # true_traces = list(
-            #     filter(
-            #         lambda x: x[1][0].start_mus > start_time,
-            #         list(true_traces.items())[p1:]
-            #     )
-            # )
-            true_traces = list(
-                filter(
-                    lambda x: x[1][0].start_mus < start_time,
-                    list(true_traces.items())[p1:]
-                )
-            )
-            # true_traces = list(
-            #     filter(
-            #         lambda x: x[1][0].start_mus > 0,
-            #         list(true_traces.items())[p1:]
-            #     )
-            # )
-
-            pred_traces = e2e_traces[method][1]
-            pred_traces_assigned = []
-
-            for trace in true_traces:
-                if not any(x is None for x in pred_traces[trace[0]]):
-                    pred_traces_assigned.append((trace[0], pred_traces[trace[0]]))
-
-            latency_per_service_true = [[] for i in range(5)]
-            latency_per_service_pred = [[] for i in range(5)]
-
-            for _, trace in true_traces:
-                for i, span in enumerate(trace):
-                    latency_per_service_true[i].append((span.trace_id, span.sid, span.start_mus, span.duration_mus))
-            for _, trace in pred_traces_assigned:
-                for i, span in enumerate(trace):
-                    latency_per_service_pred[i].append((span.trace_id, span.sid, span.start_mus, span.duration_mus))
-
-            query_latency[method] = [latency_per_service_true, latency_per_service_pred]
-
-        LOAD_LEVEL = (j + 1) * 25
-
-        with open(PLOTS_DIR + 'query_latency_' + str(LOAD_LEVEL) + '_version2_randomSet.pickle', 'wb') as handle:
-            pickle.dump(query_latency, handle, protocol = pickle.HIGHEST_PROTOCOL)
-        with open(PLOTS_DIR + 'query_latency_' + str(LOAD_LEVEL) + '_all_version2_randomSet.pickle', 'wb') as handle:
-            pickle.dump(query_latency, handle, protocol = pickle.HIGHEST_PROTOCOL)
-
 
 def GetAllTracesInDir(directory):
     files = [f for f in os.listdir(directory) if os.path.isfile(directory + "/" + f)]
@@ -579,7 +495,7 @@ def ProcessTraceData(data):
     def ExploreSubTree(span_id, depth):
         span = spans[span_id]
         AddSpanToProcess(span_id)
-        # if VERBOSE:
+        # if config.VERBOSE:
         # print(
         #     (4 * depth) * " ",
         #     span.sid,
@@ -612,14 +528,14 @@ traces = GetAllTracesInDir(TRACES_DIR)
 traces.sort()
 cnt = 0
 for trace in traces:
-    if VERBOSE:
+    if config.VERBOSE:
         print("\n\n\n")
     data = ParseJsonTrace(trace)
     cnt += ProcessTraceData(data)
     if cnt > 10000:  # 10000:
         break
 
-if VERBOSE:
+if config.VERBOSE:
     print("Incoming spans")
     for p, s in in_spans_by_process.items():
         print("  %s: %s" % (p, s))
@@ -628,139 +544,16 @@ if VERBOSE:
         print("  %s: %s" % (p, s))
     print("\n\n\n")
 
-def PrintLatency12(trace_acc):
-    all_traces = []
-    min_time = 1.0e40
-    for _, span in all_spans.items():
-        if span.IsRoot():
-            child_spans = copy.deepcopy(span.children_spans)
-            child_spans.sort(key=lambda s: all_spans[s].start_mus)
-            processing_delay = all_spans[child_spans[0]].start_mus - span.start_mus
-            correct = trace_acc[span.trace_id]
-            all_traces.append((span.start_mus, processing_delay, span.trace_id, correct, 1))
-            min_time = min(span.start_mus, min_time)
-    all_traces.sort()
-    for x in all_traces:
-        x = x[0] - min_time, x[1], x[2], x[3], x[4]
-        print(x)
-
-def BinAccuracyByServiceTimes(method):
-
-    for j in range(4, 5):
-
-        query_latency = {}
-
-        with open(PLOTS_DIR + "e2e_" + str((j + 1) * 25) + ".pickle", 'rb') as afile:
-            e2e_traces = pickle.load(afile)
-
-        true_traces = e2e_traces[method][0]
-        pred_traces = e2e_traces[method][1]
-
-        all_traces = []
-
-        for trace in true_traces.items():
-            true_trace = true_traces[trace[0]]
-            duration = true_trace[1].start_mus - (true_trace[0].start_mus + true_trace[0].duration_mus)
-            if pred_traces[trace[0]][1]:
-                correct = true_trace[1].sid == pred_traces[trace[0]][1].sid
-            else:
-                correct = False
-            all_traces.append((duration, correct, 1))
-
-        all_traces.sort()
-        for i in range(1, len(all_traces)):
-            _, c, n = all_traces[i - 1]
-            t0, c0, n0 = all_traces[i]
-            all_traces[i] = (t0, c + c0, n + n0)
-        nbins = 10
-        prev_c, prev_n = 0, 0
-        accuracy = []
-        for b in range(nbins):
-            d, c, n = all_traces[int((len(all_traces) * (b + 1)) / nbins - 1)]
-            c, n = c - prev_c, n - prev_n
-            prev_c, prev_n = prev_c + c, prev_n + n
-            percentile = (b + 1) * 100 / nbins
-            acc = c / n
-            accuracy.append((percentile, acc, d / 1000.0))
-        return accuracy
-
-def BinAccuracyByResponseTimes(trace_acc):
-    all_traces = []
-    for _, span in all_spans.items():
-        if span.IsRoot():
-            correct = trace_acc[span.trace_id]
-            all_traces.append((span.duration_mus, span.trace_id, correct, 1))
-    all_traces.sort()
-    # accumulate
-    for i in range(1, len(all_traces)):
-        _, _, c, n = all_traces[i - 1]
-        t0, s0, c0, n0 = all_traces[i]
-        all_traces[i] = (t0, s0, c + c0, n + n0)
-    nbins = 10
-    prev_c, prev_n = 0, 0
-    accuracy = []
-    for b in range(nbins):
-        d, _, c, n = all_traces[int((len(all_traces) * (b + 1)) / nbins - 1)]
-        c, n = c - prev_c, n - prev_n
-        prev_c, prev_n = prev_c + c, prev_n + n
-        percentile = (b + 1) * 100 / nbins
-        acc = c / n
-        if VERBOSE:
-            print(
-                "Accuracy of %d-percentile bin: %.3f, response_time (ms): %.1f"
-                % (percentile, acc, d / 1000.0)
-            )
-        accuracy.append((percentile, acc, d / 1000.0))
-    return accuracy
-
-def ConstructEndToEndTraces(
-    pred_assignments_by_process, true_assignments_by_process, in_spans_by_process
-):
-    def OrderTraces(end_to_end_traces):
-        for trace_id in end_to_end_traces:
-            end_to_end_traces[trace_id].sort(
-                key=lambda x: float('inf') if x is None else x.start_mus
-            )
-
-    processes = true_assignments_by_process.keys()
-    true_traces = {}
-    pred_traces = {}
-    for process in processes:
-        for in_span in in_spans_by_process[process]:
-            if in_span.trace_id not in pred_traces:
-                true_traces[in_span.trace_id] = []
-                pred_traces[in_span.trace_id] = []
-            true_assignments = true_assignments_by_process[process]
-            pred_assignments = pred_assignments_by_process[process]
-            for ep in true_assignments.keys():
-                true_traces[in_span.trace_id].append(
-                    all_spans.get(true_assignments[ep][in_span.GetId()])
-                )
-                options = pred_assignments[ep].get(in_span.GetId(), None)
-                if isinstance(options, list):
-                    for option in options:
-                        pred_traces[in_span.trace_id].append(
-                            all_spans.get(option, None)
-                        )
-                else:
-                    pred_traces[in_span.trace_id].append(
-                        all_spans.get(options, None)
-                    )
-    OrderTraces(true_traces)
-    OrderTraces(pred_traces)
-
-    return true_traces, pred_traces
-
 predictors = [
     ("MaxScoreBatchSubsetWithSkips", Timing3(all_spans, all_processes)),
     # ("MaxScoreBatch", Timing2(all_spans, all_processes)),
     # ("MaxScoreBatchParallel", Timing2(all_spans, all_processes)),
     # ("MaxScore", Timing(all_spans, all_processes)),
-    # ("WAP5_OG", WAP5_OG(all_spans, all_processes)),
-    # ("FCFS", FCFS(all_spans, all_processes)),
+    ("WAP5_OG", WAP5_OG(all_spans, all_processes)),
+    ("FCFS", FCFS(all_spans, all_processes)),
     ("ArrivalOrder", ArrivalOrder(all_spans, all_processes)),
-    # ("VPath", VPATH(all_spans, all_processes)),
-    # ("DeepFlow", DeepFlow(all_spans, all_processes)),
+    ("vPath", vPath(all_spans, all_processes)),
+    ("DeepFlow", DeepFlow(all_spans, all_processes)),
 ]
 
 accuracy_per_process = {}
@@ -830,7 +623,7 @@ for method, predictor in predictors:
         else:
             instrumented_hops = []
 
-        true_assignments = GetGroundTruth(in_span_partitions, out_span_partitions)
+        true_assignments = utils.GetGroundTruth(in_span_partitions, out_span_partitions)
 
         copy_x = copy.deepcopy(in_span_partitions)
         copy_y = copy.deepcopy(out_span_partitions)
@@ -838,12 +631,12 @@ for method, predictor in predictors:
 
         invocation_graph = FindOrder(in_span_partitions, out_span_partitions, true_assignments)
 
-        # in_span_partitions, out_span_partitions = repeat_change_spans(in_span_partitions, out_span_partitions, REPEAT_FACTOR, COMPRESS_FACTOR)
-        # true_assignments = GetGroundTruth(in_span_partitions, out_span_partitions)
+        # in_span_partitions, out_span_partitions = transforms.repeat_change_spans(in_span_partitions, out_span_partitions, REPEAT_FACTOR, COMPRESS_FACTOR)
+        # true_assignments = utils.GetGroundTruth(in_span_partitions, out_span_partitions)
 
         if process == "frontend" and (method != "MaxScoreBatch" or method != "MaxScoreBatchParallel" or method !=  "FCFS" or method !=  "ArrivalOrder"):
             print("cache %: ", float(CACHE_RATE) * 100)
-            true_assignments = create_cache_hits(true_assignments, in_span_partitions, out_span_partitions, cache_rate=CACHE_RATE)
+            true_assignments = transforms.create_cache_hits(true_assignments, in_span_partitions, out_span_partitions, cache_rate=CACHE_RATE)
 
         # print(bool(DeepDiff(copy_x, in_span_partitions)))
         # print(bool(DeepDiff(copy_y, out_span_partitions)))
@@ -895,10 +688,10 @@ for method, predictor in predictors:
                 process, in_span_partitions, out_span_partitions, PARALLEL, instrumented_hops, true_assignments
             )
 
-        acc = AccuracyForService(pred_assignments, true_assignments, in_span_partitions)
+        acc = utils.AccuracyForService(pred_assignments, true_assignments, in_span_partitions)
         print("Accuracy for service %s: %.3f%%\n" % (process, acc * 100))
         if method == "MaxScoreBatchSubsetWithSkips":
-            acc2 = TopKAccuracyForService(pred_topk_assignments, true_assignments, in_span_partitions)
+            acc2 = utils.TopKAccuracyForService(pred_topk_assignments, true_assignments, in_span_partitions)
             print("Top K accuracy for service %s: %.3f%%\n" % (process, acc2 * 100))
         true_assignments_by_process[process] = true_assignments
         pred_assignments_by_process[process] = pred_assignments
@@ -940,15 +733,15 @@ for method, predictor in predictors:
         # # print(top5)
         # # input()
 
-    trace_acc, acc_e2e = AccuracyEndToEnd(
+    trace_acc, acc_e2e = utils.AccuracyEndToEnd(
         pred_assignments_by_process, true_assignments_by_process, in_spans_by_process
     )
     if method == "MaxScoreBatchSubsetWithSkips":
-        trace_acc_2, acc_e2e_2 = TopKAccuracyEndToEnd(
+        trace_acc_2, acc_e2e_2 = utils.TopKAccuracyEndToEnd(
             pred_topk_assignments_by_process, true_assignments_by_process, in_spans_by_process
         )
-    true_traces_e2e, pred_traces_e2e = ConstructEndToEndTraces(
-        pred_assignments_by_process, true_assignments_by_process, in_spans_by_process
+    true_traces_e2e, pred_traces_e2e = utils.ConstructEndToEndTraces(
+        pred_assignments_by_process, true_assignments_by_process, in_spans_by_process, all_spans
     )
     traces_overall[method] = [true_traces_e2e, pred_traces_e2e]
 
@@ -958,7 +751,7 @@ for method, predictor in predictors:
     accuracy_overall[method] = acc_e2e * 100
     if method == "MaxScoreBatchSubsetWithSkips":
         accuracy_overall[method + "TopK"] = acc_e2e_2 * 100
-    accuracy_percentile_bins[method] = BinAccuracyByResponseTimes(trace_acc)
+    accuracy_percentile_bins[method] = utils.BinAccuracyByResponseTimes(trace_acc, all_spans)
 
 for key in accuracy_overall.keys():
     print("End-to-end accuracy for method %s: %.3f%%" % (key, accuracy_overall[key]))
@@ -980,7 +773,7 @@ with open(PLOTS_DIR + 'process_acc' + "_" + str(LOAD_LEVEL) + "_" + TEST_NAME + 
 
 # x = {}
 # for method, predictor in predictors:
-#     x[method] = BinAccuracyByServiceTimes(method)
+#     x[method] = utils.BinAccuracyByServiceTimes(method)
 
 # with open(PLOTS_DIR + 'bin_acc_per_service_time_' + str(LOAD_LEVEL) + '_service12_version3.pickle', 'wb') as handle:
 #     pickle.dump(x, handle, protocol = pickle.HIGHEST_PROTOCOL)

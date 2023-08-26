@@ -62,7 +62,7 @@ def create_cache_hits(true_assignments, in_span_partitions, out_span_partitions,
 
     np.random.seed(10)
 
-    def FindSpan(partition, span_id):
+    def find_span(partition, span_id):
         index = -1
         for i, span in enumerate(partition):
             if span.GetId() == span_id:
@@ -72,7 +72,7 @@ def create_cache_hits(true_assignments, in_span_partitions, out_span_partitions,
         if index != -1:
             return partition[index]
 
-    def AdjustSpans(in_span_partitions, out_span_partitions, in_span_id, cache_duration_mus, eps, chosen_ep_number):
+    def adjust_spans(in_span_partitions, out_span_partitions, in_span_id, cache_duration_mus, eps, chosen_ep_number):
         trace_id = in_span_id[0]
         for ep in in_span_partitions.keys():
             for span in in_span_partitions[ep]:
@@ -84,7 +84,7 @@ def create_cache_hits(true_assignments, in_span_partitions, out_span_partitions,
                     if span.GetId()[0] == trace_id:
                         span.start_mus -= cache_duration_mus
 
-    def DeleteSpan(partition, span_id):
+    def delete_span(partition, span_id):
         index = -1
         for i, span in enumerate(partition):
             if span.GetId() == span_id:
@@ -128,10 +128,10 @@ def create_cache_hits(true_assignments, in_span_partitions, out_span_partitions,
                     # for ep1 in out_span_partitions.keys():
                     #     print(all_spans[true_assignments[ep1][in_span.GetId()]])
                     span_ID = true_assignments[ep][in_span.GetId()]
-                    span = FindSpan(out_span_partitions[ep], span_ID)
+                    span = find_span(out_span_partitions[ep], span_ID)
                     true_assignments[ep][in_span.GetId()] = ('Skip', 'Skip')
-                    AdjustSpans(in_span_partitions, out_span_partitions, in_span.GetId(), span.duration_mus, eps, chosen_ep_number)
-                    DeleteSpan(out_span_partitions[ep], span.GetId())
+                    adjust_spans(in_span_partitions, out_span_partitions, in_span.GetId(), span.duration_mus, eps, chosen_ep_number)
+                    delete_span(out_span_partitions[ep], span.GetId())
                     # print("\n After:\n")
                     # print(in_span)
                     # for ep1 in out_span_partitions.keys():
