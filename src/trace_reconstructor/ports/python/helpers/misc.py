@@ -1,4 +1,6 @@
+import inspect
 from pathlib import Path
 
 def get_project_root() -> Path:
-    return Path(__file__).parent.parent.parent.parent.parent.parent
+    path = inspect.getabsfile(inspect.currentframe())
+    return Path(path).parent.parent.parent.parent.parent.parent

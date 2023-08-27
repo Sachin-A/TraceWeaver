@@ -1,4 +1,6 @@
+import copy
 import config
+import pickle
 
 def GetOutEpsInOrder(out_span_partitions):
     eps = []
@@ -133,7 +135,7 @@ def TopKAccuracyEndToEnd(
     correct = sum(trace_acc[tid] for tid in trace_acc)
     return trace_acc, float(correct) / len(trace_acc)
 
-def BinAccuracyByServiceTimes(method):
+def BinAccuracyByServiceTimes(method, PLOTS_DIR):
 
     for j in range(4, 5):
 
