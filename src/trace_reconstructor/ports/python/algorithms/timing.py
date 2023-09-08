@@ -159,7 +159,6 @@ class Timing(object):
                 curr_ep = assignment[0].GetParentProcess(self.all_processes, self.all_spans)
                 curr_time = assignment[0].start_mus + assignment[0].duration_mus
                 cost += self.GetEpPairCost(prev_ep, curr_ep, prev_time, curr_time, normalized)
-
             else:
                 if assignment[i].trace_id != "None":
                     num_mappings += 1
@@ -258,7 +257,7 @@ class Timing(object):
                     return True
         return False
 
-    def ScoreAssignmentAsPerInvocationGraph(self, assignment, invocation_graph, out_eps, normalized = False):
+    def ScoreAssignmentAsPerInvocationGraph(self, assignment, invocation_graph, out_eps, sub_scores, normalized = False):
 
         # print("New")
 
@@ -336,14 +335,24 @@ class Timing(object):
                     if b_span.trace_id == "None":
                         valid_spans = FindValidAncestor(b_ep)
                         if valid_spans == None:
-                            cost += self.GetEpPairCost(first_ep, current_ep, first_span.start_mus, current_span.start_mus, normalized)
+                        # if (first_ep, current_ep, first_span.start_mus, current_span.start_mus, normalized) in sub_scores:
+                        #     cost += sub_scores[(first_ep, current_ep, first_span.start_mus, current_span.start_mus, normalized)]
+                        # else:
+                            sub_cost = self.GetEpPairCost(first_ep, current_ep, first_span.start_mus, current_span.start_mus, normalized)
+                            # sub_scores[(first_ep, current_ep, first_span.start_mus, current_span.start_mus, normalized)] = sub_cost
+                            cost += sub_cost
                             num_mappings += 1
                             # print(first_ep, current_ep)
                             # print(num_mappings)
                             # input()
                         else:
                             latest = max(valid_spans, key = lambda x: x[1].start_mus + x[1].duration_mus)
-                            cost += self.GetEpPairCost(latest[0], current_ep, latest[1].start_mus, current_span.start_mus, normalized)
+                        # if (latest[0], current_ep, latest[1].start_mus, current_span.start_mus, normalized) in sub_scores:
+                            # cost += sub_scores[(latest[0], current_ep, latest[1].start_mus, current_span.start_mus, normalized)]
+                        # else:
+                            sub_cost = self.GetEpPairCost(latest[0], current_ep, latest[1].start_mus, current_span.start_mus, normalized)
+                            # sub_scores[(latest[0], current_ep, latest[1].start_mus, current_span.start_mus, normalized)] = sub_cost
+                            cost += sub_cost
                             num_mappings += 1
                             # print(latest[0], current_ep)
                             # print(num_mappings)
@@ -352,19 +361,34 @@ class Timing(object):
                         continue
 
                     # print(before_ep, current_ep)
-                    cost += self.GetEpPairCost(before_ep, current_ep, b_span.start_mus + b_span.duration_mus, current_span.start_mus, normalized)
+                # if (before_ep, current_ep, b_span.start_mus + b_span.duration_mus, current_span.start_mus, normalized) in sub_scores:
+                #     cost += sub_scores[(before_ep, current_ep, b_span.start_mus + b_span.duration_mus, current_span.start_mus, normalized)]
+                # else:
+                    sub_cost = self.GetEpPairCost(before_ep, current_ep, b_span.start_mus + b_span.duration_mus, current_span.start_mus, normalized)
+                    # sub_scores[(before_ep, current_ep, b_span.start_mus + b_span.duration_mus, current_span.start_mus, normalized)] = sub_cost
+                    cost += sub_cost
                     num_mappings += 1
                     # print(num_mappings)
 
             if len(invocation_graph.in_edges(current_ep)) == 0:
                 # print(first_ep, current_ep)
-                cost += self.GetEpPairCost(first_ep, current_ep, first_span.start_mus, current_span.start_mus, normalized)
+            # if (first_ep, current_ep, first_span.start_mus, current_span.start_mus, normalized) in sub_scores:
+            #     cost += sub_scores[(first_ep, current_ep, first_span.start_mus, current_span.start_mus, normalized)]
+            # else:
+                sub_cost = self.GetEpPairCost(first_ep, current_ep, first_span.start_mus, current_span.start_mus, normalized)
+                # sub_scores[(first_ep, current_ep, first_span.start_mus, current_span.start_mus, normalized)] = sub_cost
+                cost += sub_cost
                 num_mappings += 1
                 # print(num_mappings)
 
             if current_ep == last_ep:
                 # print(current_ep, first_ep)
-                cost += self.GetEpPairCost(current_ep, first_ep, current_span.start_mus + current_span.duration_mus, first_span.start_mus + first_span.duration_mus, normalized)
+            # if (current_ep, first_ep, current_span.start_mus + current_span.duration_mus, first_span.start_mus + first_span.duration_mus, normalized) in sub_scores:
+            #     cost += sub_scores[(current_ep, first_ep, current_span.start_mus + current_span.duration_mus, first_span.start_mus + first_span.duration_mus, normalized)]
+            # else:
+                sub_cost = self.GetEpPairCost(current_ep, first_ep, current_span.start_mus + current_span.duration_mus, first_span.start_mus + first_span.duration_mus, normalized)
+                # sub_scores[(current_ep, first_ep, current_span.start_mus + current_span.duration_mus, first_span.start_mus + first_span.duration_mus, normalized)] = sub_cost
+                cost += sub_cost
                 num_mappings += 1
                 # print(num_mappings)
 
@@ -374,8 +398,8 @@ class Timing(object):
 
         # print(num_mappings, normalized)
         if normalized:
-            return cost / num_mappings
-        return cost
+            return cost / num_mappings, sub_scores
+        return cost, sub_scores
 
     def FindMinCostAssignment(self, in_span, out_eps, out_span_partitions):
         global best_assignment
