@@ -3,11 +3,14 @@ import time
 import math
 import copy
 import heapq
+import bisect
 import numpy as np
 import scipy.stats
 import random, string
 import networkx as nx
 from spans import Span
+import helpers.utils as utils
+import matplotlib.pyplot as plt
 from algorithms.timing import Timing
 from networkx.algorithms import approximation
 
@@ -37,6 +40,7 @@ class Timing3(Timing):
         self.true_skips = False
         self.true_dist = False
         self.overall_skip_budget = {}
+        self.sub_scores = {}
 
     def ContainsSkip2(self, assignment):
         for (ep, i) in assignment:
@@ -91,40 +95,6 @@ class Timing3(Timing):
 
         for key in self.distribution_values_true.keys():
             self.services_times[key] = np.mean(self.distribution_values_true[key]), np.std(self.distribution_values_true[key])
-
-    # def BuildDistributions2(self, process, in_span_partitions, out_span_partitions, in_eps, out_eps):
-    #     for ep in in_span_partitions.keys():
-    #         in_span_partitions[ep].sort(key = lambda x: float(x.start_mus))
-    #     for ep in out_span_partitions.keys():
-    #         out_span_partitions[ep].sort(key = lambda x: float(x.start_mus))
-
-    #     in_span_ep, in_spans = list(in_span_partitions.items())[0]
-    #     all_assignments = { ep: {} for ep in out_span_partitions.keys() }
-
-    #     for ind in range(len(in_spans)):
-    #         for ep, out_spans in out_span_partitions.items():
-    #             all_assignments[ep][(in_spans[ind].trace_id, in_spans[ind].sid)] = ['NA', 'NA']
-
-    #     out_eps = self.GetOutEpsInOrder(out_span_partitions)
-
-    #     for ep in out_eps:
-    #         out_spans = out_span_partitions[ep]
-    #         j = 0
-    #         for i in range(len(in_spans)):
-    #             while float(out_spans[j].start_mus) < float(in_spans[i].start_mus):
-    #                 j += 1
-    #             if float(out_spans[j].start_mus) >= float(in_spans[i].start_mus) and ((i == (len(in_spans) - 1)) or (float(out_spans[j].start_mus) < float(in_spans[i + 1].start_mus))):
-    #                 all_assignments[ep][(in_spans[i].trace_id, in_spans[i].sid)] = [out_spans[j].trace_id, out_spans[j].sid]
-    #                 if (in_span_ep, ep) not in self.distribution_values2:
-    #                     self.distribution_values2[(in_span_ep, ep)] = []
-    #                 self.distribution_values2[(in_span_ep, ep)].append(out_spans[j].start_mus - in_spans[i].start_mus)
-    #                 if
-    #                 j += 1
-
-    #     for key in self.distribution_values2.keys():
-    #         self.services_times[key] = np.mean(self.distribution_values2[key]), np.std(self.distribution_values2[key])
-
-    #     return all_assignments
 
     def BuildDistributions(self, process, in_span_partitions, out_span_partitions, in_eps, out_eps):
 
@@ -193,6 +163,40 @@ class Timing3(Timing):
         for key in self.distribution_values.keys():
             self.services_times[key] = np.mean(self.distribution_values[key]), np.std(self.distribution_values[key])
 
+    # def BuildDistributions2(self, process, in_span_partitions, out_span_partitions, in_eps, out_eps):
+    #     for ep in in_span_partitions.keys():
+    #         in_span_partitions[ep].sort(key = lambda x: float(x.start_mus))
+    #     for ep in out_span_partitions.keys():
+    #         out_span_partitions[ep].sort(key = lambda x: float(x.start_mus))
+
+    #     in_span_ep, in_spans = list(in_span_partitions.items())[0]
+    #     all_assignments = { ep: {} for ep in out_span_partitions.keys() }
+
+    #     for ind in range(len(in_spans)):
+    #         for ep, out_spans in out_span_partitions.items():
+    #             all_assignments[ep][(in_spans[ind].trace_id, in_spans[ind].sid)] = ['NA', 'NA']
+
+    #     out_eps = self.GetOutEpsInOrder(out_span_partitions)
+
+    #     for ep in out_eps:
+    #         out_spans = out_span_partitions[ep]
+    #         j = 0
+    #         for i in range(len(in_spans)):
+    #             while float(out_spans[j].start_mus) < float(in_spans[i].start_mus):
+    #                 j += 1
+    #             if float(out_spans[j].start_mus) >= float(in_spans[i].start_mus) and ((i == (len(in_spans) - 1)) or (float(out_spans[j].start_mus) < float(in_spans[i + 1].start_mus))):
+    #                 all_assignments[ep][(in_spans[i].trace_id, in_spans[i].sid)] = [out_spans[j].trace_id, out_spans[j].sid]
+    #                 if (in_span_ep, ep) not in self.distribution_values2:
+    #                     self.distribution_values2[(in_span_ep, ep)] = []
+    #                 self.distribution_values2[(in_span_ep, ep)].append(out_spans[j].start_mus - in_spans[i].start_mus)
+    #                 if
+    #                 j += 1
+
+    #     for key in self.distribution_values2.keys():
+    #         self.services_times[key] = np.mean(self.distribution_values2[key]), np.std(self.distribution_values2[key])
+
+    #     return all_assignments
+
     def GenerateRandomID(self):
         x = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
         return x
@@ -203,21 +207,143 @@ class Timing3(Timing):
 
         self.per_span_candidates[(stack[0].trace_id, stack[0].sid)] += 1
 
-    def FindTopKAssignments(self, in_eps, in_span, out_eps, out_span_partitions, K, invocation_graph):
+    def FindTopKAssignments(self, in_eps, in_span, out_eps, out_span_partitions, K, invocation_graph, id_x, preprocess_phase = False, count_candidates_phase = True):
+
+        def FindCutoffs(in_span, out_span_partitions, invocation_graph):
+
+            cutoff_points = {}
+            # Initialize cutoff points for outgoing partitions
+            for ep in out_span_partitions.keys():
+                cutoff_points[ep] = [len(out_span_partitions[ep]) - 1, 0]
+
+            # Create a reverse topological order of nodes in the invocation graph
+            reverse_top_order = list(reversed(list(nx.topological_sort(invocation_graph))))
+
+            # Iterate through each node in the reverse topological order
+            for node in reverse_top_order:
+                # Initialize the future start time
+                early_exit_time = in_span.start_mus + in_span.duration_mus
+
+                # Iterate through each outgoing edge of the current node
+                for _, neighbor in invocation_graph.out_edges(node):
+                    # Update the future start time based on the neighbor's cutoff point
+                    early_exit_time = min(early_exit_time, out_span_partitions[neighbor][cutoff_points[neighbor][1]].start_mus)
+
+                # Find the start and end indices of the subset of spans using binary search
+                start_index = bisect.bisect_left(
+                    out_span_partitions[node],
+                    in_span.start_mus,
+                    key=lambda span: span.start_mus
+                )
+                end_index = bisect.bisect_right(
+                    out_span_partitions[node],
+                    early_exit_time,
+                    key=lambda span: span.start_mus
+                )
+
+                cutoff_points[node][0] = start_index
+                cutoff_points[node][1] = end_index - 1
+                # print(in_span)
+                # print(node)
+                # print(cutoff_points[node][0], cutoff_points[node][1])
+                # input()
+                # # Iterate through the spans in the subset
+                # for span_index in range(start_index, end_index):
+                #     span = out_span_partitions[node][span_index]
+                #     # Check if the current span satisfies the constraints
+                #     if span.start_mus >= in_span.start_mus and span.start_mus + span.duration_mus <= early_exit_time:
+                #         # Update the cutoff point for the current node
+                #         cutoff_points[node][1] = span_index
+                #     else:
+                #         # Break the loop if the constraints are not satisfied
+                #         break
+                # if node == "search" or node == "reservation" or node == "profile":
+                #     continue
+                # else:
+                #     print("node", node)
+                #     print("cut-off", cutoff_points[node])
+            return cutoff_points
+
+        cutoff_points = FindCutoffs(in_span, out_span_partitions, invocation_graph)
+        # for ep in out_span_partitions.keys():
+        #     if len(out_span_partitions[ep]) != 1000:
+        #         print(id_x, len(out_span_partitions[ep]))
+        #     cutoff_points[ep] = [0, len(out_span_partitions[ep])]
+
         # f = open("dump.txt", "a")
 
         global top_assignments
         top_assignments = []
 
         normalized = False
-        for ep in out_eps:
-            if self.overall_skip_budget[ep] > 0:
-                normalized = True
-                break
-
-        if self.true_skips == False:
+        if not preprocess_phase:
             for ep in out_eps:
-                out_span_partitions[ep].append(None)
+                if self.overall_skip_budget[ep] > 0:
+                    normalized = True
+                    break
+
+        if not preprocess_phase:
+            if self.true_skips == False:
+                for ep in out_eps:
+                    out_span_partitions[ep].append(None)
+
+        def DfsTraverse3(stack, invocation_graph):
+            global top_assignments
+            i = len(stack)
+            if VERBOSE:
+                print("DFSTraverse3", i, out_eps, stack)
+            if i == len(out_span_partitions) + 1:
+                stack2 = []
+                for s in stack:
+                    stack2.append(s[1])
+                if count_candidates_phase:
+                    self.AddToCandidatesList(stack2)
+                # min heap
+                heapq.heappush(top_assignments, stack)
+                if len(top_assignments) > K and K != -1:
+                    heapq.heappop(top_assignments)
+            else:
+                ep = out_eps[i - 1]
+
+                for x, s in enumerate(out_span_partitions[ep]):
+                    if cutoff_points[ep][0] > x:
+                        continue
+                    if cutoff_points[ep][1] < x:
+                        break
+                    before_eps = invocation_graph.in_edges(ep)
+                    candidate = True
+
+                    if (
+                        in_span.start_mus > s.start_mus or
+                        s.start_mus + s.duration_mus > in_span.start_mus + in_span.duration_mus
+                    ):
+                        candidate = False
+                        continue
+
+                    b_span = "None"
+                    for (before_ep, self_ep) in before_eps:
+
+                        # print(before_ep, self_ep)
+                        # nx.draw(invocation_graph, with_labels=True, font_weight='bold')
+                        # plt.show()
+
+                        idx = next((i for i, (v, *_) in enumerate(stack) if v == before_ep), None)
+                        assert idx != None
+                        b_ep = stack[idx][0]
+                        b_span = stack[idx][1]
+                        assert b_ep == before_ep
+
+                        if b_span.trace_id == "None":
+                            continue
+
+                        if (
+                            b_span.start_mus + b_span.duration_mus > s.start_mus
+                        ):
+                            candidate = False
+                            continue
+
+                    if candidate:
+                        DfsTraverse3(stack + [(ep, s)], invocation_graph)
 
         # Handle skip spans in this version
 
@@ -233,17 +359,18 @@ class Timing3(Timing):
                 # for st in stack2:
                     # print(st)
                 # input()
-                self.AddToCandidatesList(stack2)
+                if count_candidates_phase:
+                    self.AddToCandidatesList(stack2)
                 # if self.ContainsSkip(stack2):
                 #     score = self.ScoreAssignmentWithSkip(stack2, normalized)
                 # elif self.parallel:
                 #     score = self.ScoreAssignmentParallel(stack2, normalized)
                 # else:
                 #     score = self.ScoreAssignmentSequential(stack2, normalized)
-                score = self.ScoreAssignmentAsPerInvocationGraph(stack, invocation_graph, out_eps, normalized)
+                score, self.sub_scores = self.ScoreAssignmentAsPerInvocationGraph(stack, invocation_graph, out_eps, self.sub_scores, normalized)
                 # min heap
                 heapq.heappush(top_assignments, (score, stack))
-                if len(top_assignments) > K:
+                if len(top_assignments) > K and K != -1:
                     heapq.heappop(top_assignments)
             # elif i in self.instrumented_hops:
             #     ep = out_eps[i - 1]
@@ -254,12 +381,17 @@ class Timing3(Timing):
             #             break
             else:
                 ep = out_eps[i - 1]
+
                 if self.true_skips == True and self.true_assignments[ep][in_span.GetId()][0] == "Skip":
                     new_span_id = self.GenerateRandomID()
                     skip_span = Span("None", new_span_id, "None", "None", "None", "None", "None", "None", "None")
                     DfsTraverse2(stack + [(ep, skip_span)], invocation_graph)
                 else:
                     for x, s in enumerate(out_span_partitions[ep]):
+                        if cutoff_points[ep][0] > x:
+                            continue
+                        if cutoff_points[ep][1] < x:
+                            break
                         if self.true_skips == False and s == None:
                             skip_span = self.FetchSkipFromWindow(ep, in_span.start_mus)
                             if skip_span != None:
@@ -318,7 +450,8 @@ class Timing3(Timing):
             last_span = stack[-1]
             if i == len(out_span_partitions) + 1:
                 # print("X")
-                self.AddToCandidatesList(stack)
+                if count_candidates_phase:
+                    self.AddToCandidatesList(stack)
                 if self.ContainsSkip(stack):
                     score = self.ScoreAssignmentWithSkip(stack, normalized)
                 elif self.parallel:
@@ -450,31 +583,34 @@ class Timing3(Timing):
                                         # f.write(str(last_span) + ", " + str(s) + "\n")
                                         DfsTraverse(stack + [s], depth + 1, l_non_skip_depth + 1, None, None)
 
-        # DfsTraverse([in_span], 1, 1, None, None)
-        # top_assignments.sort(reverse=True)
-        # if self.true_skips == False:
-        #     for ep in out_eps:
-        #         out_span_partitions[ep].pop()
+        if preprocess_phase:
+            in_ep = in_eps[0]
+            DfsTraverse3([(in_ep, in_span)], invocation_graph)
+            top_assignments.sort(reverse=True)
+            return top_assignments
 
-        # # f.close()
+        else:
 
-        # return top_assignments
+            # DfsTraverse([in_span], 1, 1, None, None)
+            # top_assignments.sort(reverse=True)
+            # if self.true_skips == False:
+            #     for ep in out_eps:
+            #         out_span_partitions[ep].pop()
+            # # f.close()
+            # return top_assignments
 
-        in_ep = in_eps[0]
-
-        DfsTraverse2([(in_ep, in_span)], invocation_graph)
-        top_assignments2 = []
-        for assignment in top_assignments:
-            s_assignment = (assignment[0], [s[1] for s in assignment[1]])
-            top_assignments2.append(s_assignment)
-        top_assignments2.sort(reverse=True)
-        if self.true_skips == False:
-            for ep in out_eps:
-                out_span_partitions[ep].pop()
-
-        # f.close()
-
-        return top_assignments2
+            in_ep = in_eps[0]
+            DfsTraverse2([(in_ep, in_span)], invocation_graph)
+            top_assignments2 = []
+            for assignment in top_assignments:
+                s_assignment = (assignment[0], [s[1] for s in assignment[1]])
+                top_assignments2.append(s_assignment)
+            top_assignments2.sort(reverse=True)
+            if self.true_skips == False:
+                for ep in out_eps:
+                    out_span_partitions[ep].pop()
+            # f.close()
+            return top_assignments2
 
     def GetSpanIDNotation(self, out_eps, assignment, type1):
         span_id_notation = []
@@ -691,6 +827,64 @@ class Timing3(Timing):
                     % (ep1, ep2, mean, std)
                 )
             self.services_times[(ep1, ep2)] = mean, std
+
+        in_ep = list(in_span_partitions.keys())[0]
+
+        for out_ep in out_span_partitions.keys():
+
+            if len(invocation_graph.in_edges(out_ep)) == 0:
+                t1 = sorted([s.start_mus for s in in_span_partitions[in_ep]])
+                t2 = sorted([s.start_mus for s in out_span_partitions[out_ep]])
+                ComputeDistParams(in_ep, out_ep, t1, t2)
+
+            before_eps = invocation_graph.in_edges(out_ep)
+
+            for (before_ep, self_ep) in before_eps:
+
+                if not self.AlsoNonPrimaryAncestor(before_ep, self_ep, invocation_graph):
+
+                    if before_ep == in_ep:
+                        t1 = sorted([s.start_mus for s in in_span_partitions[before_ep]])
+                        t2 = sorted([s.start_mus for s in out_span_partitions[self_ep]])
+                        ComputeDistParams(before_ep, self_ep, t1, t2)
+
+                    else:
+                        t1 = sorted([s.start_mus + s.duration_mus for s in out_span_partitions[before_ep]])
+                        t2 = sorted([s.start_mus for s in out_span_partitions[self_ep]])
+                        ComputeDistParams(before_ep, self_ep, t1, t2)
+
+            t1 = sorted([s.start_mus + s.duration_mus for s in out_span_partitions[out_ep]])
+            t2 = sorted([s.start_mus + s.duration_mus for s in in_span_partitions[in_ep]])
+            ComputeDistParams(out_ep, in_ep, t1, t2)
+
+    def ComputeEpPairDistParams4(
+        self,
+        in_span_partitions,
+        out_span_partitions,
+        out_eps,
+        in_span_start,
+        in_span_end,
+        invocation_graph
+    ):
+
+        def ComputeDistParams(ep1, ep2, t1, t2):
+            t1 = t1[in_span_start:in_span_end]
+            t2 = t2[in_span_start:in_span_end]
+            assert len(t1) == len(t2)
+            batch_means = []
+            batch_size = 50
+            nbatches = math.ceil(float(len(t1)) / batch_size)
+            if nbatches == 0:
+                print("no batches")
+                input()
+            for i in range(nbatches):
+                start = i * batch_size
+                end = min(len(t1), (i + 1) * batch_size)
+                if end - start > 0:
+                    batch_means.append(
+                        (sum(t2[start:end]) - sum(t1[start:end])) / (end - start)
+                    )
+            self.services_times[(ep1, ep2)] = batch_means
 
         in_ep = list(in_span_partitions.keys())[0]
 
@@ -974,16 +1168,20 @@ class Timing3(Timing):
         span_to_top_assignments = {}
         in_eps, in_spans = list(in_span_partitions.items())[0]
         in_eps = [in_eps] if isinstance(in_eps, str) else in_eps
-        out_eps = self.GetOutEpsInOrder(out_span_partitions)
+        # out_eps = self.GetOutEpsInOrder(out_span_partitions)
+        out_eps = self.GetOutEpsInOrder(out_span_partitions, invocation_graph)
         out_span_partitions_copy = copy.deepcopy(out_span_partitions)
+        out_span_partitions_copy_2 = copy.deepcopy(out_span_partitions)
         # TODO: make this dynamic
         sorted_durations = [i.duration_mus for i in sorted(in_span_partitions[in_eps[0]], key=lambda s: s.duration_mus)]
         batch_size = 100
-        batch_size_mis = 10
-        topK = 5
+        batch_size_mis = 1000
+        topK = 10
         self.normal = True
         self.span_windows = self.CreateWindows(in_span_partitions, in_eps, batch_size_mis, np.percentile(sorted_durations, 50))
         window_ends = [i[1] for i in self.span_windows]
+        print("Len(window ends): ", len(window_ends))
+        print("Max batch size: ", max([x[1]-x[0] for x in self.span_windows]))
         cnt = 0
         cnt_unassigned = 0
         not_best_count = 0
@@ -991,6 +1189,7 @@ class Timing3(Timing):
         all_topk_assignments = {}
         top_assignments = []
         batch_in_spans = []
+        self.sub_scores = {}
 
         # print(len(self.span_windows))
         # print(self.span_windows)
