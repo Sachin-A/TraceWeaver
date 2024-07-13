@@ -120,7 +120,7 @@ class Timing2(Timing):
                 span_id_notation.append(assignment[out_ep].GetId())
         return span_id_notation
 
-    def FindAssignments(self, process, in_span_partitions, out_span_partitions, parallel, instrumented_hops, true_assignments):
+    def FindAssignments(self, method, process, in_span_partitions, out_span_partitions, parallel, instrumented_hops, true_assignments):
         assert len(in_span_partitions) == 1
         self.process = process
         self.parallel = parallel
@@ -136,7 +136,7 @@ class Timing2(Timing):
         out_span_partitions_copy = copy.deepcopy(out_span_partitions)
         #!TODO: make this dynamic
         batch_size = 100
-        batch_size_mis = 10
+        batch_size_mis = 30
         topK = 5
         cnt = 0
         cnt_unassigned = 0

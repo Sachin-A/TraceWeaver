@@ -2,6 +2,14 @@ import copy
 import config
 import pickle
 
+def SortPartitionsByTraceId(span_partitions):
+    for ep, part in span_partitions.items():
+        part.sort(key=lambda x: x.trace_id)
+
+def SortPartitionsByTime(span_partitions):
+    for ep, part in span_partitions.items():
+        part.sort(key=lambda x: (x.start_mus, x.start_mus + x.duration_mus))
+
 def GetOutEpsInOrder(out_span_partitions):
     eps = []
     for ep, spans in out_span_partitions.items():
@@ -256,4 +264,4 @@ def PrintLatency12(trace_acc, all_spans):
     all_traces.sort()
     for x in all_traces:
         x = x[0] - min_time, x[1], x[2], x[3], x[4]
-        print(x)
+        # print(x)

@@ -1,7 +1,9 @@
 import math
 import copy
 import scipy.stats
+import numpy as np
 import networkx as nx
+from sklearn import mixture
 
 VERBOSE = False
 
@@ -31,7 +33,9 @@ class Timing(object):
                 assert out_span.start_mus > prev_time
                 prev_time = out_span.start_mus + out_span.duration_mus
 
-    def GetOutEpsInOrder(self, out_span_partitions):
+    def GetOutEpsInOrder(self, out_span_partitions, invocation_graph=None):
+        if invocation_graph:
+            return list(nx.topological_sort(invocation_graph))
         eps = []
         for ep, spans in out_span_partitions.items():
             assert len(spans) > 0
@@ -110,26 +114,37 @@ class Timing(object):
         return p
 
     def GetEpPairCost(self, ep1, ep2, t1, t2, normalized = False):
-        mean, std = self.services_times[(ep1, ep2)]
-        if std < 1.0e-12:
-            std = 0.001
-        if self.normal:
-            if not normalized:
-                p = scipy.stats.norm.logpdf(t2 - t1, loc=mean, scale=std)
+        dist_value = self.services_times[(ep1, ep2)]
+        if type(dist_value) is list:
+
+            kde = scipy.stats.gaussian_kde(dist_value)
+            p = kde.evaluate(t2 - t1)
+            return p
+
+        elif type(dist_value) is mixture._gaussian_mixture.GaussianMixture:
+            return dist_value.score(np.array([t2 - t1]).reshape(1, -1))
+
+        else:
+            mean, std = dist_value
+            if std < 1.0e-12:
+                std = 0.001
+            if self.normal:
+                if not normalized:
+                    p = scipy.stats.norm.logpdf(t2 - t1, loc=mean, scale=std)
+                else:
+                    p = scipy.stats.norm.pdf(t2 - t1, loc=mean, scale=std)
             else:
-                p = scipy.stats.norm.pdf(t2 - t1, loc=mean, scale=std)
-        else:
-            p = scipy.stats.expon.logpdf(t2 - t1, scale=mean)
-        return p
-        """
-        # CDF
-        x = scipy.stats.norm.cdf(t2 - t1, loc=mean, scale=std)
-        cp = 2 * min(x, 1-x)
-        if cp==0:
-            return -math.inf
-        else:
-            return math.log(cp)
-        """
+                p = scipy.stats.expon.logpdf(t2 - t1, scale=mean)
+            return p
+            """
+            # CDF
+            x = scipy.stats.norm.cdf(t2 - t1, loc=mean, scale=std)
+            cp = 2 * min(x, 1-x)
+            if cp==0:
+                return -math.inf
+            else:
+                return math.log(cp)
+            """
 
     def AllSkip(self, assignment):
         for i in assignment[1:]:
@@ -256,6 +271,9 @@ class Timing(object):
                 if path_length > 1:
                     return True
         return False
+
+    def ScoreAssignmentAsPerInvocationGraph2(self, assignment, invocation_graph, out_eps, sub_scores, normalized = False):
+        return 0, sub_scores
 
     def ScoreAssignmentAsPerInvocationGraph(self, assignment, invocation_graph, out_eps, sub_scores, normalized = False):
 
@@ -531,7 +549,7 @@ class Timing(object):
                     out_span_id = out_span.GetId() if out_span is not None else ("NA", "NA")
                 all_topk_assignments[ep][in_span.GetId()].append(out_span_id)
 
-    def FindAssignments(self, process, in_span_partitions, out_span_partitions, parallel, instrumented_hops, true_assignments):
+    def FindAssignments(self, method, process, in_span_partitions, out_span_partitions, parallel, instrumented_hops, true_assignments):
         assert len(in_span_partitions) == 1
         self.parallel = parallel
         self.instrumented_hops = instrumented_hops

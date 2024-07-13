@@ -29,6 +29,7 @@ class Span(object):
 
     def GetChildProcess(self, all_processes, all_spans):
         assert self.span_kind == "client"
+        # print(len(self.children_spans))
         assert len(self.children_spans) == 1
         return all_processes[self.trace_id][
             all_spans[self.children_spans[0]].process_id

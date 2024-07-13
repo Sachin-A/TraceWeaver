@@ -4,7 +4,7 @@ class vPath(object):
         self.all_processes = all_processes
 
     def FindAssignments(
-        self, process, in_span_partitions, out_span_partitions, parallel, instrumented_hops, true_assignments
+        self, method, process, in_span_partitions, out_span_partitions, parallel, instrumented_hops, true_assignments
     ):
         assert len(in_span_partitions) == 1
         for ep in in_span_partitions.keys():

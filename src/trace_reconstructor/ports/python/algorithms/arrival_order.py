@@ -11,7 +11,7 @@ class ArrivalOrder(object):
         self.true_assignments = None
 
     def FindAssignments(
-        self, process, in_span_partitions, out_span_partitions, parallel, instrumented_hops, true_assignments
+        self, method, process, in_span_partitions, out_span_partitions, parallel, instrumented_hops, true_assignments
     ):
 
         assert len(in_span_partitions) == 1

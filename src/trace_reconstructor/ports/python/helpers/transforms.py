@@ -1,11 +1,101 @@
+import copy
 import random
+import string
 import numpy as np
 from spans import Span
-from helpers.utils import GetOutEpsInOrder
+from helpers.utils import *
 
 def repeat_change_spans(in_span_partitions, out_span_partitions, repeat_factor, compress_factor):
-
     if repeat_factor == 1 and compress_factor == 1:
+        return in_span_partitions, out_span_partitions
+
+    SortPartitionsByTraceId(in_span_partitions)
+    SortPartitionsByTraceId(out_span_partitions)
+
+    assert len(in_span_partitions) == 1
+    ep_in, in_spans = list(in_span_partitions.items())[0]
+
+    for i, in_span in enumerate(in_spans):
+        x = in_span.start_mus / compress_factor
+        x_tid = in_span.trace_id
+
+        for ep_out in out_span_partitions.keys():
+            # print(out_span_partitions[ep_out][i].trace_id, x_tid)
+            if out_span_partitions[ep_out][i].trace_id != x_tid:
+                # print(out_span_partitions[ep_out][i].trace_id, x_tid)
+                print("Spans are not in order!")
+                assert False
+            y = x + (int(out_span_partitions[ep_out][i].start_mus) - int(in_span_partitions[ep_in][i].start_mus))
+            out_span_partitions[ep_out][i].start_mus = y
+
+        in_span_partitions[ep_in][i].start_mus = x
+
+    SortPartitionsByTime(in_span_partitions)
+    SortPartitionsByTime(out_span_partitions)
+
+    # input()
+
+    return in_span_partitions, out_span_partitions
+
+def repeat_change_spans2(in_span_partitions, out_span_partitions, repeat_factor, compress_factor):
+
+    print("Compresses but doesn't repeat or shuffle")
+
+    # if repeat_factor <= 1 and compress_factor <= 1:
+    #     return in_span_partitions, out_span_partitions
+
+    assert len(in_span_partitions) == 1
+    in_span_partitions_old = copy.deepcopy(in_span_partitions)
+    out_span_partitions_old = copy.deepcopy(out_span_partitions)
+    ep_in, in_spans = list(in_span_partitions_old.items())[0]
+
+    span_inds = []
+    for ind, in_span in enumerate(in_spans):
+        time_order = True
+        for ep_out in out_span_partitions.keys():
+            out_span = out_span_partitions[ep_out][ind]
+            time_order = (
+                time_order
+                and (float(in_span.start_mus) <= float(out_span.start_mus))
+                and (
+                    float(out_span.start_mus) + float(out_span.duration_mus)
+                    <= float(in_span.start_mus) + float(in_span.duration_mus)
+                )
+            )
+        if time_order:
+            span_inds.append(ind)
+
+    in_span_partitions[ep_in] = []
+    for ep_out in out_span_partitions_old.keys():
+        out_span_partitions[ep_out] = []
+
+    for ind in span_inds:
+        # trace_id = "".join(random.choice(string.ascii_lowercase + string.digits) for _ in range(32))
+        in_span = copy.deepcopy(in_spans[ind])
+        print(in_span.start_mus)
+        in_span.start_mus = float(in_span.start_mus) / compress_factor
+        print(in_span.start_mus)
+        in_span_partitions[ep_in].append(in_span)
+        # print(in_span.trace_id, in_span.sid)
+
+        for ep_out in out_span_partitions_old.keys():
+            out_span = copy.deepcopy(out_span_partitions_old[ep_out][ind])
+            print(out_span.start_mus)
+            out_span.start_mus = float(out_span.start_mus) / compress_factor
+            print(out_span.start_mus)
+            input()
+            # out_span.trace_id = trace_id
+            out_span_partitions[ep_out].append(out_span)
+            # print(out_span.trace_id, out_span.sid)
+            # input()
+
+    return in_span_partitions, out_span_partitions
+
+def repeat_change_spans_3(in_span_partitions, out_span_partitions, repeat_factor, compress_factor):
+
+    print("Compresses, repeats, and shuffles")
+
+    if repeat_factor <= 1 and compress_factor <= 1:
         return in_span_partitions, out_span_partitions
 
     assert len(in_span_partitions) == 1
