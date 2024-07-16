@@ -934,7 +934,7 @@ traces_overall = {}
 cache_updated = False
 rps_rates = {}
 
-with open(r"/scratch/sachina3/projects/random/service_to_replica_new.pickle", "rb") as input_file:
+with open(os.path.join(PROJECT_ROOT, "data/misc/service_to_replica_new.pickle"), "rb") as input_file:
     service_to_replica = cPickle.load(input_file)
 
 def process_single_process(method, predictor, process_id, process, in_spans_by_process, out_spans_by_process, all_processes, all_spans, service_to_replica, serviceLoopMap, COMPRESS_FACTOR, REPEAT_FACTOR, CACHE_RATE, INSTRUMENTED, CalculateRate, FindOrder, transforms, utils):
