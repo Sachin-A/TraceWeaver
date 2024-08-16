@@ -22,40 +22,21 @@ test_name_suffix = sys.argv[2]
 output_file_name = sys.argv[3]
 
 def plot_lines(xs, ys, labels, xlabel, ylabel, outfile):
-    # create plot
     fig, ax = plt.subplots()
-    # fig.set_figheight(6)
-    # fig.set_figwidth(7)
-    #ax.set_xscale("log", basex=2)
-    #ax.set_yscale("log", basey=2)
     nlines = len(xs)
     assert (len(ys) == nlines and len(labels) == nlines)
     for i in range(nlines):
         pcolor = pcolors[i]
         ax.plot(xs[i], ys[i], '-', color=pcolor,  lw=2.5,  marker=markers[i], mew = 1.5, fillstyle="full", markersize = 10, markeredgecolor=pcolor, dash_capstyle='round', label=labels[i], zorder=10, clip_on=False)
-        #ax.plot(xs[i], ys[i], '-', color=pcolor,  lw=2.5,  dash_capstyle='round', label=labels[i])
 
     label_fontsize=20
     ax.set_xlabel(xlabel, fontproperties=gs_font, fontsize=label_fontsize)
     ax.set_ylabel(ylabel, fontproperties=gs_font, fontsize=label_fontsize)
-    # xmax=1.05*max([max(x) for x in xs])
     xmax, ymax = 200, 60
-    # plt.xlim(xmax=155.0)
-    # plt.xlim(xmax=105.0)
-    # plt.xlim(xmax=1.05)
     plt.ylim(ymin=0, ymax=100.5)
     plt.xlim(xmin=0, xmax=5.05)
-    #plt.ylim(ymin=-0.1, ymax=1.0) #ymax=1.01*max([max(y) for y in ys]))
-    #plt.annotate('correct prediction', xy=(0.45, 0.90), xycoords='axes fraction', fontsize=label_fontsize)
-    #ax.axhspan(0.0, xmax, alpha=0.6, color='grey')
     ax.grid(linestyle=':', linewidth=1, color='grey')
     ticklabelcolor = 'black'
-    # plt.xticks(fontsize=12, rotation=90)
-    # plt.xticks(fontsize=12)
-    #xticks = np.array([300, 1200, 4800, 19200, 76800])
-    #ax.xaxis.set_ticks(xticks)
-    #xticks = np.array([string(x) for x in xticks])
-    #ax.set_xticklabels(xticks, color=ticklabelcolor)
     leg = ax.legend(bbox_to_anchor=(0.28, 0.45), borderaxespad=0, loc=2, numpoints=2, handlelength=2, prop=gs_font, fontsize=30)
     leg.get_frame().set_linewidth(0.0)
     plt.tick_params(labelsize=label_fontsize)

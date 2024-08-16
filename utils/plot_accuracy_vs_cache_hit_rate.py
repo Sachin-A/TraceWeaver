@@ -25,16 +25,12 @@ test_name_suffix = sys.argv[2]
 output_file_name = sys.argv[3]
 
 def plot_lines(xs, ys, labels, xlabel, ylabel, outfile):
-    # create plot
     fig, ax = plt.subplots()
-    #ax.set_xscale("log", basex=2)
-    #ax.set_yscale("log", basey=2)
     nlines = len(xs)
     assert (len(ys) == nlines and len(labels) == nlines)
     for i in range(nlines):
         pcolor = pcolors[i]
         ax.plot(xs[i], ys[i], '-', color=pcolor,  lw=2.5,  marker=markers[i], mew = 1.5, fillstyle="full", markersize = 10, markeredgecolor=pcolor, dash_capstyle='round', label=labels[i], zorder=10, clip_on=False)
-        #ax.plot(xs[i], ys[i], '-', color=pcolor,  lw=2.5,  dash_capstyle='round', label=labels[i])
 
     label_fontsize=20
     ax.set_xlabel(xlabel, fontproperties=gs_font, fontsize=label_fontsize)
@@ -42,18 +38,9 @@ def plot_lines(xs, ys, labels, xlabel, ylabel, outfile):
     xmax=1.05*max([max(x) for x in xs])
     xmax, ymax = 200, 60
     plt.xlim(xmax=76.0)
-    # plt.xlim(xmax=46.0)
     plt.ylim(ymin=0, ymax=105)
-    # plt.axhline(y = 0.9, color = 'r', linestyle = '--', linewidth = 1)
-    #plt.ylim(ymin=-0.1, ymax=1.0) #ymax=1.01*max([max(y) for y in ys]))
-    #plt.annotate('correct prediction', xy=(0.45, 0.90), xycoords='axes fraction', fontsize=label_fontsize)
-    #ax.axhspan(0.0, xmax, alpha=0.6, color='grey')
     ax.grid(linestyle=':', linewidth=1, color='grey')
     ticklabelcolor = 'black'
-    #xticks = np.array([300, 1200, 4800, 19200, 76800])
-    #ax.xaxis.set_ticks(xticks)
-    #xticks = np.array([string(x) for x in xticks])
-    #ax.set_xticklabels(xticks, color=ticklabelcolor)
     leg = ax.legend(bbox_to_anchor=(0.28, 0.6), borderaxespad=0, loc=2, numpoints=2, handlelength=2, prop=gs_font, fontsize=label_fontsize)
     leg.get_frame().set_linewidth(0.0)
     plt.tick_params(labelsize=label_fontsize)
@@ -89,17 +76,13 @@ load = 150
 cache_hit_levels = [0.0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7]
 xs = []
 ys = []
-methods = ["MaxScoreBatchSubsetWithSkips", "WAP5", "vPath", "FCFS"]
+methods = ["MaxScoreBatchSubsetWithSkips", "WAP5", "FCFS"]
 for i in range(len(methods)):
     x = []
     y = []
     for j in range(len(cache_hit_levels)):
-        # if methods[i] == "MaxScoreBatchSubsetWithSkips":
         with open(results_directory + "accuracy_" + str(load) + "_" + test_name_suffix + "_" + str(cache_hit_levels[j]) + ".pickle", 'rb') as afile:
             accuracy_load = pickle.load(afile)
-        # else:
-        #     with open("accuracy_150__skipTestCameraReady_" + str(cache_hit_levels[j]) + ".pickle", 'rb') as afile:
-        #         accuracy_load = pickle.load(afile)
         x.append((j) * 5)
         y.append(accuracy_load[methods[i]])
     xs.append(x)
@@ -108,5 +91,5 @@ for i in range(len(methods)):
 print(xs)
 print(ys)
 
-methods = ["TraceWeaver", "WAP5", "vPath", "FCFS"]
+methods = ["TraceWeaver", "WAP5", "FCFS"]
 plot_lines(xs, ys, methods, "Cache %", "Accuracy %", output_file_name)

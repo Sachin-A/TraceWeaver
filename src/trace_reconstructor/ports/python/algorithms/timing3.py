@@ -763,7 +763,6 @@ class Timing3(Timing):
             if len(durations) == 0:
                 self.services_times[(ep1, ep2)] = (0, 0)
             else:
-                # print(len(durations))
                 max_n = min(len(np.unique(durations)), 5)
                 n_components = np.arange(1, max_n + 1)
                 models = []
@@ -1401,27 +1400,18 @@ class Timing3(Timing):
         best_score = -math.inf
         # Graph adjacency matrix (upper triangular) as a sparse matrix.
         adjacency_matrix = sp.triu(nx.to_scipy_sparse_array(G))
-        # adjacency_matrix = nx.adjacency_matrix(G)
         # Vertex weights
-        # weights = np.array([1 for i in range(len(G.nodes))])
         weights = np.array([G.nodes[n]['weight'] for n in G.nodes])
         nodes_list = np.array(list(G.nodes()))
 
-        # for i in range(20000):
         for i in range(1):
             try:
-                # print(f"Number of nodes: {G.number_of_nodes()}")
-                # print(f"Number of edges: {G.number_of_edges()}")
                 mwis = gurobi_mwis.maximum_weighted_independent_set(adjacency_matrix, weights, verbose=False)
             except:
-                # print(f"Number of nodes: {G.number_of_nodes()}")
-                # print(f"Number of edges: {G.number_of_edges()}")
                 print("Gurobi MIS error!")
                 assert False
             score = sum([G.nodes[tuple(nodes_list[n])]['weight'] for n in mwis])
-            # score = len(mis)
             if best_mwis is None or score > best_score:
-                # print(i)
                 best_mwis = [tuple(nodes_list[n]) for n in mwis]
                 best_score = score
         return best_mwis

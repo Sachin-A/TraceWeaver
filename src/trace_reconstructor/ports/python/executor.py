@@ -33,7 +33,6 @@ from algorithms.deepflow import DeepFlow
 from algorithms.timing import Timing
 from algorithms.timing2 import Timing2
 from algorithms.timing3 import Timing3
-# from algorithms.timing7 import Timing7 as Timing3
 
 cg_booleans = []
 
@@ -68,6 +67,10 @@ parser.add_argument('--execute_parallel', type=int, required=False, default=1,
                     help='should each service tracing be executed in parallel?')
 parser.add_argument('--results_directory', type=ascii, required=True, default=None,
                     help='directory to store results')
+parser.add_argument('--clear_cache', type=int, required=False, default=0,
+                    help='clear cache of processed, time-ordered file names')
+parser.add_argument('--predictor_indices', type=str, required=False, default='',
+                    help='Comma-separated list of indices of algorithms to run')
 args = parser.parse_args()
 
 if args.relative_path is None and args.absolute_path is None:
@@ -92,6 +95,13 @@ REPEAT_FACTOR = args.repeat_factor
 COMPRESS_FACTOR = args.compress_factor
 EXECUTE_PARALLEL = args.execute_parallel
 RESULTS_DIR = args.results_directory.strip('\'')
+CLEAR_CACHE = bool(args.clear_cache)
+
+try:
+    PREDICTOR_INDICES = list(map(int, args.predictor_indices.split(',')))
+except ValueError as e:
+    print(f"Error converting predictor indices: {e}")
+    sys.exit(1)
 
 random.seed(10)
 # np.seterr(all='raise')
@@ -175,9 +185,6 @@ def FindConstraintsUsingFit(in_span_partitions, out_span_partitions, gt_invocati
                 candidate_count += 1
                 if candidate_invocation_graph.has_edge(osp_2, osp_1) == False:
 
-                    # nx.draw(gt_invocation_graph, with_labels=True, font_weight='bold')
-                    # plt.show()
-
                     # Add the edge
                     candidate_invocation_graph.add_edge(osp_1, osp_2)
 
@@ -227,10 +234,6 @@ def FindOrder(in_span_partitions, out_span_partitions, true_assignments):
                 G2.add_edge(out_eps[i] + "-start", out_eps[j] + "-end")
                 G2.add_edge(out_eps[i] + "-end", out_eps[j] + "-start")
                 G2.add_edge(out_eps[i] + "-end", out_eps[j] + "-end")
-
-    # nx.draw(G2, with_labels=True, font_weight='bold')
-    # plt.show()
-    # plt.clf()
 
     for in_span in in_spans:
         outgoing_spans = []
@@ -316,13 +319,14 @@ def TimeOrder(files):
 
 def GetAllTracesInDir(directory):
     sorted_filenames_path = Path(directory) / "time_order_filenames.pickle"
+    if CLEAR_CACHE:
+        if os.path.exists(sorted_filenames_path):
+            os.remove(sorted_filenames_path)
 
-    if sorted_filenames_path.exists():
-        print("Yes")
+    if os.path.exists(sorted_filenames_path):
         with open(sorted_filenames_path, "rb") as f:
             files = pickle.load(f)
     else:
-        print("No")
         files = [f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
         files = [f for f in files if f.endswith("json")]
         full_path = os.path.abspath(directory)
@@ -425,9 +429,6 @@ def ParseSpansJson(spans_json, selfLoopMap, serviceLoopMap, first_span):
                 for child_id in children:
                     spans[parent_id].AddChild(child_id)
 
-        # for k, v in temp_children.items():
-        #     print(k[1], [i[1] for i in v])
-
         # Check time order constraint
         def check_time_constraints(span):
             for child_id in span.children_spans:
@@ -451,10 +452,6 @@ def ParseSpansJson(spans_json, selfLoopMap, serviceLoopMap, first_span):
             for child_id in span.children_spans:
                 child = spans[child_id]
                 if child.span_kind == "client":
-                    # print(child.span_id)
-                    # print(span.span_id)
-                    # print(spans[(span.trace_id, span.sid)].process_id)
-                    # input()
                     child.process_id = spans[(span.trace_id, span.sid)].process_id
                 # Recursively update references for all descendants
                 update_references(child)
@@ -470,15 +467,7 @@ def ParseSpansJson(spans_json, selfLoopMap, serviceLoopMap, first_span):
                 traverse_and_update(child)
 
         if root_span:
-            # print("yo")
             traverse_and_update(root_span)
-
-        # for span_id, span in spans.items():
-        #     print(span_id[1], span.process_id)
-        #     for child_id in span.children_spans:
-        #         print(child_id[1], spans[child_id].process_id)
-        #     print("XXX")
-        #     input()
 
         for span_id, span in spans.items():
             span.children_spans = []
@@ -665,12 +654,8 @@ def VisualizeTraceFromSpans(spans):
             parent_span_id = span.references[0]
             parent_span = spans[parent_span_id]
             caller_process = parent_span.process_id
-            # print(caller_process)
         else:
             caller_process = 'client'
-        #     print(caller_process)
-        # print(callee_process)
-        # input()
 
         # Map caller process to a simple letter
         if caller_process not in process_mapping:
@@ -709,12 +694,6 @@ def VisualizeTraceFromSpans(spans):
     print("{:<20} {:<20}".format('Real Process Name', 'Dummy Name'))
     for process, label in process_mapping.items():
         print("{:<20} {:<20}".format(process, label))
-
-    plt.title('Trace Execution Graph')
-    plt.savefig("trace-graph.svg")
-    plt.show()
-    print("done plotting")
-    input()
 
 def VisualizeTrace(trace_data):
     # Create a directed graph
@@ -773,10 +752,6 @@ def VisualizeTrace(trace_data):
     for process, label in process_mapping.items():
         print("{:<20} {:<20}".format(process, label))
 
-    plt.title('Trace Execution Graph')
-    plt.savefig("trace-graph.svg")
-    print("done plotting")
-
 def ParseJsonTrace(trace_json, selfLoopMap, serviceLoopMap):
     match FIX:
         case 0: first_span = "init-span"
@@ -790,14 +765,12 @@ def ParseJsonTrace(trace_json, selfLoopMap, serviceLoopMap):
 
     with open(trace_json, "r") as tfile:
         json_data = json.load(tfile)
-        # VisualizeTrace(json_data)
         json_data = json_data["data"]
         for d in json_data:
             trace_id = d["traceID"]
             spans, selfLoopMap, serviceLoopMap, d["spans"] = ParseSpansJson(d["spans"], selfLoopMap, serviceLoopMap, first_span)
             if spans == None:
                 return None, None, None, selfLoopMap, serviceLoopMap
-            # VisualizeTraceFromSpans(spans)
             if "requestType" in d["spans"][0].keys():
                 processes = ParseProcessesJson2(d["spans"])
             else:
@@ -913,18 +886,20 @@ if config.VERBOSE:
     print("\n\n\n")
 
 predictors = [
-    # ("MaxScoreBatch", Timing2(all_spans, all_processes)),
-    # ("MaxScoreBatchParallel", Timing2(all_spans, all_processes)),
+    ("MaxScoreBatch", Timing2(all_spans, all_processes)),
+    ("MaxScoreBatchParallel", Timing2(all_spans, all_processes)),
     ("MaxScore", Timing(all_spans, all_processes)),
     ("WAP5", WAP5(all_spans, all_processes)),
     ("FCFS", FCFS(all_spans, all_processes)),
-    # ("ArrivalOrder", ArrivalOrder(all_spans, all_processes)),
+    ("ArrivalOrder", ArrivalOrder(all_spans, all_processes)),
     ("vPath", vPath(all_spans, all_processes)),
     ("DeepFlow", DeepFlow(all_spans, all_processes)),
     ("MaxScoreBatchParallelWithoutIterations", Timing3(all_spans, all_processes)),
     ("MaxScoreBatchParallel", Timing3(all_spans, all_processes)),
     ("MaxScoreBatchSubsetWithSkips", Timing3(all_spans, all_processes)),
 ]
+
+predictors = [predictors[i] for i in PREDICTOR_INDICES if i < len(predictors)]
 
 accuracy_per_process = {}
 accuracy_overall = {}
@@ -976,10 +951,7 @@ def process_single_process(method, predictor, process_id, process, in_spans_by_p
 
     PARALLEL = (method == "MaxScoreBatchParallel") or (method == "MaxScoreBatchParallelWithoutIterations")
 
-    if INSTRUMENTED and process == "search":
-        instrumented_hops = []
-    else:
-        instrumented_hops = []
+    instrumented_hops = []
 
     true_assignments = utils.GetGroundTruth(in_span_partitions, out_span_partitions)
     invocation_graph = FindOrder(in_span_partitions, out_span_partitions, true_assignments)
@@ -1027,11 +999,6 @@ def process_single_process(method, predictor, process_id, process, in_spans_by_p
     return process, true_assignments, pred_assignments, pred_topk_assignments, acc, acc2, not_best_count, num_spans, per_span_candidates
 
 if EXECUTE_PARALLEL:
-
-    # accuracy_per_process = {}
-    # accuracy_overall = {}
-    # accuracy_percentile_bins = {}
-    # traces_overall = {}
 
     for method, predictor in predictors:
         random.seed(10)
@@ -1165,11 +1132,7 @@ else:
             else:
                 PARALLEL = False
 
-            if INSTRUMENTED and process == "search":
-                print(process)
-                instrumented_hops = []
-            else:
-                instrumented_hops = []
+            instrumented_hops = []
 
             true_assignments = utils.GetGroundTruth(in_span_partitions, out_span_partitions)
 
@@ -1191,8 +1154,6 @@ else:
             start_time = time.time()
 
             if method == "MaxScoreBatch":
-                if process == "service1":
-                    PARALLEL = True
                 pred_assignments, not_best_count, num_spans, per_span_candidates = predictor.FindAssignments(
                     method, process, in_span_partitions, out_span_partitions, PARALLEL, instrumented_hops, true_assignments
                 )
@@ -1201,20 +1162,14 @@ else:
                     method, process, in_span_partitions, out_span_partitions, True, instrumented_hops, true_assignments, invocation_graph
                 )
             elif method == "MaxScoreBatchSubset":
-                if process == "service1":
-                    PARALLEL = True
                 pred_assignments, not_best_count, num_spans, per_span_candidates = predictor.FindAssignments(
                     method, process, in_span_partitions, out_span_partitions, PARALLEL, instrumented_hops, true_assignments
                 )
             elif method == "MaxScore" or method == "MaxScoreBatchParallel2":
-                if process == "service1":
-                    PARALLEL = True
                 pred_assignments = predictor.FindAssignments(
                     method, process, in_span_partitions, out_span_partitions, True, instrumented_hops, true_assignments
                 )
             elif method == "MaxScoreBatchSubsetWithSkips":
-                if process == "service1":
-                    PARALLEL = True
                 pred_assignments, pred_topk_assignments, not_best_count, num_spans, per_span_candidates, unassigned = predictor.FindAssignments(
                     method, process, in_span_partitions, out_span_partitions, PARALLEL, instrumented_hops, true_assignments, invocation_graph
                 )

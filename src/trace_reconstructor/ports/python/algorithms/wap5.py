@@ -68,7 +68,6 @@ class WAP5(object):
                 x = FindPreviousDelay(t2[i], t1)
                 if x != -1:
                     new_samples.append(float(t2[i]) - x)
-            # mean = (sum(t2) - sum(t1)) / len(t1)
             if (ep1, ep2) not in self.samples:
                 self.samples[(ep1, ep2)] = []
             self.samples[(ep1, ep2)].extend(new_samples)
@@ -149,17 +148,9 @@ class WAP5(object):
 
     def GetEpPairCost(self, ep1, ep2, t1, t2):
         mean, std = self.services_times[(ep1, ep2)]
-        # print("mean, std:", mean, std)
         if std < 1.0e-12:
             std = 0.001
-        # !TODO uncomment next line
-        # p = scipy.stats.norm.logpdf(t2 - t1, loc=mean, scale=std)
-        # p = self.GetParetoPDF(t2 - t1, mean, std)
-        # p = self.GetLogNormalPDF(t2 - t1, mean, std)
         p = self.GetExponentialPDF(t2 - t1, mean, std)
-        # print(t2, t1)
-        # print("x:", t2-t1)
-        # print("p:", p)
         return p
         """
         # CDF
@@ -199,9 +190,6 @@ class WAP5(object):
             if VERBOSE:
                 print("Computing cost between", curr_ep, next_ep)
             cost += self.GetEpPairCost(curr_ep, next_ep, curr_time, next_time)
-            if assignment[i][1] in ["eg9d6u4jwelh6he6acx2fai6385q8br0", "3m6q1llsb1w49543sallcg07eyllj05n"]:
-                mean, std = self.services_times[(curr_ep, next_ep)]
-                print("Service times", curr_ep, next_ep, mean, std)
         return cost
 
     def FindMinCostAssignment(self, in_span, out_eps, out_span_partitions):
@@ -224,15 +212,9 @@ class WAP5(object):
             last_span = stack[-1]
             if i == len(out_span_partitions) + 1:
                 score = self.ScoreAssignment(stack)
-                if in_span[1] in ["eg9d6u4jwelh6he6acx2fai6385q8br0", "3m6q1llsb1w49543sallcg07eyllj05n"]:
-                    print("scores: ", [ii[1] for ii in stack], [ii[2] for ii in stack], score)
-                    # input()
                 if best_score < score:
                     best_assignment = stack
                     best_score = score
-                    # print("Picked:", [i[2] for i in stack])
-                    # print(score)
-                    # input()
             else:
                 #!TODO: filter out branches that have high cost
                 ep = out_eps[i - 1]
@@ -283,7 +265,6 @@ class WAP5(object):
             # remove spans of this assignment so they can't be assigned again
             #!TODO: this implementation is not efficient
             for ep, span in assignment.items():
-                # print(ep, in_span, span)
                 out_span_partitions[ep].remove(span)
 
     def BuildDistributions(self, incoming_spans, outgoing_spans_per_ep, out_ep):
@@ -292,7 +273,6 @@ class WAP5(object):
 
         for i, span in enumerate(spans):
             if span.span_kind == "client":
-                # print(i, span)
                 sent_mus = span.start_mus
                 parent_span = None
                 for j, preceding_span in reversed(list(enumerate(spans[:i]))):
@@ -320,7 +300,6 @@ class WAP5(object):
 
         for i, span in enumerate(spans):
             if span.span_kind == "client":
-                # print(i, span)
                 sent_mus = span.start_mus
                 candidate_parent_spans = []
                 for j, preceding_span in reversed(list(enumerate(spans[:i]))):

@@ -25,16 +25,12 @@ test_name_suffix = sys.argv[2]
 output_file_name = sys.argv[3]
 
 def plot_lines(xs, ys, labels, xlabel, ylabel, outfile):
-    # create plot
     fig, ax = plt.subplots()
-    #ax.set_xscale("log", basex=2)
-    #ax.set_yscale("log", basey=2)
     nlines = len(xs)
     assert (len(ys) == nlines and len(labels) == nlines)
     for i in range(nlines):
         pcolor = pcolors[i]
         ax.plot(xs[i], ys[i], '-', color=pcolor,  lw=2.5,  marker=markers[i], mew = 1.5, fillstyle="full", markersize = 9, markeredgecolor=pcolor, dash_capstyle='round', label=labels[i], zorder=10, clip_on=False)
-        #ax.plot(xs[i], ys[i], '-', color=pcolor,  lw=2.5,  dash_capstyle='round', label=labels[i])
 
     label_fontsize=20
     ax.set_xlabel(xlabel, fontproperties=gs_font, fontsize=label_fontsize)
@@ -43,21 +39,12 @@ def plot_lines(xs, ys, labels, xlabel, ylabel, outfile):
     xmax, ymax = 200, 60
     plt.xlim(xmax=100.0)
     plt.ylim(ymin=0, ymax=100.0)
-    #plt.annotate('correct prediction', xy=(0.45, 0.90), xycoords='axes fraction', fontsize=label_fontsize)
-    #ax.axhspan(0.0, xmax, alpha=0.6, color='grey')
     ax.grid(linestyle=':', linewidth=1, color='grey')
     ticklabelcolor = 'black'
-    #xticks = np.array([300, 1200, 4800, 19200, 76800])
-    #ax.xaxis.set_ticks(xticks)
-    #xticks = np.array([string(x) for x in xticks])
-    #ax.set_xticklabels(xticks, color=ticklabelcolor)
     handles, labels = plt.gca().get_legend_handles_labels()
     handles, labels = zip(*[ (handles[i], labels[i]) for i in sorted(range(len(handles)), key=lambda k: list(labels)[k])])
-    # print(labels)
-    # order = [2,3,4,0,1]
     order = [2, 1, 3, 4, 0]
     leg = ax.legend([handles[idx] for idx in order],[labels[idx] for idx in order], bbox_to_anchor=(0.1, 0.55), borderaxespad=0, loc=2, numpoints=2, handlelength=2, prop=gs_font, fontsize=label_fontsize)
-    # leg = ax.legend(handles,labels, bbox_to_anchor=(0.28, 0.45), borderaxespad=0, loc=2, numpoints=2, handlelength=2, prop=gs_font, fontsize=label_fontsize)
     leg.get_frame().set_linewidth(0.0)
     plt.tick_params(labelsize=label_fontsize)
     axcolor='black'

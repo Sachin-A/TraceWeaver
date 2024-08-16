@@ -41,10 +41,6 @@ class Timing2(Timing):
                 self.AddToCandidatesList(stack)
                 if self.parallel:
                     score = self.ScoreAssignmentParallel(stack)
-                    # if in_span.GetId() == ("6f6def166e4f4221", "6f6def166e4f4221"):
-                    #     print(stack)
-                    #     print(score)
-                    #     input()
                 else:
                     score = self.ScoreAssignmentSequential(stack)
                 # min heap
@@ -63,12 +59,6 @@ class Timing2(Timing):
                 for s in out_span_partitions[ep]:
                     # parallel eps
                     if self.parallel:
-                        # if (
-                        #     in_span.start_mus < s.start_mus
-                        #     and s.start_mus + s.duration_mus
-                        #     < in_span.start_mus + in_span.duration_mus
-                        # ):
-                        #     DfsTraverse(stack + [s])
                         # first ep
                         if (
                             i == 1
@@ -105,8 +95,6 @@ class Timing2(Timing):
                             DfsTraverse(stack + [s])
         DfsTraverse([in_span])
         top_assignments.sort(reverse=True)
-        # print(top_assignments)
-        # input()
         return top_assignments
 
     def GetSpanIDNotation(self, out_eps, assignment, type1):
@@ -134,7 +122,6 @@ class Timing2(Timing):
         ep, in_spans = list(in_span_partitions.items())[0]
         out_eps = self.GetOutEpsInOrder(out_span_partitions)
         out_span_partitions_copy = copy.deepcopy(out_span_partitions)
-        #!TODO: make this dynamic
         batch_size = 100
         batch_size_mis = 30
         topK = 5
@@ -202,8 +189,6 @@ class Timing2(Timing):
             mis = self.GetMIS(G)
         else:
             return mis_assignments
-        #mis = self.GetWeightedMIS(G, "weight")
-        #print("MIS- num assigned: %d/%d" % (len(mis), len(top_assignments)))
         for in_span_ind, a_ind in mis:
             score, a = top_assignments[in_span_ind][a_ind]
             mis_assignments[in_span_ind] = a
@@ -215,7 +200,6 @@ class Timing2(Timing):
             for i1 in range(len(top_assignments[ind1])):
                 aid1 = (ind1, i1)
                 score = top_assignments[ind1][i1][0]
-                #!TODO: 10000 is sort of arbitrary to offset negative scores
                 G.add_node(aid1, weight=10000.0 + score)
                 # add edges from previous assignments for the same incoming span
                 for i0 in range(0, i1):
@@ -249,7 +233,6 @@ class Timing2(Timing):
         for i in range(20000):
             mis = nx.maximal_independent_set(G)
             score = sum([G.nodes[n]['weight'] for n in mis])
-            #score = len(mis)
             if best_mis is None or score > best_score:
                 best_mis = mis
                 best_score = score
