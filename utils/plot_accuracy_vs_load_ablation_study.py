@@ -1,13 +1,13 @@
 import os
-import sys
 import pickle
-import numpy as np
+import sys
+import warnings
 
 import matplotlib
-import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
+import matplotlib.pyplot as plt
+import numpy as np
 
-import warnings
 warnings.filterwarnings("ignore")
 
 pcolors = ['#000080', '#008000', '#990000', '#a5669f',  '#db850d',  '#00112d']
@@ -81,7 +81,7 @@ for i in range(len(methods)):
     for j in range(len(loads)):
         p = []
         for k in range(len(apps)):
-            with open(results_directory + "accuracy_" + str(loads[j]) + "_" + apps[k] + "_" + test_name_suffix + "_0.0.pickle", 'rb') as afile:
+            with open(results_directory + "accuracy_" + apps[k] + "_" + test_name_suffix + "_" + str(loads[j]) + "_1_1_0.0.pickle", 'rb') as afile:
                 accuracy_load = pickle.load(afile)
             p.append(accuracy_load[methods[i]])
         x.append((loads[j] * 100) / 150)

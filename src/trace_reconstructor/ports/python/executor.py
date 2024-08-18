@@ -1,38 +1,38 @@
-import os
-import sys
-import json
-import time
-import math
-import copy
-import random
-import pickle
-import string
-import shutil
 import argparse
-import numpy as np
-import networkx as nx
-from scipy import stats
-from pathlib import Path
 import concurrent.futures
+import copy
+import json
+import math
+import os
+import pickle
+import random
+import shutil
+import string
+import sys
+import time
+from pathlib import Path
+
 import _pickle as cPickle
-from deepdiff import DeepDiff
 import matplotlib.pyplot as plt
+import networkx as nx
+import numpy as np
+from deepdiff import DeepDiff
 from matplotlib.table import Table
+from scipy import stats
 
 import config
-from spans import Span
 import helpers.misc as misc
-import helpers.utils as utils
 import helpers.transforms as transforms
-
-from algorithms.fcfs import FCFS
+import helpers.utils as utils
 from algorithms.arrival_order import ArrivalOrder
-from algorithms.vpath import vPath
-from algorithms.wap5 import WAP5
-from algorithms.deepflow import DeepFlow
+from algorithms.fcfs import FCFS
 from algorithms.timing import Timing
 from algorithms.timing2 import Timing2
 from algorithms.timing3 import Timing3
+from algorithms.vpath import vPath
+from algorithms.vpath_old import vPathOld
+from algorithms.wap5 import WAP5
+from spans import Span
 
 cg_booleans = []
 
@@ -892,8 +892,8 @@ predictors = [
     ("WAP5", WAP5(all_spans, all_processes)),
     ("FCFS", FCFS(all_spans, all_processes)),
     ("ArrivalOrder", ArrivalOrder(all_spans, all_processes)),
+    ("vPathOld", vPathOld(all_spans, all_processes)),
     ("vPath", vPath(all_spans, all_processes)),
-    ("DeepFlow", DeepFlow(all_spans, all_processes)),
     ("MaxScoreBatchParallelWithoutIterations", Timing3(all_spans, all_processes)),
     ("MaxScoreBatchParallel", Timing3(all_spans, all_processes)),
     ("MaxScoreBatchSubsetWithSkips", Timing3(all_spans, all_processes)),
@@ -1232,13 +1232,13 @@ else:
 for key in accuracy_overall.keys():
     print("End-to-end accuracy for method %s: %.3f%%" % (key, accuracy_overall[key]))
 
-with open(RESULTS_DIR + 'bin_acc' + "_" + str(LOAD_LEVEL) + "_" + TEST_NAME + "_" + str(CACHE_RATE) + '.pickle', 'wb') as handle:
+with open(RESULTS_DIR + 'bin_acc' + "_" + TEST_NAME + "_" + str(LOAD_LEVEL) + "_" + str(int(COMPRESS_FACTOR)) + "_" + str(int(REPEAT_FACTOR)) + "_" + str(CACHE_RATE) + '.pickle', 'wb') as handle:
     pickle.dump(accuracy_percentile_bins, handle, protocol = pickle.HIGHEST_PROTOCOL)
-with open(RESULTS_DIR + 'accuracy' + "_" + str(LOAD_LEVEL) + "_" + TEST_NAME + "_" + str(CACHE_RATE) + '.pickle', 'wb') as handle:
+with open(RESULTS_DIR + 'accuracy' + "_" + TEST_NAME + "_" + str(LOAD_LEVEL) + "_" + str(int(COMPRESS_FACTOR)) + "_" + str(int(REPEAT_FACTOR)) + "_" + str(CACHE_RATE) + '.pickle', 'wb') as handle:
     pickle.dump(accuracy_overall, handle, protocol = pickle.HIGHEST_PROTOCOL)
-with open(RESULTS_DIR + 'e2e' + "_" + str(LOAD_LEVEL) + "_" + TEST_NAME + "_" + str(CACHE_RATE) + '.pickle', 'wb') as handle:
+with open(RESULTS_DIR + 'e2e' + "_" + TEST_NAME + "_" + str(LOAD_LEVEL) + "_" + str(int(COMPRESS_FACTOR)) + "_" + str(int(REPEAT_FACTOR)) + "_" + str(CACHE_RATE) + '.pickle', 'wb') as handle:
     pickle.dump(traces_overall, handle, protocol = pickle.HIGHEST_PROTOCOL)
-with open(RESULTS_DIR + 'confidence_scores' + "_" + str(LOAD_LEVEL) + "_" + TEST_NAME + "_" + str(CACHE_RATE) + '.pickle', 'wb') as handle:
+with open(RESULTS_DIR + 'confidence_scores' + "_" + TEST_NAME + "_" + str(LOAD_LEVEL) + "_" + str(int(COMPRESS_FACTOR)) + "_" + str(int(REPEAT_FACTOR)) + "_" + str(CACHE_RATE) + '.pickle', 'wb') as handle:
     pickle.dump(confidence_scores_by_process, handle, protocol = pickle.HIGHEST_PROTOCOL)
-with open(RESULTS_DIR + 'process_acc' + "_" + str(LOAD_LEVEL) + "_" + TEST_NAME + "_" + str(CACHE_RATE) + '.pickle', 'wb') as handle:
+with open(RESULTS_DIR + 'process_acc' + "_" + TEST_NAME + "_" + str(LOAD_LEVEL) + "_" + str(int(COMPRESS_FACTOR)) + "_" + str(int(REPEAT_FACTOR)) + "_" + str(CACHE_RATE) + '.pickle', 'wb') as handle:
     pickle.dump(accuracy_per_process, handle, protocol = pickle.HIGHEST_PROTOCOL)

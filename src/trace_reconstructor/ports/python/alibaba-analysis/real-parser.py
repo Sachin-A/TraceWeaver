@@ -1,14 +1,14 @@
-import os
-import csv
 import copy
+import csv
 import json
-import shutil
+import os
 import random
+import shutil
 import string
 import tarfile
+from distutils.version import LooseVersion
 from pathlib import Path
 from pprint import pprint
-from distutils.version import LooseVersion
 
 search_strings = ["(?)", "NAN", "nan", ""]
 

@@ -1,6 +1,7 @@
 import copy
-import config
 import pickle
+
+import config
 
 def SortPartitionsByTraceId(span_partitions):
     for ep, part in span_partitions.items():

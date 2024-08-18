@@ -32,8 +32,8 @@ mkdir -p $results_directory
 # ["WAP5", "WAP5(all_spans, all_processes)"],
 # ["FCFS", "FCFS(all_spans, all_processes)"],
 # ["ArrivalOrder", "ArrivalOrder(all_spans, all_processes)"],
+# ["vPathOld", "vPathOld(all_spans, all_processes)"],
 # ["vPath", "vPath(all_spans, all_processes)"],
-# ["DeepFlow", "DeepFlow(all_spans, all_processes)"],
 # ["MaxScoreBatchParallelWithoutIterations", "Timing3(all_spans, all_processes)"],
 # ["MaxScoreBatchParallel", "Timing3(all_spans, all_processes)"],
 # ["MaxScoreBatchSubsetWithSkips", "Timing3(all_spans, all_processes)"]
@@ -67,5 +67,5 @@ wait
 
 echo "All tests have concluded."
 
-output_file_name_1="$results_directory/fig2.pdf"
+output_file_name_1="$results_directory/fig4c.pdf"
 python3.11 "$root/utils/plot_accuracy_vs_cache_hit_rate.py" $results_directory $test_name_suffix $output_file_name_1

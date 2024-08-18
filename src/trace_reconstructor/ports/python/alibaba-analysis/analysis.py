@@ -1,8 +1,9 @@
-import os
-import sys
 import json
+import os
 import shutil
+import sys
 import tarfile
+
 import matplotlib.pyplot as plt
 from algorithms.fcfs import FCFS
 from algorithms.fcfs2 import FCFS2

@@ -1,12 +1,13 @@
 #!/usr/bin/python
 
 from __future__ import print_function
+
+import argparse
+import ctypes as ct
+
+import chardet
 from bcc import BPF
 from bcc.utils import printb
-
-import ctypes as ct
-import chardet
-import argparse
 
 MAX_MSG_SIZE = 30720
 CHUNK_LIMIT = 4

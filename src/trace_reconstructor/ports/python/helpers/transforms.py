@@ -1,9 +1,11 @@
 import copy
 import random
 import string
+
 import numpy as np
-from spans import Span
+
 from helpers.utils import *
+from spans import Span
 
 def repeat_change_spans(in_span_partitions, out_span_partitions, repeat_factor, compress_factor):
     if repeat_factor == 1 and compress_factor == 1:

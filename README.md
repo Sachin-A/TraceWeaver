@@ -8,7 +8,7 @@ The project is organized as follows:
 
 ```src/``` The main traceweaver algorithm as well as baselines are provided within ```src/```.
 
-```data/``` For convenience, trace data collected from each application is made available within the ```data/``` directory. The trace data is converted to standard JSON format as supported by the Jaeger tracing framework.
+```data/``` For convenience, trace data collected from each application is made available within the ```data/``` directory. The trace data is converted to standard JSON format as supported by the Jaeger tracing framework. Please ensure at least 100 GB of space on your local node to store the traces once extracted.
 
 ```exps/``` The experiments folder contain one sub-directory per experiment mentioned in the paper. The provided bash scripts execute the experiments mentioned in the paper from scratch using traces from ```data/```.
 
@@ -19,6 +19,21 @@ The project is organized as follows:
 # Setup
 
 ### Installation
+
+Please ensure git is installed locally on your machine. For some large datasets (e.g., ```data/alibaba_microservices/```), Git LFS is needed to manage and track changes. Please install it in the following way.
+
+    # On macOS
+    brew install git-lfs
+
+    # On Debian/Ubuntu
+    sudo apt-get install git-lfs
+
+    # On Windows (using Chocolatey)
+    choco install git-lfs
+
+And initialize Git LFS locally by doing
+
+    git lfs install
 
 To clone this repository, run:
 
@@ -39,10 +54,11 @@ Now install all dependencies within the virtual environment:
 
 	pip install -r requirements.txt
 
+Finally, proceed to ```exps/exp*``` to re-run each experiment (README within exps/ has more details).
+
 ### Gurobi License
 
 In order to use the Gurobi Solver invoked by TraceWeaver, a Gurobi Academic license is required. Please follow instructions at this link ([Academic Named-User License](https://www.gurobi.com/features/academic-named-user-license/)) to set up your Gurobi license and environment variables before exercising the code.
-
 
 # Status
 Note that this artifact is still being updated. We are making the source code available now, but some functionality is being updated from our private development. In addition, we plan to provide more detailed instructions to run the benchmarks, some of which relies on large preprocessed datasets from the Alibaba cluster.

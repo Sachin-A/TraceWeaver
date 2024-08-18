@@ -1,25 +1,27 @@
+import bisect
+import copy
+import hashlib
+import heapq
+import math
+import random
+import string
 import sys
 import time
-import math
-import copy
-import heapq
-import bisect
-import hashlib
-import numpy as np
-import scipy.stats
-import random, string
-import networkx as nx
-from spans import Span
-from pygmmis import GMM
-import scipy.sparse as sp
-import helpers.misc as misc
-from sklearn import mixture
-import helpers.utils as utils
-import matplotlib.pyplot as plt
-from algorithms.timing import Timing
-from networkx.algorithms import approximation
 
 import gurobi_optimods.mwis as gurobi_mwis
+import helpers.misc as misc
+import helpers.utils as utils
+import matplotlib.pyplot as plt
+import networkx as nx
+import numpy as np
+import scipy.sparse as sp
+import scipy.stats
+from networkx.algorithms import approximation
+from pygmmis import GMM
+from sklearn import mixture
+from spans import Span
+
+from algorithms.timing import Timing
 
 VERBOSE = False
 EPS = 1e-6

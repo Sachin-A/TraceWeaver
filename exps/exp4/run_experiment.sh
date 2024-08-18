@@ -31,8 +31,8 @@ mkdir -p $results_directory
 # ["WAP5", "WAP5(all_spans, all_processes)"],
 # ["FCFS", "FCFS(all_spans, all_processes)"],
 # ["ArrivalOrder", "ArrivalOrder(all_spans, all_processes)"],
+# ["vPathOld", "vPathOld(all_spans, all_processes)"],
 # ["vPath", "vPath(all_spans, all_processes)"],
-# ["DeepFlow", "DeepFlow(all_spans, all_processes)"],
 # ["MaxScoreBatchParallelWithoutIterations", "Timing3(all_spans, all_processes)"],
 # ["MaxScoreBatchParallel", "Timing3(all_spans, all_processes)"],
 # ["MaxScoreBatchSubsetWithSkips", "Timing3(all_spans, all_processes)"]

@@ -31,8 +31,8 @@ mkdir -p $results_directory
 # ["WAP5", "WAP5(all_spans, all_processes)"],
 # ["FCFS", "FCFS(all_spans, all_processes)"],
 # ["ArrivalOrder", "ArrivalOrder(all_spans, all_processes)"],
+# ["vPathOld", "vPathOld(all_spans, all_processes)"],
 # ["vPath", "vPath(all_spans, all_processes)"],
-# ["DeepFlow", "DeepFlow(all_spans, all_processes)"],
 # ["MaxScoreBatchParallelWithoutIterations", "Timing3(all_spans, all_processes)"],
 # ["MaxScoreBatchParallel", "Timing3(all_spans, all_processes)"],
 # ["MaxScoreBatchSubsetWithSkips", "Timing3(all_spans, all_processes)"]
@@ -71,8 +71,8 @@ wait
 
 echo "All tests have concluded."
 
-output_file_name_1="$results_directory/fig1a.pdf"
+output_file_name_1="$results_directory/fig4a.pdf"
 python3.11 "$root/utils/plot_accuracy_vs_load_multiple_apps.py" $results_directory $test_name_suffix $output_file_name_1
 
-output_file_name_2="$results_directory/fig1b.pdf"
+output_file_name_2="$results_directory/fig4b.pdf"
 python3.11 "$root/utils/plot_accuracy_vs_response_times_multiple_apps.py" $results_directory $test_name_suffix $output_file_name_2

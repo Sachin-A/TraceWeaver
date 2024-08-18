@@ -1,13 +1,13 @@
 import os
-import sys
 import pickle
-import numpy as np
+import sys
+import warnings
 
 import matplotlib
-import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
+import matplotlib.pyplot as plt
+import numpy as np
 
-import warnings
 warnings.filterwarnings("ignore")
 
 pcolors = ['#008000', '#990000', '#a5669f',  '#db850d',  '#00112d']
@@ -81,15 +81,12 @@ for i in range(len(methods)):
     x = []
     y = []
     for j in range(len(cache_hit_levels)):
-        with open(results_directory + "accuracy_" + str(load) + "_" + test_name_suffix + "_" + str(cache_hit_levels[j]) + ".pickle", 'rb') as afile:
+        with open(results_directory + "accuracy_" + test_name_suffix + "_" + str(load) + "_1_1_" + str(cache_hit_levels[j]) + ".pickle", 'rb') as afile:
             accuracy_load = pickle.load(afile)
         x.append((j) * 5)
         y.append(accuracy_load[methods[i]])
     xs.append(x)
     ys.append(y)
-
-print(xs)
-print(ys)
 
 methods = ["TraceWeaver", "WAP5", "FCFS"]
 plot_lines(xs, ys, methods, "Cache %", "Accuracy %", output_file_name)

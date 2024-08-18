@@ -1,10 +1,10 @@
-import re
-import h2.connection
-import h2.config
 import codecs
 import logging
-
+import re
 from enum import Enum
+
+import h2.config
+import h2.connection
 
 class Direction(Enum):
     INGRESS = 1
@@ -566,6 +566,7 @@ for k1 in per_trace_id:
     y.append(e)
 
 from sklearn.model_selection import train_test_split
+
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
 
 from sklearn.linear_model import LogisticRegression

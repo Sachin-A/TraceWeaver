@@ -1,7 +1,8 @@
+import copy
 import math
 import statistics
+
 import scipy.stats
-import copy
 
 VERBOSE = False
 ERROR_WINDOW = False #True

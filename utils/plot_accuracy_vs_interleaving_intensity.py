@@ -1,11 +1,11 @@
 import os
-import sys
 import pickle
-import numpy as np
+import sys
 
 import matplotlib
-import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
+import matplotlib.pyplot as plt
+import numpy as np
 
 pcolors = ['#008000', '#a5669f']
 markers = ['o', '^']
@@ -70,13 +70,13 @@ xs = []
 ys = []
 loads = [50]
 apps = ["node"]
-methods = ["MaxScoreBatchSubsetWithSkips", "DeepFlow"]
+methods = ["MaxScoreBatchSubsetWithSkips", "vPath"]
 interleaving_rate = [0, 0.2, 0.4, 0.6, 0.8, 1]
 for i in range(len(methods)):
     x = []
     y = []
     for j in range(len(interleaving_rate)):
-        with open(results_directory + "accuracy_" + str(loads[0]) + "_" + apps[0] + "_" + str(interleaving_rate[j]) + "_" + test_name_suffix + "_0.0.pickle", 'rb') as afile:
+        with open(results_directory + "accuracy_" + apps[0] + "_" + str(interleaving_rate[j]) + "_" + test_name_suffix + "_" + str(loads[0]) + "_1_1_0.0.pickle", 'rb') as afile:
             accuracy_load = pickle.load(afile)
             y.append(accuracy_load[methods[i]] * (1))
     xs.append(["1", "2", "3", "4", "5", "6"])

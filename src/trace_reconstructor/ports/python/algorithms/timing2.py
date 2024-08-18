@@ -1,11 +1,13 @@
-import math
-import scipy.stats
-from algorithms.timing import Timing
 import copy
-import sys
-import networkx as nx
 import heapq
+import math
+import sys
+
+import networkx as nx
+import scipy.stats
 from networkx.algorithms import approximation
+
+from algorithms.timing import Timing
 
 VERBOSE = False
 

@@ -1,12 +1,12 @@
-import os
-import sys
-import pickle
 import argparse
+import os
+import pickle
+import sys
 
 sys.path.append("..")
 
-from trace_reconstructor.ports.python.spans import Span
 from trace_reconstructor.ports.python.helpers.misc import get_project_root
+from trace_reconstructor.ports.python.spans import Span
 
 parser = argparse.ArgumentParser(
         description='Execute query: Identify service contributing most\

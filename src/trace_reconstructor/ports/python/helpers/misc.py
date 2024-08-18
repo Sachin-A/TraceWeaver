@@ -1,6 +1,7 @@
 import inspect
+import random
+import string
 import tarfile
-import random, string
 from pathlib import Path
 
 def get_project_root() -> Path:

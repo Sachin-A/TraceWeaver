@@ -1,8 +1,9 @@
-import math
 import copy
-import scipy.stats
-import numpy as np
+import math
+
 import networkx as nx
+import numpy as np
+import scipy.stats
 from sklearn import mixture
 
 VERBOSE = False

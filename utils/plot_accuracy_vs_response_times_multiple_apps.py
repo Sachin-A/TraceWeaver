@@ -1,13 +1,13 @@
 import os
-import sys
 import pickle
-import numpy as np
+import sys
+import warnings
 
 import matplotlib
-import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
+import matplotlib.pyplot as plt
+import numpy as np
 
-import warnings
 warnings.filterwarnings("ignore")
 
 pcolors = ['#000080', '#008000', '#990000', '#a5669f',  '#db850d',  '#00112d']
@@ -74,7 +74,7 @@ def plot_lines(xs, ys, labels, xlabel, ylabel, outfile):
 
 xs = []
 ys = []
-methods = ["MaxScoreBatchSubsetWithSkipsTopK", "MaxScoreBatchSubsetWithSkips", "WAP5", "DeepFlow", "FCFS"]
+methods = ["MaxScoreBatchSubsetWithSkipsTopK", "MaxScoreBatchSubsetWithSkips", "WAP5", "vPath", "FCFS"]
 loads = [25, 50, 75, 100, 125, 150]
 apps = ["hotel", "media", "node"]
 
@@ -82,7 +82,7 @@ method_accuracy = {}
 for j in range(len(loads)):
     p = []
     for k in range(len(apps)):
-        with open(results_directory + "bin_acc_" + str(loads[j]) + "_" + apps[k] + "_" + test_name_suffix + "_0.0.pickle", 'rb') as afile:
+        with open(results_directory + "bin_acc_" + apps[k] + "_" + test_name_suffix + "_" + str(loads[j]) + "_1_1_0.0.pickle", 'rb') as afile:
             accuracy_percentile_bins = pickle.load(afile)
             for method, acc in accuracy_percentile_bins.items():
                 if method not in method_accuracy:
