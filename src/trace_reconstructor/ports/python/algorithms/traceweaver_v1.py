@@ -8,7 +8,7 @@ from sklearn import mixture
 
 VERBOSE = False
 
-class Timing(object):
+class TraceWeaverV1(object):
     def __init__(self, all_spans, all_processes):
         self.all_spans = all_spans
         self.all_processes = all_processes

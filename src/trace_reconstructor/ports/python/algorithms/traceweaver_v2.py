@@ -7,11 +7,11 @@ import networkx as nx
 import scipy.stats
 from networkx.algorithms import approximation
 
-from algorithms.timing import Timing
+from algorithms.traceweaver_v1 import TraceWeaverV1
 
 VERBOSE = False
 
-class Timing2(Timing):
+class TraceWeaverV2(TraceWeaverV1):
     def __init__(self, all_spans, all_processes):
         super().__init__(all_spans, all_processes)
         self.all_spans = all_spans

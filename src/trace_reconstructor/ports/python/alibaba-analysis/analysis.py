@@ -6,9 +6,9 @@ import tarfile
 
 import matplotlib.pyplot as plt
 from algorithms.fcfs import FCFS
-from algorithms.fcfs2 import FCFS2
-from algorithms.timing import Timing
-from algorithms.timing2 import Timing2
+from algorithms.arrival_order import ArrivalOrder
+from algorithms.traceweaver_v1 import TraceWeaverV1
+from algorithms.traceweaver_v2 import TraceWeaverV2
 
 def uncompress(output_path, source_file):
     tarfile_object = tarfile.open(source_file)

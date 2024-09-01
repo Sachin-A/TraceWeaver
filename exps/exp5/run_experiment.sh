@@ -43,17 +43,17 @@ mkdir -p $data_directory
 extract_tar_file
 
 # Predictor options
-# ["MaxScoreBatch", "Timing2(all_spans, all_processes)"],
-# ["MaxScoreBatchParallel", "Timing2(all_spans, all_processes)"],
-# ["MaxScore", "Timing(all_spans, all_processes)"],
-# ["WAP5", "WAP5(all_spans, all_processes)"],
-# ["FCFS", "FCFS(all_spans, all_processes)"],
-# ["ArrivalOrder", "ArrivalOrder(all_spans, all_processes)"],
-# ["vPathOld", "vPathOld(all_spans, all_processes)"],
-# ["vPath", "vPath(all_spans, all_processes)"],
-# ["MaxScoreBatchParallelWithoutIterations", "Timing3(all_spans, all_processes)"],
-# ["MaxScoreBatchParallel", "Timing3(all_spans, all_processes)"],
-# ["MaxScoreBatchSubsetWithSkips", "Timing3(all_spans, all_processes)"]
+# ("MaxScoreBatch", TraceWeaverV2(all_spans, all_processes))
+# ("MaxScoreBatchParallel", TraceWeaverV2(all_spans, all_processes))
+# ("MaxScore", TraceWeaverV1(all_spans, all_processes))
+# ("WAP5", WAP5(all_spans, all_processes))
+# ("FCFS", FCFS(all_spans, all_processes))
+# ("ArrivalOrder", ArrivalOrder(all_spans, all_processes))
+# ("vPathOld", vPathOld(all_spans, all_processes))
+# ("vPath", vPath(all_spans, all_processes))
+# ("MaxScoreBatchParallelWithoutIterations", TraceWeaverV3(all_spans, all_processes))
+# ("MaxScoreBatchParallel", TraceWeaverV3(all_spans, all_processes))
+# ("MaxScoreBatchSubsetWithSkips", TraceWeaverV3(all_spans, all_processes))
 
 predictor_indices="3,4,7,10"
 

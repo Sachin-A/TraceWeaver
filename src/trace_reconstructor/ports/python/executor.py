@@ -26,9 +26,9 @@ import helpers.transforms as transforms
 import helpers.utils as utils
 from algorithms.arrival_order import ArrivalOrder
 from algorithms.fcfs import FCFS
-from algorithms.timing import Timing
-from algorithms.timing2 import Timing2
-from algorithms.timing3 import Timing3
+from algorithms.traceweaver_v1 import TraceWeaverV1
+from algorithms.traceweaver_v2 import TraceWeaverV2
+from algorithms.traceweaver_v3 import TraceWeaverV3
 from algorithms.vpath import vPath
 from algorithms.vpath_old import vPathOld
 from algorithms.wap5 import WAP5
@@ -152,7 +152,7 @@ def topological_sort_grouped(G):
 def FindConstraintsUsingFit(in_span_partitions, out_span_partitions, gt_invocation_graph, args):
     global cg_booleans
 
-    predictor = Timing3(all_spans, all_processes)
+    predictor = TraceWeaverV3(all_spans, all_processes)
 
     def test_fit_dag(candidate_invocation_graph):
         unassigned = predictor.FindAssignments(
@@ -886,17 +886,17 @@ if config.VERBOSE:
     print("\n\n\n")
 
 predictors = [
-    ("MaxScoreBatch", Timing2(all_spans, all_processes)),
-    ("MaxScoreBatchParallel", Timing2(all_spans, all_processes)),
-    ("MaxScore", Timing(all_spans, all_processes)),
+    ("MaxScoreBatch", TraceWeaverV2(all_spans, all_processes)),
+    ("MaxScoreBatchParallel", TraceWeaverV2(all_spans, all_processes)),
+    ("MaxScore", TraceWeaverV1(all_spans, all_processes)),
     ("WAP5", WAP5(all_spans, all_processes)),
     ("FCFS", FCFS(all_spans, all_processes)),
     ("ArrivalOrder", ArrivalOrder(all_spans, all_processes)),
     ("vPathOld", vPathOld(all_spans, all_processes)),
     ("vPath", vPath(all_spans, all_processes)),
-    ("MaxScoreBatchParallelWithoutIterations", Timing3(all_spans, all_processes)),
-    ("MaxScoreBatchParallel", Timing3(all_spans, all_processes)),
-    ("MaxScoreBatchSubsetWithSkips", Timing3(all_spans, all_processes)),
+    ("MaxScoreBatchParallelWithoutIterations", TraceWeaverV3(all_spans, all_processes)),
+    ("MaxScoreBatchParallel", TraceWeaverV3(all_spans, all_processes)),
+    ("MaxScoreBatchSubsetWithSkips", TraceWeaverV3(all_spans, all_processes)),
 ]
 
 predictors = [predictors[i] for i in PREDICTOR_INDICES if i < len(predictors)]
