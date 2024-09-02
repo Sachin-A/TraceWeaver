@@ -13,7 +13,7 @@
 
 ### Class template
 
-A custom algorithm must be described via a class with the following template which can be extended to suit the algorithm's needs (refer to fcfs.py for an example).
+A custom algorithm must be described via a class with the following template which can be extended to suit the algorithm's needs (refer to fcfs.py for an example). In practice, an object of CustomAlgorithm is instantiated within executor.py by passing the required dictionaries prepared by the executor script.
 
 ```
 class CustomAlgorithm(object):
@@ -51,6 +51,8 @@ class CustomAlgorithm(object):
 
         return result
 ```
+
+To map the spans for each process/ service within the system, the executor script invokes the CustomAlgorithm's FindAssignments method passing the following prepared inputs as arguments.
 
 ### Inputs
 
