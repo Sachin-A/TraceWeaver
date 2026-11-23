@@ -31,6 +31,41 @@ def GetGroundTruth(in_span_partitions, out_span_partitions):
                     break
     return true_assignments
 
+def GetGroundTruthByParent(in_span_partitions, out_span_partitions):
+    assert len(in_span_partitions) == 1
+    _, in_spans = list(in_span_partitions.items())[0]
+    true_assignments = {ep: {} for ep in out_span_partitions.keys()}
+    for ep, out_spans in out_span_partitions.items():
+        for span in out_spans:
+            if span.references[0] not in true_assignments[ep]:
+                true_assignments[ep][span.references[0]] = span.GetId()
+    for in_span in in_spans:
+        for ep in out_span_partitions.keys():
+            if in_span.GetId() not in true_assignments[ep]:
+                true_assignments[ep][in_span.GetId()] = ('Skip', 'Skip')
+    return true_assignments
+
+def UnassignedAsSkip(assignments):
+    for ep in assignments.keys():
+        for in_span_id, pred in assignments[ep].items():
+            if isinstance(pred, list):
+                assignments[ep][in_span_id] = [('Skip', 'Skip') if p == ("NA", "NA") else p for p in pred]
+            elif pred == ("NA", "NA"):
+                assignments[ep][in_span_id] = ('Skip', 'Skip')
+
+def AccuracyForCalls(pred_assignments, true_assignments):
+    cnt, total = 0, 0
+    for ep in true_assignments.keys():
+        for in_span_id, out_span_id in true_assignments[ep].items():
+            if out_span_id[0] == "Skip":
+                continue
+            pred = pred_assignments[ep].get(in_span_id)
+            if isinstance(pred, list):
+                pred = pred[0] if len(pred) == 1 else None
+            cnt += int(pred == out_span_id)
+            total += 1
+    return float(cnt) / total
+
 def AccuracyForSpan(pred_assignments, true_assignments, in_span_id):
     correct = True
     for ep in true_assignments.keys():

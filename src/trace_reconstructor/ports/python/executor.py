@@ -71,6 +71,8 @@ parser.add_argument('--clear_cache', type=int, required=False, default=0,
                     help='clear cache of processed, time-ordered file names')
 parser.add_argument('--predictor_indices', type=str, required=False, default='',
                     help='Comma-separated list of indices of algorithms to run')
+parser.add_argument('--multi_caller', type=str, required=False, default='skip', choices=['skip', 'merge'],
+                    help='services with several callers: skip them, or score them with the incoming spans of all callers in one partition')
 args = parser.parse_args()
 
 if args.relative_path is None and args.absolute_path is None:
@@ -96,6 +98,7 @@ COMPRESS_FACTOR = args.compress_factor
 EXECUTE_PARALLEL = args.execute_parallel
 RESULTS_DIR = args.results_directory.strip('\'')
 CLEAR_CACHE = bool(args.clear_cache)
+MULTI_CALLER = args.multi_caller
 
 try:
     PREDICTOR_INDICES = list(map(int, args.predictor_indices.split(',')))
@@ -211,10 +214,16 @@ def FindConstraintsUsingFit(in_span_partitions, out_span_partitions, gt_invocati
     # plt.show()
     return best_graph
 
+def MergeCallerPartitions(in_span_partitions):
+    spans = [span for part in in_span_partitions.values() for span in part]
+    spans.sort(key=lambda x: (x.start_mus, x.start_mus + x.duration_mus))
+    return {"+".join(sorted(in_span_partitions.keys())): spans}
+
 def FindOrder(in_span_partitions, out_span_partitions, true_assignments):
     assert len(in_span_partitions) == 1
 
     ep_in, in_spans = list(in_span_partitions.items())[0]
+    in_spans = [s for s in in_spans if all(true_assignments[ep][s.GetId()][0] != "Skip" for ep in out_span_partitions.keys())]
     order = set()
     out_eps = list(out_span_partitions.keys())
     G = nx.DiGraph()
@@ -946,19 +955,23 @@ def process_single_process(method, predictor, process_id, process, in_spans_by_p
         out_spans, lambda x: x.GetChildProcess(all_processes, all_spans)
     )
 
-    if len(in_span_partitions.keys()) > 1:
+    multi_caller = len(in_span_partitions.keys()) > 1
+    if multi_caller and MULTI_CALLER == "skip":
         return None, None, None, None, None, None, None, None, None
+    if multi_caller:
+        in_span_partitions = MergeCallerPartitions(in_span_partitions)
+    GetGroundTruth = utils.GetGroundTruthByParent if multi_caller else utils.GetGroundTruth
 
     PARALLEL = (method == "MaxScoreBatchParallel") or (method == "MaxScoreBatchParallelWithoutIterations")
 
     instrumented_hops = []
 
-    true_assignments = utils.GetGroundTruth(in_span_partitions, out_span_partitions)
+    true_assignments = GetGroundTruth(in_span_partitions, out_span_partitions)
     invocation_graph = FindOrder(in_span_partitions, out_span_partitions, true_assignments)
 
     if COMPRESS_FACTOR > 0:
         in_span_partitions, out_span_partitions = transforms.repeat_change_spans(in_span_partitions, out_span_partitions, REPEAT_FACTOR, load_factor)
-        true_assignments = utils.GetGroundTruth(in_span_partitions, out_span_partitions)
+        true_assignments = GetGroundTruth(in_span_partitions, out_span_partitions)
 
     if process == "frontend" and method not in ["MaxScoreBatch", "MaxScoreBatchParallel", "FCFS", "ArrivalOrder"]:
         true_assignments = transforms.create_cache_hits(true_assignments, in_span_partitions, out_span_partitions, cache_rate=CACHE_RATE)
@@ -990,6 +1003,10 @@ def process_single_process(method, predictor, process_id, process, in_spans_by_p
             method, process, in_span_partitions, out_span_partitions, PARALLEL, instrumented_hops, true_assignments
         )
 
+    if multi_caller:
+        utils.UnassignedAsSkip(pred_assignments)
+        if pred_topk_assignments is not None:
+            utils.UnassignedAsSkip(pred_topk_assignments)
     acc = utils.AccuracyForService(pred_assignments, true_assignments, in_span_partitions)
     if method == "MaxScoreBatchSubsetWithSkips":
         acc2 = utils.TopKAccuracyForService(pred_topk_assignments, true_assignments, in_span_partitions)
@@ -1123,9 +1140,14 @@ else:
             )
             print("Outgoing span partitions: ", process, out_span_partitions.keys())
 
-            if len(in_span_partitions.keys()) > 1:
+            multi_caller = len(in_span_partitions.keys()) > 1
+            if multi_caller and MULTI_CALLER == "skip":
                 print("SKIPPING THIS PROCESS:", process)
                 continue
+            if multi_caller:
+                print("MERGING CALLERS OF THIS PROCESS:", process)
+                in_span_partitions = MergeCallerPartitions(in_span_partitions)
+            GetGroundTruth = utils.GetGroundTruthByParent if multi_caller else utils.GetGroundTruth
 
             if method == "MaxScoreBatchParallel":
                 PARALLEL = True
@@ -1134,7 +1156,7 @@ else:
 
             instrumented_hops = []
 
-            true_assignments = utils.GetGroundTruth(in_span_partitions, out_span_partitions)
+            true_assignments = GetGroundTruth(in_span_partitions, out_span_partitions)
 
             copy_x = copy.deepcopy(in_span_partitions)
             copy_y = copy.deepcopy(out_span_partitions)
@@ -1145,7 +1167,7 @@ else:
             ep_in = list(in_span_partitions.keys())[0]
             if COMPRESS_FACTOR > 1:
                 in_span_partitions, out_span_partitions = transforms.repeat_change_spans(in_span_partitions, out_span_partitions, REPEAT_FACTOR, load_factor)
-                true_assignments = utils.GetGroundTruth(in_span_partitions, out_span_partitions)
+                true_assignments = GetGroundTruth(in_span_partitions, out_span_partitions)
 
             if process == "frontend" and (method != "MaxScoreBatch" or method != "MaxScoreBatchParallel" or method !=  "FCFS" or method !=  "ArrivalOrder"):
                 print("cache %: ", float(CACHE_RATE) * 100)
@@ -1188,6 +1210,11 @@ else:
 
             print("--- %s seconds ---" % (time.time() - start_time))
 
+            if multi_caller:
+                utils.UnassignedAsSkip(pred_assignments)
+                if method == "MaxScoreBatchSubsetWithSkips":
+                    utils.UnassignedAsSkip(pred_topk_assignments)
+                print("Call accuracy for service %s: %.3f%%" % (process, utils.AccuracyForCalls(pred_assignments, true_assignments) * 100))
             acc = utils.AccuracyForService(pred_assignments, true_assignments, in_span_partitions)
             print("Accuracy for service %s: %.3f%%\n" % (process, acc * 100))
             if method == "MaxScoreBatchSubsetWithSkips":
