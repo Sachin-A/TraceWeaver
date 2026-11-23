@@ -259,7 +259,7 @@ class TraceWeaverV1(object):
     def ScoreAssignmentAsPerInvocationGraph(self, assignment, invocation_graph, out_eps, sub_scores, normalized = False):
 
         if self.AllSkip2(assignment):
-            return 0
+            return 0, sub_scores
 
         def FindValidAncestor(ep):
 
@@ -305,6 +305,8 @@ class TraceWeaverV1(object):
         cost = 0
         num_mappings = 0
         first_ep, first_span = assignment[0]
+        if first_span.ep is not None:
+            first_ep = first_span.ep
 
         assignment_without_skips = []
         for a in assignment:
