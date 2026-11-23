@@ -49,6 +49,8 @@ class Span(object):
         return len(self.references) == 0
 
     def __lt__(self, other):
+        if isinstance(self.start_mus, str) or isinstance(other.start_mus, str):
+            return not isinstance(self.start_mus, str) and isinstance(other.start_mus, str)
         return self.start_mus < other.start_mus
 
     def __repr__(self):
