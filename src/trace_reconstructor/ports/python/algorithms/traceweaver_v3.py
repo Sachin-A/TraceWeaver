@@ -16,6 +16,7 @@ import networkx as nx
 import numpy as np
 import scipy.sparse as sp
 import scipy.stats
+from scipy.optimize import Bounds, LinearConstraint, milp
 from networkx.algorithms import approximation
 from pygmmis import GMM
 from sklearn import mixture
@@ -1392,6 +1393,19 @@ class TraceWeaverV3(TraceWeaverV1):
         return best_mis
         # return get_mwis(graph_copy)
 
+    def HiGHS_MIS(self, adjacency_matrix, weights):
+        edges = sp.coo_array(adjacency_matrix)
+        n = len(weights)
+        constraints = []
+        if edges.nnz > 0:
+            rows = np.repeat(np.arange(edges.nnz), 2)
+            cols = np.column_stack([edges.row, edges.col]).ravel()
+            A = sp.csr_matrix((np.ones(2 * edges.nnz), (rows.astype(np.int32), cols.astype(np.int32))), shape=(edges.nnz, n))
+            constraints = [LinearConstraint(A, ub=1)]
+        res = milp(c=-weights, constraints=constraints, integrality=np.ones(n), bounds=Bounds(0, 1), options={"mip_rel_gap": 0})
+        assert res.success, res.message
+        return np.flatnonzero(res.x > 0.5)
+
     def Gurobi_MIS(self, G):
 
         '''
@@ -1409,9 +1423,9 @@ class TraceWeaverV3(TraceWeaverV1):
         for i in range(1):
             try:
                 mwis = gurobi_mwis.maximum_weighted_independent_set(adjacency_matrix, weights, verbose=False)
-            except:
-                print("Gurobi MIS error!")
-                assert False
+            except Exception as e:
+                print("Gurobi MIS error, using HiGHS instead:", e)
+                mwis = self.HiGHS_MIS(adjacency_matrix, weights)
             score = sum([G.nodes[tuple(nodes_list[n])]['weight'] for n in mwis])
             if best_mwis is None or score > best_score:
                 best_mwis = [tuple(nodes_list[n]) for n in mwis]
